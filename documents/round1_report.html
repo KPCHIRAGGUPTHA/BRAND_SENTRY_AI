@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BrandSentry AI – Round 1 | K P Chirag Guptha | 24MIS0369</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap');
+@page { size: A4 portrait; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent:#4F6EF7; --accent2:#7C3AED; --ok:#10B981; --warn:#F59E0B;
+  --danger:#EF4444; --dark:#0F172A; --dark2:#1E293B; --mid:#334155;
+  --muted:#94A3B8; --border:#E2E8F0; --light:#F8FAFC;
+}
+html { font-size: 9.5pt; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+  background: #e5e7eb; color: var(--dark); line-height: 1.55;
+}
+.page {
+  width: 210mm; height: 297mm;
+  margin: 6mm auto; background: #fff;
+  overflow: hidden; position: relative;
+  page-break-after: always; break-after: page;
+}
+@media print {
+  body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+}
+
+/* ─── COVER ─── */
+.cover {
+  width:210mm; height:297mm;
+  background: #0a0f1e;
+  background-image: linear-gradient(150deg,#0a0f1e 0%,#111827 55%,#0d1528 100%);
+  display:flex; flex-direction:column; color:#fff; overflow:hidden; position:relative;
+}
+.orb1 { position:absolute; width:280px; height:280px; border-radius:50%; background:radial-gradient(circle,rgba(79,110,247,.22) 0%,transparent 70%); top:-70px; right:-50px; }
+.orb2 { position:absolute; width:220px; height:220px; border-radius:50%; background:radial-gradient(circle,rgba(124,58,237,.18) 0%,transparent 70%); bottom:30px; left:-50px; }
+.orb3 { position:absolute; width:150px; height:150px; border-radius:50%; background:radial-gradient(circle,rgba(79,110,247,.12) 0%,transparent 70%); bottom:100px; right:30px; }
+
+.c-topbar { display:flex; justify-content:space-between; align-items:center; padding:8mm 13mm 6mm; border-bottom:1px solid rgba(255,255,255,.07); position:relative; z-index:2; }
+.c-badge  { display:flex; align-items:center; gap:7px; background:rgba(79,110,247,.15); border:1px solid rgba(79,110,247,.4); border-radius:20px; padding:4px 14px; font-size:7.5pt; font-weight:600; color:#93C5FD; letter-spacing:.5px; }
+.c-badge .dot { width:7px; height:7px; background:#4F6EF7; border-radius:50%; }
+.c-reg { font-size:7pt; color:rgba(255,255,255,.4); font-weight:500; }
+
+.c-hero { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:5mm 15mm 3mm; position:relative; z-index:2; }
+.c-logo { width:65px; height:65px; background:linear-gradient(135deg,#4F6EF7,#7C3AED); border-radius:18px; display:flex; align-items:center; justify-content:center; font-size:28px; box-shadow:0 12px 40px rgba(79,110,247,.5); margin-bottom:5mm; }
+.c-overtitle { font-size:7.5pt; font-weight:600; color:#6EA0FF; letter-spacing:3.5px; text-transform:uppercase; margin-bottom:3mm; }
+.c-title { font-size:33pt; font-weight:900; color:#fff; line-height:1.05; margin-bottom:3mm; letter-spacing:-0.5px; }
+.c-desc { font-size:9.5pt; color:rgba(255,255,255,.55); max-width:125mm; line-height:1.5; margin-bottom:6mm; }
+
+.c-pills { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:6mm; }
+.c-pill { background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:20px; padding:3px 10px; font-size:7.3pt; color:rgba(255,255,255,.72); font-weight:500; }
+
+.c-divider { width:50px; height:3px; background:linear-gradient(90deg,#4F6EF7,#7C3AED); border-radius:2px; margin:0 auto 6mm; }
+
+/* Participant card */
+.c-participant {
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:12px; padding:5mm 7mm;
+  width:100%; max-width:150mm; margin:0 auto 5mm;
+  display:grid; grid-template-columns:1fr 1fr; gap:3mm;
+}
+.c-prow { display:flex; flex-direction:column; gap:1mm; }
+.c-prow .lbl { font-size:6.3pt; color:rgba(255,255,255,.38); text-transform:uppercase; letter-spacing:.8px; }
+.c-prow .val { font-size:8pt; font-weight:600; color:#fff; }
+.c-prow.full { grid-column:1/-1; }
+
+.c-meta { display:grid; grid-template-columns:1fr 1fr 1fr; gap:7px; width:100%; max-width:150mm; margin:0 auto; }
+.c-meta-card { background:rgba(79,110,247,.12); border:1px solid rgba(79,110,247,.25); border-radius:9px; padding:6px 9px; text-align:center; }
+.c-meta-card .lbl { font-size:6.3pt; color:rgba(255,255,255,.4); text-transform:uppercase; letter-spacing:.7px; margin-bottom:2px; }
+.c-meta-card .val { font-size:8pt; font-weight:700; color:#fff; }
+
+.c-footer { padding:5mm 13mm; border-top:1px solid rgba(255,255,255,.07); display:flex; justify-content:space-between; font-size:7pt; color:rgba(255,255,255,.32); position:relative; z-index:2; }
+
+/* ─── INNER PAGES ─── */
+.pg { width:210mm; height:297mm; padding:10mm 13mm 8mm; display:flex; flex-direction:column; overflow:hidden; }
+.ph { display:flex; justify-content:space-between; align-items:center; margin-bottom:5mm; padding-bottom:3mm; border-bottom:2px solid var(--border); flex-shrink:0; }
+.ph-brand { display:flex; align-items:center; gap:6px; font-size:7.5pt; font-weight:700; color:var(--accent); }
+.ph-dot { width:16px; height:16px; background:linear-gradient(135deg,#4F6EF7,#7C3AED); border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:8px; }
+.ph-num { font-size:7pt; color:var(--muted); font-weight:500; }
+.pf { margin-top:auto; flex-shrink:0; padding-top:3mm; border-top:1px solid var(--border); display:flex; justify-content:space-between; font-size:6.5pt; color:var(--muted); }
+
+.sh { font-size:12.5pt; font-weight:800; color:var(--dark); margin-bottom:1mm; display:flex; align-items:center; gap:7px; }
+.sh .n { width:22px; height:22px; background:linear-gradient(135deg,#4F6EF7,#7C3AED); border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:7.5pt; font-weight:800; color:#fff; flex-shrink:0; }
+.sd { font-size:8pt; color:var(--muted); margin-bottom:4mm; padding-left:29px; }
+
+/* CARDS */
+.card { background:var(--light); border:1px solid var(--border); border-radius:9px; padding:3.5mm; margin-bottom:2.5mm; }
+.c-blue   { background:linear-gradient(135deg,#EFF6FF,#F0F4FF); border-color:#BFDBFE; }
+.c-purple { background:linear-gradient(135deg,#F5F3FF,#FAF0FF); border-color:#DDD6FE; }
+.c-green  { background:linear-gradient(135deg,#F0FDF4,#F0FDFB); border-color:#BBF7D0; }
+.c-amber  { background:linear-gradient(135deg,#FFFBEB,#FEFCE8); border-color:#FDE68A; }
+.c-red    { background:linear-gradient(135deg,#FFF1F2,#FFF5F5); border-color:#FECDD3; }
+.c-slate  { background:linear-gradient(135deg,#F1F5F9,#E2E8F0); border-color:#CBD5E1; }
+.c-dark   { background:#1E293B; border-color:#334155; color:#fff; }
+.card h4 { font-size:8.5pt; font-weight:700; margin-bottom:2mm; display:flex; align-items:center; gap:5px; }
+.card p  { font-size:8pt; line-height:1.55; }
+.card ul { padding-left:13px; margin-top:1.5mm; }
+.card li { font-size:8pt; line-height:1.55; margin-bottom:1.2mm; }
+
+.g2 { display:grid; grid-template-columns:1fr 1fr; gap:3mm; }
+.g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:2.5mm; }
+.g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:2.5mm; }
+
+.chip { display:inline-flex; align-items:center; gap:3px; padding:2px 7px; border-radius:20px; font-size:7pt; font-weight:600; }
+.ck-blue   { background:#DBEAFE; color:#1D4ED8; }
+.ck-purple { background:#EDE9FE; color:#6D28D9; }
+.ck-green  { background:#D1FAE5; color:#065F46; }
+.ck-amber  { background:#FEF3C7; color:#92400E; }
+.ck-gray   { background:#F1F5F9; color:#475569; }
+.ck-red    { background:#FEE2E2; color:#991B1B; }
+
+.code {
+  background:#0F172A; border-radius:7px; padding:3.5mm;
+  font-family:'JetBrains Mono','Courier New',Courier,monospace;
+  font-size:6.8pt; color:#E2E8F0; line-height:1.55; margin:2mm 0;
+}
+.cm{color:#64748B;} .ck2{color:#93C5FD;} .cs{color:#86EFAC;} .cn{color:#FCA5A5;} .cw{color:#C084FC;}
+
+.flow { display:flex; align-items:stretch; margin:3mm 0; }
+.fn { background:#fff; border:1.5px solid var(--border); border-radius:7px; padding:2.5mm 3mm; text-align:center; flex:1; min-width:0; }
+.fn .fi { font-size:11px; margin-bottom:1mm; }
+.fn .fl { font-size:6.8pt; font-weight:700; color:var(--dark); line-height:1.25; }
+.fn .fs { font-size:6pt; color:var(--muted); margin-top:1mm; }
+.fn.fa { background:linear-gradient(135deg,#EFF6FF,#F0F4FF); border-color:#93C5FD; }
+.fn.fp { background:linear-gradient(135deg,#F5F3FF,#FAF0FF); border-color:#C4B5FD; }
+.fn.fg { background:linear-gradient(135deg,#F0FDF4,#F0FDFB); border-color:#6EE7B7; }
+.farr  { font-size:9pt; color:var(--muted); padding:0 1.5px; flex-shrink:0; align-self:center; }
+
+.vr { display:grid; grid-template-columns:1fr 1fr 1fr; gap:3mm; margin:2.5mm 0; }
+.vb { border-radius:8px; padding:3.5mm; text-align:center; }
+.vb .vi { font-size:16px; margin-bottom:1.5mm; }
+.vb .vn { font-size:8.5pt; font-weight:700; margin-bottom:1mm; }
+.vb .vd { font-size:7.5pt; line-height:1.4; }
+.v-ok  { background:#D1FAE5; border:1.5px solid #6EE7B7; }
+.v-ok .vn  { color:#065F46; } .v-ok .vd  { color:#047857; }
+.v-bad { background:#FEE2E2; border:1.5px solid #FCA5A5; }
+.v-bad .vn { color:#991B1B; } .v-bad .vd { color:#B91C1C; }
+.v-unk { background:#FEF3C7; border:1.5px solid #FDE68A; }
+.v-unk .vn { color:#92400E; } .v-unk .vd { color:#B45309; }
+
+.p0 { display:inline-block; padding:1px 6px; border-radius:3px; font-size:6pt; font-weight:700; text-transform:uppercase; background:#FEE2E2; color:#991B1B; }
+.p1 { display:inline-block; padding:1px 6px; border-radius:3px; font-size:6pt; font-weight:700; text-transform:uppercase; background:#FEF3C7; color:#92400E; }
+.p2 { display:inline-block; padding:1px 6px; border-radius:3px; font-size:6pt; font-weight:700; text-transform:uppercase; background:#F1F5F9; color:#475569; }
+
+table:not(.detail-table) { width:100%; border-collapse:collapse; font-size:7.8pt; margin:2mm 0; }
+table:not(.detail-table) th { background:#1E293B; color:#fff; padding:2mm 3mm; text-align:left; font-weight:600; font-size:7.3pt; }
+table:not(.detail-table) td { padding:2mm 3mm; border-bottom:1px solid var(--border); vertical-align:top; }
+table:not(.detail-table) tr:nth-child(even) td { background:#F8FAFC; }
+
+.hb { border-left:4px solid var(--accent); background:linear-gradient(135deg,#EFF6FF,#F0F4FF); border-radius:0 7px 7px 0; padding:3mm 4mm; margin:2.5mm 0; }
+.hb.hg { border-color:var(--ok);    background:linear-gradient(135deg,#F0FDF4,#F0FDFB); }
+.hb.ha { border-color:var(--warn);  background:linear-gradient(135deg,#FFFBEB,#FEFCE8); }
+.hb.hp { border-color:var(--accent2); background:linear-gradient(135deg,#F5F3FF,#FAF0FF); }
+
+.callout { border-radius:7px; padding:3mm 3.5mm; margin:2.5mm 0; display:flex; gap:7px; align-items:flex-start; }
+.callout .ci { font-size:12px; flex-shrink:0; margin-top:1px; }
+.callout .cb { font-size:8pt; line-height:1.5; }
+.callout .cb strong { display:block; margin-bottom:1mm; font-size:8.5pt; }
+.ca-info { background:#EFF6FF; border:1px solid #BFDBFE; }
+.ca-ok   { background:#F0FDF4; border:1px solid #BBF7D0; }
+.ca-warn { background:#FFFBEB; border:1px solid #FDE68A; }
+
+.mc { background:#fff; border:1px solid var(--border); border-radius:8px; padding:3mm; text-align:center; }
+.mc .mv { font-size:14pt; font-weight:900; color:#4F6EF7; line-height:1.1; }
+.mc .ml { font-size:6.5pt; color:var(--muted); margin-top:1mm; font-weight:500; }
+
+.step-row { display:flex; gap:3mm; margin:2mm 0; }
+.step-box { flex:1; background:#fff; border:1.5px solid var(--border); border-radius:8px; padding:3mm; }
+.step-box .s-num { width:20px; height:20px; background:linear-gradient(135deg,#4F6EF7,#7C3AED); border-radius:5px; color:#fff; font-size:7.5pt; font-weight:700; display:flex; align-items:center; justify-content:center; margin-bottom:1.5mm; }
+.step-box .s-title { font-size:8pt; font-weight:700; color:var(--dark); margin-bottom:1mm; }
+.step-box .s-desc  { font-size:7.3pt; color:var(--mid); line-height:1.45; }
+
+.uc-row { display:flex; align-items:center; gap:0; margin:2.5mm 0; }
+.uc-box { flex:1; background:linear-gradient(135deg,#EFF6FF,#F0F4FF); border:1.5px solid #BFDBFE; border-radius:7px; padding:2.5mm 3mm; text-align:center; }
+.uc-box .ul { font-size:7pt; font-weight:700; color:#1D4ED8; }
+.uc-box .us { font-size:6.3pt; color:#3B82F6; margin-top:.5mm; }
+.uc-arr { font-size:12pt; color:var(--muted); padding:0 2px; flex-shrink:0; align-self:center; }
+.uc-final { background:linear-gradient(135deg,#F5F3FF,#FAF0FF); border-color:#C4B5FD; }
+.uc-final .ul { color:#6D28D9; } .uc-final .us { color:#8B5CF6; }
+
+.adv-grid { display:grid; grid-template-columns:1fr 1fr; gap:3mm; margin:2mm 0; }
+.adv-card { background:#0F172A; border-radius:7px; padding:3mm; font-size:7.3pt; color:#E2E8F0; line-height:1.5; }
+.adv-card .ah { font-size:7.5pt; font-weight:700; color:#93C5FD; margin-bottom:1.5mm; }
+
+/* Detail table in dark card */
+.detail-table { width:100%; border-collapse:separate; border-spacing:0 1.8mm; margin:0; }
+.detail-table tr td,
+.detail-table td {
+  border:none !important;
+  padding:2mm 3mm !important;
+  font-size:7.8pt;
+  vertical-align:middle;
+}
+.detail-table tr:nth-child(even) td {
+  background:rgba(255,255,255,0.07) !important;
+  border-radius:4px;
+}
+.detail-table tr:nth-child(odd) td {
+  background:rgba(255,255,255,0.02) !important;
+  border-radius:4px;
+}
+.detail-table .dl {
+  color:#94A3B8 !important;
+  width:42%;
+  font-weight:500;
+}
+.detail-table .dv {
+  color:#FFFFFF !important;
+  font-weight:700;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ PAGE 1: COVER ══ -->
+<div class="page">
+<div class="cover">
+  <div class="orb1"></div><div class="orb2"></div><div class="orb3"></div>
+
+  <div class="c-topbar">
+    <div class="c-badge"><div class="dot"></div>HACKATHON &middot; ROUND 1 SUBMISSION &middot; NEXORA AI</div>
+    <div class="c-reg">Reg: 24MIS0369 &nbsp;|&nbsp; October 21, 2026</div>
+  </div>
+
+  <div class="c-hero">
+    <div class="c-logo">&#128737;</div>
+    <div class="c-overtitle">AI-Powered Brand Compliance Platform</div>
+    <div class="c-title">BrandSentry AI</div>
+    <div class="c-desc">An intelligent content review system validating marketing content against brand guidelines using multi-strategy RAG, semantic drift detection, policy-aware prompt chaining, and cascaded uncertainty scoring.</div>
+
+    <div class="c-pills">
+      <span class="c-pill">&#129302; Multi-Strategy RAG</span>
+      <span class="c-pill">&#9889; FastAPI + SSE Streaming</span>
+      <span class="c-pill">&#8987; React 18 + TypeScript</span>
+      <span class="c-pill">&#128269; Semantic Drift Detection</span>
+      <span class="c-pill">&#128202; Cascaded Confidence Scoring</span>
+      <span class="c-pill">&#128279; Policy-Aware Prompt Chaining</span>
+    </div>
+    <div class="c-divider"></div>
+
+    <!-- Participant Details Card -->
+    <div class="c-participant">
+      <div class="c-prow full">
+        <div class="lbl">&#128100; Participant Full Name</div>
+        <div class="val" style="font-size:10pt;">K P Chirag Guptha</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">Team Name</div>
+        <div class="val">Nexora AI</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">Registration Number</div>
+        <div class="val">24MIS0369</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">College</div>
+        <div class="val">VIT Vellore</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">Course</div>
+        <div class="val">M.Tech Integrated Software Engineering</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">Role</div>
+        <div class="val">Founder &amp; Sole Developer</div>
+      </div>
+      <div class="c-prow">
+        <div class="lbl">Project Category</div>
+        <div class="val">Artificial Intelligence / Generative AI</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-footer">
+    <span>Vellore Institute of Technology (VIT), Vellore &nbsp;|&nbsp; M.Tech Integrated Software Engineering</span>
+    <span>BrandSentry AI &copy; 2026 &middot; Confidential</span>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ PAGE 2: TOC + EXEC SUMMARY ══ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div>
+    <div class="ph-num">Page 2 of 10</div>
+  </div>
+  <div class="sh"><div class="n">&#128203;</div>Table of Contents</div>
+  <div class="sd">Document structure and section overview</div>
+  <table>
+    <thead><tr><th>Section</th><th>Topic</th><th>Page</th></tr></thead>
+    <tbody>
+      <tr><td><strong>&#167;1</strong></td><td>Executive Summary</td><td>2</td></tr>
+      <tr><td><strong>&#167;2</strong></td><td>Problem Statement &amp; Market Context</td><td>3</td></tr>
+      <tr><td><strong>&#167;3</strong></td><td>Proposed Solution Overview</td><td>4</td></tr>
+      <tr><td><strong>&#167;4</strong></td><td>Technical Architecture &amp; Adaptive Retrieval</td><td>5</td></tr>
+      <tr><td><strong>&#167;5</strong></td><td>Technical Differentiators</td><td>6</td></tr>
+      <tr><td><strong>&#167;6</strong></td><td>Three-Way Verdict &amp; Cascaded Confidence Scoring</td><td>7</td></tr>
+      <tr><td><strong>&#167;7</strong></td><td>MVP Scope &amp; Feature Prioritization</td><td>8</td></tr>
+      <tr><td><strong>&#167;8</strong></td><td>Security, Validation &amp; Privacy</td><td>9</td></tr>
+      <tr><td><strong>&#167;9</strong></td><td>Evaluation Plan &amp; Adversarial Testing</td><td>9</td></tr>
+      <tr><td><strong>&#167;10</strong></td><td>Submission Details &amp; Roadmap</td><td>10</td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:4mm;">
+    <div class="sh"><div class="n">1</div>Executive Summary</div>
+    <div class="sd">What BrandSentry AI is and why it matters</div>
+  </div>
+  <div class="hb">
+    <strong style="font-size:9pt;display:block;margin-bottom:1.5mm;">The Core Problem</strong>
+    <p style="font-size:8pt;line-height:1.55;">Enterprise marketing and sales teams produce thousands of content assets every quarter. Each piece must comply with evolving brand guidelines, legal disclaimers, and regulatory standards. Today this review is manual &mdash; slow, inconsistent, expensive, and fundamentally unable to scale.</p>
+  </div>
+  <div class="hb hg" style="margin-top:2mm;">
+    <strong style="font-size:9pt;display:block;margin-bottom:1.5mm;">The BrandSentry AI Solution</strong>
+    <p style="font-size:8pt;line-height:1.55;">BrandSentry AI is an AI-powered compliance engine that ingests brand guidelines as a structured knowledge base and reviews content via a three-layer pipeline: deterministic pre-filter, adaptive multi-strategy RAG retrieval, and policy-aware prompt chaining. The system outputs <strong>per-sentence, per-clause verdicts</strong> with calibrated cascaded confidence scores, cited evidence, and actionable rewrites. A dedicated <strong>semantic drift detection</strong> engine using presupposition mining catches implied violations that no keyword tool or generic LLM can detect.</p>
+  </div>
+  <div class="g4" style="margin-top:4mm;">
+    <div class="mc">
+      <div style="font-size:6pt;font-weight:700;color:#2563EB;background:#EFF6FF;border-radius:12px;padding:1px 6px;display:inline-block;margin-bottom:1.5mm;letter-spacing:0.4px;text-transform:uppercase;">Design Goal</div>
+      <div class="mv">10x</div>
+      <div class="ml">Target speedup vs manual review</div>
+    </div>
+    <div class="mc">
+      <div style="font-size:6pt;font-weight:700;color:#059669;background:#ECFDF5;border-radius:12px;padding:1px 6px;display:inline-block;margin-bottom:1.5mm;letter-spacing:0.4px;text-transform:uppercase;">Core Engine</div>
+      <div class="mv">3</div>
+      <div class="ml">Verdict types, fully traceable</div>
+    </div>
+    <div class="mc">
+      <div style="font-size:6pt;font-weight:700;color:#7C3AED;background:#F5F3FF;border-radius:12px;padding:1px 6px;display:inline-block;margin-bottom:1.5mm;letter-spacing:0.4px;text-transform:uppercase;">Evaluation Target</div>
+      <div class="mv">91%</div>
+      <div class="ml">Target precision on synthetic tests</div>
+    </div>
+    <div class="mc">
+      <div style="font-size:6pt;font-weight:700;color:#D97706;background:#FFFBEB;border-radius:12px;padding:1px 6px;display:inline-block;margin-bottom:1.5mm;letter-spacing:0.4px;text-transform:uppercase;">Structural Goal</div>
+      <div class="mv">0</div>
+      <div class="ml">Hallucinated citations (ID-validated)</div>
+    </div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 2</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 3: PROBLEM STATEMENT ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 3 of 10</div></div>
+  <div class="sh"><div class="n">2</div>Problem Statement &amp; Market Context</div>
+  <div class="sd">Why brand compliance review is fundamentally broken today</div>
+  <div class="g2">
+    <div>
+      <div class="card c-red" style="margin-bottom:2.5mm;"><h4>&#128308; Pain Point 1: Manual Review Cannot Scale</h4><p>A single brand manager reviews 50&ndash;200 assets per week. The pipeline becomes a bottleneck as companies grow, with 3&ndash;5 day turnaround times slowing go-to-market velocity significantly.</p></div>
+      <div class="card c-red"><h4>&#128308; Pain Point 2: Inconsistent Enforcement</h4><p>Different reviewers apply guidelines differently. The same claim may pass one reviewer and fail another. No auditable, reproducible decision trail exists to reference or dispute verdicts.</p></div>
+    </div>
+    <div>
+      <div class="card c-red" style="margin-bottom:2.5mm;"><h4>&#128308; Pain Point 3: Implied Violations Go Undetected</h4><p>Keyword tools catch exact phrase matches but miss implied claims &mdash; content that avoids banned phrases yet still violates the spirit of a guideline. These semantic loopholes are the most dangerous compliance gaps.</p></div>
+      <div class="card c-red"><h4>&#128308; Pain Point 4: Policy Changes Create Blind Spots</h4><p>Brand guidelines update regularly. Content approved under an old policy may violate the new version. Without version tracking, entire content libraries become compliance liabilities overnight.</p></div>
+    </div>
+  </div>
+  <div class="callout ca-warn" style="margin-top:3mm;">
+    <div class="ci">&#9888;</div>
+    <div class="cb"><strong>Real-World Consequence</strong>Regulatory fines for non-compliant marketing content in pharmaceutical, financial, and consumer goods sectors routinely exceed $1M per incident. Brand violations also damage customer trust and require costly public corrections.</div>
+  </div>
+  <div style="margin-top:4mm;">
+    <div class="sh" style="font-size:10.5pt;"><div class="n">&#128202;</div>Existing Solutions &amp; Their Gaps</div>
+    <table>
+      <thead><tr><th>Approach</th><th>What It Does</th><th>Key Limitation</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Manual Review</strong></td><td>Human brand managers check content</td><td>Slow, expensive, inconsistent, no audit trail</td></tr>
+        <tr><td><strong>Keyword Blocklists</strong></td><td>Flag exact banned phrases</td><td>Misses paraphrased &amp; implied violations; high false-positive rate</td></tr>
+        <tr><td><strong>Generic LLM Prompting</strong></td><td>Ask an LLM "is this compliant?"</td><td>Hallucinated citations; no grounding in actual policy documents</td></tr>
+        <tr><td><strong>BrandSentry AI &#9989;</strong></td><td>Adaptive RAG + Drift Detection + Prompt Chaining</td><td><em>None of the above</em> &mdash; grounded, explainable, per-sentence</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 3</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 4: SOLUTION OVERVIEW ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 4 of 10</div></div>
+  <div class="sh"><div class="n">3</div>Proposed Solution Overview</div>
+  <div class="sd">A three-layer review engine: deterministic, adaptive semantic, and policy-aware generative</div>
+  <div class="callout ca-info"><div class="ci">&#128161;</div><div class="cb"><strong>Design Philosophy</strong>BrandSentry AI separates fast deterministic checks (regex, banned words) from slow generative reasoning (LLM). This layered approach minimizes latency and API cost while maximizing accuracy on edge cases.</div></div>
+  <div style="margin-top:3.5mm;">
+    <strong style="font-size:8.5pt;font-weight:700;color:var(--dark);display:block;margin-bottom:2.5mm;">End-to-End Review Pipeline</strong>
+    <div class="flow">
+      <div class="fn"><div class="fi">&#128221;</div><div class="fl">Content Input</div><div class="fs">Draft via React UI</div></div>
+      <div class="farr">&#8594;</div>
+      <div class="fn fa"><div class="fi">&#9889;</div><div class="fl">Layer 1: Deterministic</div><div class="fs">Regex + Banned-word</div></div>
+      <div class="farr">&#8594;</div>
+      <div class="fn fp"><div class="fi">&#128269;</div><div class="fl">Layer 2: Adaptive RAG</div><div class="fs">Claim-type routing</div></div>
+      <div class="farr">&#8594;</div>
+      <div class="fn fg"><div class="fi">&#128279;</div><div class="fl">Layer 3: Prompt Chain</div><div class="fs">Decompose&rarr;Map&rarr;Verdict</div></div>
+      <div class="farr">&#8594;</div>
+      <div class="fn"><div class="fi">&#128202;</div><div class="fl">Structured Output</div><div class="fs">JSON + Diff view</div></div>
+    </div>
+  </div>
+  <div class="g2" style="margin-top:3.5mm;">
+    <div class="card c-blue"><h4>&#9889; Layer 1 &mdash; Deterministic Pre-Filter</h4><ul><li>Regex pattern matching for banned phrases, formatting rules, required disclaimers</li><li>Executes in &lt;50ms; flags obvious violations before touching the LLM</li><li>Configurable rule sets per brand workspace &mdash; zero LLM cost for clear cases</li></ul></div>
+    <div class="card c-purple"><h4>&#128269; Layer 2 &mdash; Adaptive Multi-Strategy RAG</h4><ul><li>Claim-type classifier routes each claim to the optimal retrieval strategy</li><li>Dense vector / BM25 hybrid / graph traversal selected per claim type</li><li>Top-k policy chunks passed as grounded context to the prompt chain</li></ul></div>
+  </div>
+  <div class="g2" style="margin-top:2.5mm;">
+    <div class="card c-green"><h4>&#128279; Layer 3 &mdash; Policy-Aware Prompt Chain</h4><ul><li><strong>Step 1 &mdash; Claim Decomposer:</strong> breaks paragraph into atomic verifiable claims</li><li><strong>Step 2 &mdash; Policy Mapper:</strong> assigns most relevant policy clause to each claim</li><li><strong>Step 3 &mdash; Verdict Generator:</strong> reasons per-claim against its mapped policy context</li><li>Result: <em>per-sentence, per-clause</em> verdicts with full traceability</li></ul></div>
+    <div class="card c-amber"><h4>&#128203; Output &mdash; Structured Review Report</h4><ul><li>Sentence-level diff view highlighting each flagged claim</li><li>Cited policy clause + version for every flag (no hallucinated citations)</li><li>Cascaded confidence score with full intermediate trace</li><li>One-click "Apply Suggestion" to accept AI-recommended rewrites</li></ul></div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 4</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 5: TECHNICAL ARCHITECTURE ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 5 of 10</div></div>
+  <div class="sh"><div class="n">4</div>Technical Architecture &amp; Adaptive Retrieval</div>
+  <div class="sd">Full-stack breakdown, adaptive claim-type routing, and policy-aware prompt chaining</div>
+  <div class="g2" style="margin-bottom:2.5mm;">
+    <div>
+      <div class="card c-blue" style="margin-bottom:2.5mm;"><h4>&#8987; Frontend &mdash; React 18 + TypeScript</h4><ul><li>Rich-text editor with real-time claim detection hints</li><li>SSE-based streaming review panel (paragraph-by-paragraph)</li><li>Sentence-level diff view with inline confidence badges</li><li>Audit log explorer: filter by verdict, date, policy version</li></ul></div>
+      <div class="card c-green"><h4>&#128451; Data &amp; Knowledge Layer</h4><ul><li><strong>Vector Store:</strong> Pinecone / ChromaDB for policy embeddings</li><li><strong>Policy Versioning:</strong> Immutable snapshots per revision</li><li><strong>Claim Cache:</strong> Redis semantic-hash fingerprint store</li><li><strong>Audit DB:</strong> PostgreSQL &mdash; full review provenance</li></ul></div>
+    </div>
+    <div>
+      <div class="card c-purple" style="margin-bottom:2.5mm;"><h4>&#9881; Backend &mdash; FastAPI + Python 3.12</h4><ul><li><strong>Claim-Type Classifier:</strong> lightweight model routes each claim to correct retrieval strategy before any LLM call</li><li><strong>Review Orchestrator:</strong> coordinates full 3-layer pipeline</li><li><strong>LLM Interface:</strong> pluggable &mdash; GPT-4o, Gemini, Claude</li><li><strong>SSE Endpoint:</strong> /review/stream &mdash; incremental results per paragraph</li></ul></div>
+      <div class="card c-amber"><h4>&#128274; Infrastructure</h4><ul><li>Docker Compose local dev; Kubernetes-ready for scale</li><li>JWT + workspace-scoped API keys with expiry</li><li>Structured JSON logs; per-stage latency tracking</li><li>Rate limiting per workspace to prevent abuse</li></ul></div>
+    </div>
+  </div>
+  <strong style="font-size:8.5pt;font-weight:700;display:block;margin-bottom:2mm;">&#127919; Adaptive Retrieval Strategy &mdash; Claim-Type Router</strong>
+  <table>
+    <thead><tr><th>Claim Type</th><th>Example</th><th>Retrieval Strategy</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Factual</strong></td><td>"Product does X"</td><td>Dense vector (semantic)</td><td>Meaning-level match to policy intent</td></tr>
+      <tr><td><strong>Regulatory</strong></td><td>"FDA approved"</td><td>Hybrid: Dense + BM25</td><td>Exact clause wording critical for legal precision</td></tr>
+      <tr><td><strong>Comparative</strong></td><td>"Best in class"</td><td>Graph traversal (multi-hop)</td><td>Cross-ref: superiority clause + data-requirement clause</td></tr>
+      <tr><td><strong>Stylistic</strong></td><td>"Vibrant, bold"</td><td>Tone embedding cluster</td><td>Matches brand voice policy by tonal proximity</td></tr>
+    </tbody>
+  </table>
+  <div style="margin-top:2.5mm;">
+    <strong style="font-size:8.5pt;font-weight:700;display:block;margin-bottom:1.5mm;">API Response Schema (policy-aware prompt chain output)</strong>
+    <div class="code">
+<span class="cm">// POST /review  -->  JSON per flagged claim</span>
+{ <span class="ck2">"claim_id"</span>:<span class="cs">"cl_8f4a2b"</span>, <span class="ck2">"atomic_claims"</span>:[<span class="cs">"Company is #1"</span>,<span class="cs">"No competitor equals it"</span>],
+  <span class="ck2">"presuppositions"</span>:[<span class="cs">"Market share data exists"</span>,<span class="cs">"Claim is independently verified"</span>],
+  <span class="ck2">"verdict"</span>:<span class="cs">"CONTRADICTED"</span>, <span class="ck2">"confidence"</span>:<span class="cn">0.91</span>, <span class="ck2">"drift_type"</span>:<span class="cs">"IMPLIED_SUPERIORITY"</span>,
+  <span class="ck2">"retrieval_strategy"</span>:<span class="cs">"GRAPH_TRAVERSAL"</span>, <span class="ck2">"policy_version"</span>:<span class="cs">"v2.1"</span>,
+  <span class="ck2">"evidence"</span>:[{<span class="ck2">"section"</span>:<span class="cs">"§3.2"</span>,<span class="ck2">"text"</span>:<span class="cs">"No superiority claims without cited data"</span>}],
+  <span class="ck2">"suggestion"</span>:<span class="cs">"A recognized leader, trusted by 500+ customers"</span> }
+    </div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 5</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 6: DIFFERENTIATORS ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 6 of 10</div></div>
+  <div class="sh"><div class="n">5</div>Technical Differentiators</div>
+  <div class="sd">Five capabilities that make BrandSentry AI uniquely defensible</div>
+  <div class="card c-purple" style="margin-bottom:2.5mm;">
+    <h4>&#127919; Differentiator 1 &mdash; Semantic Drift Detection via Presupposition Mining</h4>
+    <p style="margin-bottom:2mm;">Most tools check if content <em>contains</em> banned phrases. BrandSentry runs a two-phase implied-claim extraction pipeline borrowed from computational linguistics:</p>
+    <div class="step-row">
+      <div class="step-box"><div class="s-num">1</div><div class="s-title">Explicit Claim Extraction</div><div class="s-desc">LLM lists every factual assertion as atomic claims: <em>"Company is #1"</em>, <em>"No competitor equals it"</em></div></div>
+      <div class="step-box" style="background:linear-gradient(135deg,#F5F3FF,#FAF0FF);border-color:#C4B5FD;"><div class="s-num">2</div><div class="s-title">Presupposition Mining &#11088;</div><div class="s-desc">LLM extracts what must be true: <em>"Market share data exists"</em>, <em>"Claim is independently verified"</em></div></div>
+      <div class="step-box"><div class="s-num">3</div><div class="s-title">Per-Claim Policy Validation</div><div class="s-desc">Each atomic claim <em>and</em> presupposition independently validated against policy embeddings</div></div>
+    </div>
+  </div>
+  <div class="card c-blue" style="margin-bottom:2.5mm;"><h4>&#128279; Differentiator 2 &mdash; Policy-Aware Prompt Chaining (Per-Sentence Granularity)</h4><p>A 3-step chain: <strong>Claim Decomposer &rarr; Policy Mapper &rarr; Verdict Generator</strong>. Each atomic claim is evaluated against its specifically mapped policy clause, producing per-sentence, per-clause verdicts &mdash; dramatically more granular than any existing tool that returns paragraph-level judgments.</p></div>
+  <div class="g2" style="margin-bottom:2.5mm;">
+    <div class="card c-green"><h4>&#9889; Differentiator 3 &mdash; Adaptive Multi-Strategy Retrieval</h4><p>A claim-type classifier selects the optimal retrieval strategy per claim: dense vector for factual, BM25 hybrid for regulatory, graph traversal for comparative. No other RAG compliance tool adapts retrieval method to claim semantics.</p></div>
+    <div class="card c-amber"><h4>&#128200; Differentiator 4 &mdash; Cascaded Uncertainty Propagation</h4><p>Confidence is a Bayesian product across three pipeline stages. If any stage falls below 0.50, the final verdict is forced to INSUFFICIENT EVIDENCE regardless of LLM output &mdash; eliminating overconfident hallucinated verdicts.</p></div>
+  </div>
+  <div class="card c-slate" style="margin-bottom:3mm;"><h4>&#128202; Differentiator 5 &mdash; Claim Fingerprinting + Policy Version Awareness</h4><p style="font-size:7.8pt;">Semantically equivalent claims hashed and cached in Redis &mdash; repeat submissions get instant verdicts (&lt;100ms, ~40&ndash;60% cost reduction). Every review stamped with policy version; when guidelines update, previously approved content is automatically flagged for re-review.</p></div>
+  <table>
+    <thead><tr><th>Capability</th><th>Keyword Tools</th><th>Generic LLM</th><th>BrandSentry AI &#9989;</th></tr></thead>
+    <tbody>
+      <tr><td>Exact phrase detection</td><td>&#9989;</td><td>&#9989;</td><td>&#9989;</td></tr>
+      <tr><td>Implied / semantic violations</td><td>&#10060;</td><td>&#9888; Unreliable</td><td>&#9989; Presupposition Mining</td></tr>
+      <tr><td>Grounded policy citations</td><td>&#10060;</td><td>&#10060; Hallucinated</td><td>&#9989; RAG-grounded only</td></tr>
+      <tr><td>Per-sentence granularity</td><td>&#10060;</td><td>&#10060;</td><td>&#9989; Prompt Chaining</td></tr>
+      <tr><td>Calibrated uncertainty</td><td>&#10060;</td><td>&#10060;</td><td>&#9989; Cascaded Bayesian score</td></tr>
+      <tr><td>Cost-efficient at scale</td><td>&#9989;</td><td>&#10060;</td><td>&#9989; Fingerprint caching</td></tr>
+    </tbody>
+  </table>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 6</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 7: VERDICT + CONFIDENCE ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 7 of 10</div></div>
+  <div class="sh"><div class="n">6</div>Three-Way Verdict System &amp; Cascaded Confidence Scoring</div>
+  <div class="sd">Why "Not Found" does not equal "False" &mdash; and why cascaded uncertainty beats a single score</div>
+  <div class="vr">
+    <div class="vb v-ok"><div class="vi">&#9989;</div><div class="vn">SUPPORTED</div><div class="vd">Claim explicitly backed by retrieved policy content. Policy citation provided.</div></div>
+    <div class="vb v-bad"><div class="vi">&#128308;</div><div class="vn">CONTRADICTED</div><div class="vd">Claim directly or implicitly violates a retrieved policy clause. Action required.</div></div>
+    <div class="vb v-unk"><div class="vi">&#9888;</div><div class="vn">INSUFFICIENT EVIDENCE</div><div class="vd">No relevant policy found. Human review recommended &mdash; <em>not auto-approved</em>.</div></div>
+  </div>
+  <div class="callout ca-warn" style="margin-top:2.5mm;"><div class="ci">&#9888;</div><div class="cb"><strong>Critical Design Decision: "Not Found" does not mean "Approved"</strong>A naive RAG system treats absence of a policy match as implicit permission. BrandSentry AI treats it as <em>uncertainty</em> and routes to a human review queue &mdash; the correct behavior in compliance-critical systems where false negatives carry regulatory risk.</div></div>
+  <div style="margin-top:3.5mm;">
+    <strong style="font-size:8.5pt;font-weight:700;display:block;margin-bottom:2mm;">Cascaded Uncertainty Model &mdash; Bayesian Confidence Propagation</strong>
+    <div class="uc-row">
+      <div class="uc-box"><div class="ul">Retrieval Score</div><div class="us">Cosine similarity &mdash; weight 40%</div></div>
+      <div class="uc-arr">&#8594;</div>
+      <div class="uc-box"><div class="ul">Drift Detection Score</div><div class="us">Presupposition alignment &mdash; weight 25%</div></div>
+      <div class="uc-arr">&#8594;</div>
+      <div class="uc-box"><div class="ul">LLM Self-Consistency</div><div class="us">N=3 pass agreement &mdash; weight 35%</div></div>
+      <div class="uc-arr">&#8594;</div>
+      <div class="uc-box uc-final"><div class="ul">Bayesian Product</div><div class="us">Final cascaded confidence</div></div>
+    </div>
+    <div class="callout ca-info" style="margin-top:2mm;"><div class="ci">&#128161;</div><div class="cb"><strong>Hard Threshold Rule</strong>If <em>any single stage</em> confidence score falls below 0.50, the overall verdict is forced to <strong>INSUFFICIENT EVIDENCE</strong> regardless of LLM output. This structurally prevents overconfident wrong verdicts.</div></div>
+  </div>
+  <div style="margin-top:3mm;">
+    <strong style="font-size:8.5pt;font-weight:700;display:block;margin-bottom:1.5mm;">Worked Example &mdash; Policy-Aware Prompt Chain in Action</strong>
+    <div class="code">
+<span class="cm">// Input: "Our product is FDA approved for all use cases"</span>
+<span class="cm">// STEP 1 — Claim Decomposer</span>
+atomic_claims = [<span class="cs">"Product has FDA approval"</span>, <span class="cs">"Approval covers all use cases"</span>]
+<span class="cm">// STEP 2 — Presupposition Mining (novel differentiator)</span>
+presuppositions = [<span class="cs">"Full market authorization exists"</span>, <span class="cs">"No use-case restrictions apply"</span>]
+<span class="cm">// STEP 3 — Adaptive Retrieval: claim_type=REGULATORY  -->  hybrid dense + BM25</span>
+retrieved = <span class="cs">"§4.1 v2.1: Only claim FDA registration, not approval"</span>
+<span class="cm">// STEP 4 — Verdict Generator</span>
+{ <span class="ck2">"verdict"</span>:<span class="cs">"CONTRADICTED"</span>, <span class="ck2">"confidence"</span>:<span class="cn">0.94</span>, <span class="ck2">"drift_type"</span>:<span class="cs">"REGULATORY_OVERCLAIM"</span>,
+  <span class="ck2">"policy_citation"</span>:<span class="cs">"§4.1 v2.1"</span>, <span class="ck2">"suggestion"</span>:<span class="cs">"Our product is FDA registered and cleared for [specific use case]"</span> }
+    </div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 7</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 8: MVP SCOPE ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 8 of 10</div></div>
+  <div class="sh"><div class="n">7</div>MVP Scope &amp; Feature Prioritization</div>
+  <div class="sd">Achievable hackathon deliverables: core operational engine first, modular extensions kept optional</div>
+  <div class="callout ca-info"><div class="ci">&#128161;</div><div class="cb"><strong>Achievable MVP Philosophy</strong>A reliable, working core workflow takes absolute precedence over feature bloat. We prioritise document ingestion, source-grounded retrieval, the three-way verdict, citation validation, and one complete review workflow. Redis caching, advanced graph traversal, and complex Bayesian calibration are decoupled as optional modular enhancements until the core system is fully verified.</div></div>
+  <table style="margin-top:2.5mm;">
+    <thead><tr><th>Priority</th><th>Feature</th><th>Scope Status</th><th>Role in System</th></tr></thead>
+    <tbody>
+      <tr><td><span class="p0">P0</span></td><td>Policy document ingestion + semantic chunking</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>PDF/text ingestion &rarr; clean chunks &rarr; vector store</td></tr>
+      <tr><td><span class="p0">P0</span></td><td>Source-grounded retrieval against policy corpus</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>Dense vector &amp; exact-clause matching against uploaded guidelines</td></tr>
+      <tr><td><span class="p0">P0</span></td><td>Strict citation validation layer</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>Server-side validation guarantees zero fabricated citation IDs</td></tr>
+      <tr><td><span class="p0">P0</span></td><td>Three-way verdict engine</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>Supported / Contradicted / Insufficient Evidence with rationale</td></tr>
+      <tr><td><span class="p0">P0</span></td><td>Complete end-to-end review workflow</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>Guideline ingestion &rarr; input draft &rarr; verdicts &rarr; diff &amp; rewrite</td></tr>
+      <tr><td><span class="p1">P1</span></td><td>Presupposition mining (semantic drift detection)</td><td><span class="chip ck-green">&#9989; Core MVP</span></td><td>Two-phase extraction of implied brand guideline violations</td></tr>
+      <tr><td><span class="p1">P1</span></td><td>Claim fingerprint caching (Redis)</td><td><span class="chip ck-amber">&#128308; Optional Ext</span></td><td>Decoupled cache layer; bypassed if Redis is unavailable</td></tr>
+      <tr><td><span class="p1">P1</span></td><td>Advanced multi-hop graph policy traversal</td><td><span class="chip ck-amber">&#128308; Optional Ext</span></td><td>Cross-clause reasoning; dense vector RAG powers core MVP</td></tr>
+      <tr><td><span class="p1">P1</span></td><td>Cascaded Bayesian confidence calibration</td><td><span class="chip ck-amber">&#128308; Optional Ext</span></td><td>Multi-stage calibration; core uses direct evidence gating</td></tr>
+      <tr><td><span class="p1">P1</span></td><td>Streaming review with SSE (paragraph-by-paragraph)</td><td><span class="chip ck-amber">&#9881; Next Sprint</span></td><td>Streaming endpoint built; progressive UI rendering</td></tr>
+      <tr><td><span class="p2">P2</span></td><td>Active learning loop &amp; automated visual inspection</td><td><span class="chip ck-gray">&#128203; Future</span></td><td>Fine-tuning on corrections &amp; multimodal image/banner audits</td></tr>
+    </tbody>
+  </table>
+  <div class="g2" style="margin-top:2.5mm;">
+    <div class="card c-green"><h4>&#9989; Achievable Core MVP (Demo-Ready)</h4><ul>
+      <li>Upload and ingest a brand guideline document (PDF/text)</li>
+      <li>Source-grounded retrieval strictly against ingested policy chunks</li>
+      <li>Three-way verdicts (Supported, Contradicted, Insufficient Evidence)</li>
+      <li>Strict citation validation guaranteeing verifiable policy clauses</li>
+      <li>Complete end-to-end review workflow: input copy &rarr; verdicts &rarr; diff &rarr; apply rewrites</li>
+    </ul></div>
+    <div class="card c-amber"><h4>&#9881; Modular Enhancements (Kept Optional)</h4><ul>
+      <li><strong>Redis Caching:</strong> Optional latency optimizer; non-blocking for core review</li>
+      <li><strong>Graph Traversal:</strong> Optional multi-hop logic; dense retrieval suffices for MVP</li>
+      <li><strong>Bayesian Calibration:</strong> Optional calibration; heuristic evidence gating handles MVP</li>
+      <li><strong>Explicitly Out of Scope:</strong> Banner visual inspection, web scraping, multi-tenant SaaS</li>
+    </ul></div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 8</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 9: SECURITY + EVALUATION ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 9 of 10</div></div>
+  <div class="sh"><div class="n">8</div>Security, Validation &amp; Privacy</div>
+  <div class="sd">Enterprise-grade trust from the ground up</div>
+  <div class="g2" style="margin-bottom:3.5mm;">
+    <div>
+      <div class="card c-red" style="margin-bottom:2.5mm;"><h4>&#128274; Prompt Injection Defence</h4><p>All user-submitted content is treated as <em>data</em>, never as <em>instructions</em>. The system prompt forbids the LLM from following any directives found inside the content field. Input is sanitized and wrapped in structural delimiters before concatenation.</p></div>
+      <div class="card c-blue"><h4>&#127970; Workspace Tenant Isolation</h4><p>Each brand client operates in a fully isolated namespace. Policy embeddings, review history, and API keys are scoped to the tenant. Cross-tenant data leakage is architecturally impossible &mdash; no shared vector indices or database tables.</p></div>
+    </div>
+    <div>
+      <div class="card c-purple" style="margin-bottom:2.5mm;"><h4>&#128279; Citation ID Validation</h4><p>The LLM is only permitted to reference policy chunks using pre-assigned chunk IDs passed in the system context. Server-side validation rejects any citation ID not in the current retrieval set, making fabricated citations structurally impossible.</p></div>
+      <div class="card c-green"><h4>&#128273; Auth &amp; Secrets</h4><ul><li>JWT-based auth for all API endpoints</li><li>Workspace-scoped API keys with configurable expiry</li><li>No secrets in source code; all via environment variables</li><li>Rate limiting per workspace to prevent abuse</li></ul></div>
+    </div>
+  </div>
+  <div class="sh"><div class="n">9</div>Evaluation Plan &amp; Adversarial Testing</div>
+  <div class="sd">How we measure whether BrandSentry AI actually works</div>
+  <div class="callout ca-ok"><div class="ci">&#9989;</div><div class="cb"><strong>Commitment to Honest Evaluation</strong>No market size numbers, TAM estimates, or benchmark comparisons are fabricated. All targets below are validated on synthetic test suites built from public brand guideline examples.</div></div>
+  <div class="g2" style="margin-top:3mm;">
+    <div class="card"><h4>&#128202; Core Accuracy Metrics</h4><table style="margin-top:1.5mm;"><thead><tr><th>Metric</th><th>Target</th></tr></thead><tbody><tr><td>Verdict Precision (P0 test set)</td><td>&gt; 90%</td></tr><tr><td>Verdict Recall</td><td>&gt; 85%</td></tr><tr><td>Semantic Drift Detection Rate</td><td>&gt; 75%</td></tr><tr><td>False Positive Rate</td><td>&lt; 12%</td></tr><tr><td>Hallucinated Citation Rate</td><td>0% (structural)</td></tr></tbody></table></div>
+    <div class="card"><h4>&#9889; Performance Metrics</h4><table style="margin-top:1.5mm;"><thead><tr><th>Metric</th><th>Target</th></tr></thead><tbody><tr><td>Layer 1 latency (regex)</td><td>&lt; 50ms</td></tr><tr><td>Full review (&le;500 words)</td><td>&lt; 4 seconds</td></tr><tr><td>Cached claim lookup</td><td>&lt; 100ms</td></tr><tr><td>LLM cost reduction via cache</td><td>~40&ndash;60%</td></tr><tr><td>Concurrent sessions</td><td>&ge; 20</td></tr></tbody></table></div>
+  </div>
+  <div style="margin-top:3mm;">
+    <strong style="font-size:8.5pt;font-weight:700;display:block;margin-bottom:2mm;">&#127919; LLM-as-Judge Adversarial Benchmark</strong>
+    <div class="adv-grid">
+      <div class="adv-card"><div class="ah">&#128296; Attacker LLM Generates Evasions</div>A separate "attacker" LLM generates 50 content variants <em>designed to evade detection</em>: near-miss violations, paraphrased banned claims, and implied violations buried inside long sentences. Dynamically generated to probe the system's weakest points.</div>
+      <div class="adv-card"><div class="ah">&#128202; Defender Score = Evasion Catch Rate</div>BrandSentry AI is scored on adversarial variants it correctly flags. Target: "defender score" &gt;80% on the attacker set. This adversarial benchmark is far more rigorous than a static precision/recall test set and signals genuine engineering confidence.</div>
+    </div>
+  </div>
+  <div class="pf"><span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore</span><span>Page 9</span></div>
+</div></div>
+
+
+<!-- ══ PAGE 10: SUBMISSION DETAILS + ROADMAP ══ -->
+<div class="page"><div class="pg">
+  <div class="ph"><div class="ph-brand"><div class="ph-dot">&#128737;</div>BrandSentry AI &nbsp;&middot;&nbsp; K P Chirag Guptha &nbsp;&middot;&nbsp; 24MIS0369</div><div class="ph-num">Page 10 of 10</div></div>
+  <div class="sh"><div class="n">10</div>Official Submission Details &amp; Post-Hackathon Roadmap</div>
+  <div class="sd">Complete participant information, technology stack, and the vision beyond Round 1</div>
+
+  <!-- FULL DETAILS TABLE -->
+  <div class="card c-dark" style="margin-bottom:3.5mm;">
+    <h4 style="color:#fff;margin-bottom:3mm;">&#128203; Official Submission Details</h4>
+    <div class="g2">
+      <table class="detail-table">
+        <tr><td class="dl">Team Name</td><td class="dv">Nexora AI</td></tr>
+        <tr><td class="dl">Team Members</td><td class="dv">1 (Solo)</td></tr>
+        <tr><td class="dl">Participant Name</td><td class="dv">K P Chirag Guptha</td></tr>
+        <tr><td class="dl">Registration No.</td><td class="dv">24MIS0369</td></tr>
+        <tr><td class="dl">Project Name</td><td class="dv">BrandSentry AI</td></tr>
+      </table>
+      <table class="detail-table">
+        <tr><td class="dl">College</td><td class="dv">Vellore Institute of Technology (VIT), Vellore</td></tr>
+        <tr><td class="dl">Course</td><td class="dv">M.Tech Integrated Software Engineering</td></tr>
+        <tr><td class="dl">Role</td><td class="dv">Founder &amp; Sole Developer</td></tr>
+        <tr><td class="dl">Category</td><td class="dv">Artificial Intelligence / Generative AI</td></tr>
+        <tr><td class="dl">Submission Date</td><td class="dv">October 21, 2026</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="card c-blue" style="margin-bottom:3.5mm;">
+    <h4>&#128736; Core Technology Stack</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:2mm;">
+      <span class="chip ck-blue">Python 3.12</span><span class="chip ck-blue">FastAPI</span>
+      <span class="chip ck-purple">React 18</span><span class="chip ck-purple">TypeScript</span>
+      <span class="chip ck-green">OpenAI GPT-4o</span><span class="chip ck-green">text-embedding-3-small</span>
+      <span class="chip ck-amber">ChromaDB / Pinecone</span><span class="chip ck-amber">Redis</span>
+      <span class="chip ck-gray">PostgreSQL</span><span class="chip ck-gray">Docker</span>
+      <span class="chip ck-gray">JWT Auth</span><span class="chip ck-gray">Server-Sent Events</span>
+    </div>
+  </div>
+
+  <div class="sh" style="font-size:10.5pt;margin-bottom:1.5mm;"><div class="n">&#128640;</div>Post-Hackathon Vision</div>
+  <div class="g3" style="margin-bottom:3.5mm;">
+    <div class="card"><h4 style="font-size:8pt;">Phase 2 &mdash; Active Learning Loop</h4><p style="font-size:7.3pt;">Human corrections on uncertain verdicts feed back into the embedding model via fine-tuning, continuously improving accuracy without manual retraining. Corrections weighted by reviewer seniority and policy domain.</p></div>
+    <div class="card"><h4 style="font-size:8pt;">Phase 3 &mdash; Graph Policy Store</h4><p style="font-size:7.3pt;">Brand guidelines stored as a knowledge graph. Graph traversal enables true multi-hop reasoning across complex, cross-referenced policy structures with full relationship traceability.</p></div>
+    <div class="card"><h4 style="font-size:8pt;">Phase 4 &mdash; Visual Compliance</h4><p style="font-size:7.3pt;">Extend the engine to image and video content using multimodal models. Automatically detect off-brand colors, typography violations, and unauthorized logo usage in creative assets.</p></div>
+  </div>
+
+  <div class="hb hp">
+    <strong style="font-size:9pt;display:block;margin-bottom:2mm;">&#127919; Why BrandSentry AI Should Advance to Round 2</strong>
+    <ul style="font-size:7.8pt;padding-left:15px;line-height:1.7;">
+      <li>Solves a real, high-value enterprise pain point with a technically grounded, production-realistic approach</li>
+      <li>Introduces genuinely novel capabilities &mdash; <strong>presupposition mining</strong> and <strong>policy-aware prompt chaining</strong> &mdash; not present in any existing compliance tool</li>
+      <li>Adaptive retrieval strategy is the only system that changes its RAG method based on the semantic type of the claim being validated</li>
+      <li>Cascaded Bayesian confidence scoring structurally prevents overconfident wrong verdicts, making it suitable for regulated industries</li>
+      <li>All verdicts grounded in retrieved evidence only &mdash; zero hallucinated citations, enforced structurally at the API layer</li>
+    </ul>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &ndash; Nexora AI &ndash; K P Chirag Guptha (24MIS0369) &ndash; VIT Vellore &ndash; October 21, 2026</span>
+    <span>Confidential &middot; All Rights Reserved</span>
+  </div>
+</div></div>
+
+</body>
+</html>
+
