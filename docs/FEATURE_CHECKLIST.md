@@ -12,23 +12,23 @@
 
 ---
 
-## P0 — Mandatory Core Features (Target: Phase 2 through Phase 7)
+## P0 — Mandatory Core Features (Phases 1 through 7)
 
 | Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **P0-01** | **Project & Environment Setup** | Full-stack scaffolding, dependencies, build pipelines, health endpoint | Phase 1 | **TESTED** | FastAPI GET /health passing (pytest: 3/3 passed). React build (tsc + vite) passing. |
-| **P0-02** | **PDF/TXT Guideline Upload** | Multi-part upload handler for brand guideline documents | Phase 2 | **NOT STARTED** | Backend storage & upload endpoint targeted for Phase 2. |
-| **P0-03** | **Text Extraction Engine** | Clean text extraction using PyMuPDF preserving page numbers & sections | Phase 2 | **NOT STARTED** | PyMuPDF pipeline targeted for Phase 2. |
-| **P0-04** | **Document Chunking** | Section-aware semantic chunking (~300–500 tokens) with metadata | Phase 2 | **NOT STARTED** | Metadata schema prepared in Phase 1 schemas. |
-| **P0-05** | **Embedding Generation** | Dense vector embeddings via SentenceTransformers or remote provider | Phase 2 | **NOT STARTED** | Abstracted interface to be implemented in Phase 2. |
-| **P0-06** | **Vector Retrieval** | Persistent ChromaDB collection indexing with top-k similarity search | Phase 2 | **NOT STARTED** | ChromaDB persistence path configured in `backend/app/core/config.py`. |
-| **P0-07** | **Marketing Content Input** | Text input interface for raw advertising and marketing copy | Phase 3 / 5 | **NOT STARTED** | Frontend component queued for Phase 5. |
-| **P0-08** | **Claim Extraction** | Decompose unstructured marketing copy into discrete, testable claims | Phase 3 | **NOT STARTED** | Extraction logic queued for Phase 3. |
-| **P0-09** | **Three-Way Verdict Engine** | Rigorous evaluation: SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE | Phase 3 | **NOT STARTED** | Strict rule: No automatic approval on missing evidence. |
+| **P0-01** | **Project & Environment Setup** | Full-stack scaffolding, dependencies, build pipelines, health endpoint | Phase 1 | **TESTED** | FastAPI GET /health passing. React build (tsc + vite) passing. |
+| **P0-02** | **PDF/TXT Guideline Upload** | Multi-part upload handler with MIME/magic byte checks and UUIDs | Phase 2 | **TESTED** | Implemented `POST /api/guidelines/upload` with 10MB limit and safe paths. |
+| **P0-03** | **Text Extraction Engine** | Clean text extraction using PyMuPDF preserving page numbers & sections | Phase 2 | **TESTED** | Page-preserving extraction for PDF/TXT. Scanned PDF error (422) handling. |
+| **P0-04** | **Document Chunking** | Section-aware semantic chunking (~400 tokens / 50 tokens overlap) with metadata | Phase 2 | **TESTED** | Deterministic sliding-window chunker with chunk_id, page_number, word counts. |
+| **P0-05** | **Embedding Generation** | Dense vector embeddings via ONNX all-MiniLM-L6-v2 (384 dimensions) on CPU | Phase 2 | **TESTED** | Lazy loading, unit-normalized, finite vectors, cached in memory. |
+| **P0-06** | **Vector Retrieval** | Persistent ChromaDB collection indexing with top-k similarity search | Phase 2 | **TESTED** | Implemented `POST /api/guidelines/search` with document_id filtering & persistence. |
+| **P0-07** | **Marketing Content Input** | Text input interface for raw advertising and marketing copy | Phase 3 / 5 | **NOT STARTED** | Scheduled for Phase 3/5. |
+| **P0-08** | **Claim Extraction** | Decompose unstructured marketing copy into discrete, testable claims | Phase 3 | **NOT STARTED** | Scheduled for Phase 3. |
+| **P0-09** | **Three-Way Verdict Engine** | Rigorous evaluation: SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE | Phase 3 | **NOT STARTED** | Strict rule: No automatic approval on missing evidence. Scheduled for Phase 3. |
 | **P0-10** | **Verifiable Policy Citations** | Exact guideline document name, page number, and quote snippet | Phase 4 | **NOT STARTED** | Hallucination-prevention check queued for Phase 4. |
 | **P0-11** | **Suggested Corrections** | Compliant marketing rewrites for contradicted & insufficient claims | Phase 4 | **NOT STARTED** | Prompt & rule-guided rewrite generator. |
 | **P0-12** | **Complete Review Workflow** | End-to-end flow from guideline upload to correction application | Phase 5 | **NOT STARTED** | Primary hackathon deliverable. |
-| **P0-13** | **Graceful Error Handling** | Structured error responses, offline backend detection, retry options | All Phases | **IN PROGRESS** | Implemented & tested for health checks; to be expanded across all APIs. |
+| **P0-13** | **Graceful Error Handling** | Structured error responses, empty/corrupt validation, offline backend detection | All Phases | **TESTED** | Tested across file validations, 400 empty, 400 corrupt, 413 size, 422 scanned PDF. |
 | **P0-14** | **Public Deployment** | Cloud container deployment with public HTTPS URL for judges | Phase 7 | **NOT STARTED** | Targeted after Phase 6 testing. |
 
 ---
@@ -40,7 +40,7 @@
 | **P1-01** | **Deterministic Pre-Filter** | Regex/keyword screener for banned words and trademark casing | Phase 3 | **NOT STARTED** | Eliminates LLM latency/cost for obvious violations. |
 | **P1-02** | **Semantic Drift Detection** | Measures divergence between claim claims and original brand positioning | Phase 4 | **NOT STARTED** | Queued for Phase 4. |
 | **P1-03** | **Claim-Type Retrieval Routing** | Category-based query expansion (Regulatory, Product, Voice) | Phase 3 | **NOT STARTED** | Optimizes hybrid recall per claim type. |
-| **P1-04** | **Review History** | Session audit log tracking past copy iterations and compliance scores | Phase 5 | **NOT STARTED** | Client-side or SQLite session storage. |
+| **P1-04** | **Review History & Document Registry**| Session audit log and document tracking in SQLite | Phase 2 / 5 | **TESTED** | SQLite document registry (`data/documents.db`) implemented and tested. |
 | **P1-05** | **Exportable Review Reports** | PDF/JSON compliance summary export for legal/audit records | Phase 5 | **NOT STARTED** | Generates auditable compliance sign-off report. |
 
 ---
@@ -49,7 +49,7 @@
 
 | Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **P2-01** | **Graph-Based Policy Reasoning** | Neo4j/Knowledge Graph for complex hierarchical brand rules | Post-Hackathon | **NOT STARTED** | Architectural extension. |
+| **P2-01** | **Graph-Based Policy Reasoning** | Knowledge Graph for complex hierarchical brand rules | Post-Hackathon | **NOT STARTED** | Architectural extension. |
 | **P2-02** | **Feedback-Driven Improvement** | Human-in-the-loop review feedback to fine-tune retrieval prompts | Post-Hackathon | **NOT STARTED** | Enterprise feature. |
 | **P2-03** | **Multimodal Visual Compliance** | Image & video brand logo, color palette, and layout audit | Post-Hackathon | **NOT STARTED** | Vision model integration. |
 | **P2-04** | **Calibrated Confidence Scoring** | Probabilistic confidence calibration across verdict categories | Post-Hackathon | **NOT STARTED** | Advanced ML feature. |
@@ -57,8 +57,8 @@
 
 ---
 
-## Summary of Current Milestone Progress (Phase 1)
-- **Features Tested & Passing**: 1 (`P0-01: Project & Environment Setup`)
-- **Features In Progress**: 1 (`P0-13: Graceful Error Handling`)
-- **Features Not Started**: 17
+## Summary of Current Milestone Progress (Phase 2 Completed)
+- **Features Tested & Passing**: 7 (`P0-01`, `P0-02`, `P0-03`, `P0-04`, `P0-05`, `P0-06`, `P0-13`, plus `P1-04`)
+- **Features In Progress**: 0
+- **Features Not Started**: 12
 - **Features Blocked**: 0

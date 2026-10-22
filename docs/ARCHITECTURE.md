@@ -1,7 +1,7 @@
 # BrandSentry AI — Application Architecture Specification
 
-> **Phase:** Round 2 — Phase 1 (Foundation & Setup)  
-> **Status:** Foundational Architecture Established (Phases 2–8 Roadmap Defined)  
+> **Phase:** Round 2 — Phase 2 (Guideline Ingestion & Retrieval Foundation)  
+> **Status:** Foundational RAG Pipeline Implemented & Verified (33 Tests Passing)  
 > **Target Deadline:** 25 October 2026, 10:00 AM IST  
 
 ---
@@ -20,117 +20,46 @@ BrandSentry AI is designed for automated, verifiable brand compliance and market
 
 ## 2. Component Implementation Status
 
-| Component # | Component Description | Current Status | Target Phase |
-| :--- | :--- | :--- | :--- |
-| **01** | **React 18 + TypeScript Client** | **IMPLEMENTED & TESTED (Health UI)** | Phase 1 (Full UI in Phase 5) |
-| **02** | **FastAPI ASGI Backend** | **IMPLEMENTED & TESTED (Health API)** | Phase 1 (Core API in Phase 2/3) |
-| **03** | **Guideline Ingestion Service** | **PLANNED** | Phase 2 |
-| **04** | **Text Extraction & Chunking** | **PLANNED** | Phase 2 |
-| **05** | **Embedding Generation Engine** | **PLANNED** | Phase 2 |
-| **06** | **ChromaDB Vector Retrieval** | **PLANNED** | Phase 2 |
-| **07** | **Claim Extraction Pipeline** | **PLANNED** | Phase 3 |
-| **08** | **Deterministic Compliance Checks** | **PLANNED** | Phase 3 (P1) |
-| **09** | **Claim-Type Retrieval Routing** | **PLANNED** | Phase 3 (P1) |
-| **10** | **Evidence-Grounded LLM Review** | **PLANNED** | Phase 3 |
-| **11** | **Three-Way Verdict Engine** | **PLANNED** | Phase 3 |
-| **12** | **Citation Validation Service** | **PLANNED** | Phase 4 |
-| **13** | **Suggested Corrections Engine** | **PLANNED** | Phase 4 |
-| **14** | **Structured Review Report** | **PLANNED** | Phase 4 & 5 |
+| Component # | Component Description | Current Status | Phase | Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **01** | **React 18 + TypeScript Client** | **IMPLEMENTED & TESTED** | Phase 1 & 2 | Interactive GuidelineExplorer + Health monitor. |
+| **02** | **FastAPI ASGI Backend** | **IMPLEMENTED & TESTED** | Phase 1 & 2 | `/health`, `/api/guidelines/upload`, `/api/guidelines/search`. |
+| **03** | **Guideline Ingestion Service** | **IMPLEMENTED & TESTED** | Phase 2 | Format validation, size limits (10MB), secure file persistence. |
+| **04** | **Text Extraction & Chunking** | **IMPLEMENTED & TESTED** | Phase 2 | PyMuPDF page-preserving extraction + sliding window chunker. |
+| **05** | **Embedding Generation Engine** | **IMPLEMENTED & TESTED** | Phase 2 | `all-MiniLM-L6-v2` ONNX CPU model, unit normalized, 384 dims. |
+| **06** | **ChromaDB Vector Retrieval** | **IMPLEMENTED & TESTED** | Phase 2 | Persistent ChromaDB (`data/chroma/`), cosine similarity, filter by doc_id. |
+| **07** | **SQLite Document Registry** | **IMPLEMENTED & TESTED** | Phase 2 | Metadata store (`data/documents.db`) tracking upload/index status. |
+| **08** | **Claim Extraction Pipeline** | **PLANNED** | Phase 3 | Decomposes copy into atomic, verifiable test claims. |
+| **09** | **Deterministic Compliance Checks** | **PLANNED** | Phase 3 (P1) | Regex & keyword screening for banned words / casing. |
+| **10** | **Claim-Type Retrieval Routing** | **PLANNED** | Phase 3 (P1) | Category routing (Product, Voice, Regulatory). |
+| **11** | **Evidence-Grounded LLM Review** | **PLANNED** | Phase 3 | Strict evidence-only LLM evaluator. |
+| **12** | **Three-Way Verdict Engine** | **PLANNED** | Phase 3 | `SUPPORTED`, `CONTRADICTED`, `INSUFFICIENT_EVIDENCE`. |
+| **13** | **Citation Validation Service** | **PLANNED** | Phase 4 | Exact excerpt verifier guarding against hallucinations. |
+| **14** | **Suggested Corrections Engine** | **PLANNED** | Phase 4 | Policy-compliant rewrite generator. |
 
 ---
 
-## 3. Detailed Component Architecture
+## 3. Implemented Pipeline Deep Dive (Phase 2)
 
-### Component 01: React Frontend (`frontend/src/`)
-- **Implemented in Phase 1**: Modular client with TypeScript, dark-mode glassmorphic design system, health status polling with graceful error states, and responsive layouts.
-- **Planned for Phase 5**: Upload dropzone for guideline documents (PDF/TXT), live chunking progress, rich marketing copy editor, side-by-side claim verification cards with color-coded badges, clickable citation drawers, and single-click correction applicator.
+### A. Document Upload & Format Verification (`POST /api/guidelines/upload`)
+- **File Integrity**: Inspects magic bytes (`%PDF-` for PDF, UTF-8/UTF-8-BOM decodability for TXT). Rejects executables, Office docs, empty files (0 bytes), and oversized files (> 10MB) before processing.
+- **Scanned PDF Guard**: Detects documents containing 0 digital text across all pages and returns an explicit `HTTP 422 Unprocessable Entity` indicating OCR is required.
+- **UUID & Path Isolation**: Assigns random UUIDv4 and stores files under `data/uploads/` using sanitized server filenames. No internal filesystem paths are exposed in API payloads.
 
-### Component 02: FastAPI Backend (`backend/app/`)
-- **Implemented in Phase 1**: ASGI application with CORS middleware, centralized Pydantic settings (`backend/app/core/config.py`), and verified `/health` endpoint.
-- **Planned for Phases 2–5**: RESTful router modules (`backend/app/api/`):
-  - `POST /api/guidelines/upload`: Multi-part document upload and ingestion.
-  - `GET /api/guidelines`: List indexed guideline rulesets.
-  - `POST /api/review/analyze`: Full-text marketing copy claim audit endpoint.
-  - `POST /api/review/correct`: Claim correction suggestion generator.
+### B. Extraction & Section-Aware Chunking
+- **Page Preservation**: Extracts text page by page with PyMuPDF, attaching 1-indexed `page_number` to every chunk.
+- **Sliding Window Chunking**: Chunks pages with configurable window size (`CHUNK_SIZE_WORDS = 300`) and overlap (`CHUNK_OVERLAP_WORDS = 40`), maintaining context across chunk boundaries while preserving raw text for citations.
 
-### Component 03: Guideline Ingestion Service (`backend/app/services/ingestion.py`)
-- **Status**: Planned (Phase 2).
-- Validates uploaded file types (MIME detection for application/pdf and text/plain).
-- Persists raw source documents into `data/uploads/` with UUID-based deduplication and timestamp tracking.
+### C. Embedding & ChromaDB Persistence
+- **Model**: Local ONNX `all-MiniLM-L6-v2` (384-dimensional dense vectors), running strictly on CPU with lazy initialization and in-memory caching.
+- **Normalization**: Vectors are L2 unit-normalized, ensuring cosine distance $D \in [0, 2]$.
+- **Idempotency**: Indexed via ChromaDB `upsert`, preventing duplicate entries on repeated uploads or retries.
+- **Persistence**: Saved under `data/chroma/`, verified to reload across application restarts.
 
-### Component 04: Text Extraction and Chunking (`backend/app/services/chunking.py`)
-- **Status**: Planned (Phase 2).
-- Extracts text via PyMuPDF (`fitz`), preserving page numbers, heading hierarchies, bullet items, and table structures.
-- Chunking strategy: Semantic section-aware windowing (~300–500 tokens with 50-token overlap). Every chunk retains rich metadata:
-  ```json
-  {
-    "document_id": "guideline_01",
-    "page_number": 4,
-    "section_title": "Product Performance Claims & Disclaimers",
-    "chunk_id": "chunk_01_p4_c2",
-    "text": "..."
-  }
-  ```
-
-### Component 05: Embedding Generation (`backend/app/retrieval/embeddings.py`)
-- **Status**: Planned (Phase 2).
-- Abstracted embedding interface supporting local SentenceTransformers (`all-MiniLM-L6-v2`) or remote embedding APIs.
-- Normalized vector outputs for cosine similarity computations.
-
-### Component 06: ChromaDB Vector Retrieval (`backend/app/retrieval/vector_store.py`)
-- **Status**: Planned (Phase 2).
-- Local persistent ChromaDB instance housed at `data/chroma/`.
-- Collection management isolated per guideline version.
-- Hybrid querying capability: Dense vector nearest-neighbor search coupled with BM25 lexical search (`rank-bm25`) for regulatory keywords and brand-mandated terminology.
-
-### Component 07: Claim Extraction Pipeline (`backend/app/services/claim_extractor.py`)
-- **Status**: Planned (Phase 3).
-- Takes unstructured marketing copy (e.g., social ads, press releases, landing page copy, packaging text).
-- Segments text into atomic, verifiable compliance claims (factual, comparative, superlative, regulatory, and trademark claims).
-- Output: List of structured claim objects with character offsets.
-
-### Component 08: Deterministic Compliance Checks (`backend/app/review/deterministic.py`)
-- **Status**: Planned (Phase 3 / P1).
-- Regex-based and rule-based pre-screener checking:
-  - Banned words / forbidden claims (e.g. unqualified "guaranteed", "100% cure").
-  - Trademark styling rules (e.g. incorrect capitalization or missing registered symbols).
-  - Required disclaimers (e.g. "Terms & Conditions apply").
-
-### Component 09: Claim-Type Retrieval Routing (`backend/app/retrieval/router.py`)
-- **Status**: Planned (Phase 3 / P1).
-- Classifies claims into categories (Tone & Voice, Product Claims, Regulatory/Legal, Visual/Brand Identity).
-- Routes query expansion and metadata filters to relevant subsets of the vector store to maximize recall of applicable rules.
-
-### Component 10: Evidence-Grounded LLM Review (`backend/app/review/evaluator.py`)
-- **Status**: Planned (Phase 3).
-- Structured LLM prompt instructing the model to act as an objective compliance auditor.
-- Strict grounding constraint: The LLM may ONLY use the retrieved guideline evidence to evaluate the claim.
-- Output schema enforces structured JSON with strict type validation via Pydantic.
-
-### Component 11: Three-Way Verdict Generation
-- **Status**: Planned (Phase 3).
-- Explicit, mutually exclusive verdict taxonomy:
-  1. `SUPPORTED`: The claim directly aligns with explicit permissions or required statements in the guidelines. Verifiable citation required.
-  2. `CONTRADICTED`: The claim violates, contradicts, or exceeds restrictions established in the guidelines. Verifiable citation and violation explanation required.
-  3. `INSUFFICIENT_EVIDENCE`: No matching guideline passage was found, or guidelines do not provide sufficient criteria to confirm or refute. No automatic approval.
-
-### Component 12: Citation Validation Service (`backend/app/review/citation_validator.py`)
-- **Status**: Planned (Phase 4).
-- Cross-checks citations returned in the LLM response against the actual retrieved chunk text in memory.
-- Guards against hallucinated page numbers or fabricated quotation text. Marks unverified citations with a warning flag.
-
-### Component 13: Suggested Corrections Engine (`backend/app/review/corrections.py`)
-- **Status**: Planned (Phase 4).
-- For claims marked `CONTRADICTED` or `INSUFFICIENT_EVIDENCE`, generates policy-compliant rewrite suggestions.
-- Preserves the marketing intent and brand tone while stripping forbidden superlatives or injecting required qualifiers/disclaimers.
-
-### Component 14: Structured Review Report (`backend/app/schemas/report.py`)
-- **Status**: Planned (Phase 4 & 5).
-- Comprehensive JSON schema representing the full audit session:
-  - Document & copy metadata
-  - Overall compliance score (percentage of supported vs contradicted claims)
-  - Claim-by-claim breakdown with verdicts, confidence scores, citations, and suggested replacements
-  - Exportable format for compliance records.
+### D. Semantic Passage Retrieval (`POST /api/guidelines/search`)
+- Accepts query string (max 1000 characters) and optional `document_id`.
+- Embeds query and executes vector similarity search in ChromaDB.
+- Returns matched passages with `chunk_id`, `document_id`, `source_filename`, `page_number`, `distance`, `similarity_score`, and exact verbatim text snippet.
 
 ---
 
@@ -138,26 +67,17 @@ BrandSentry AI is designed for automated, verifiable brand compliance and market
 
 ```mermaid
 flowchart TD
-    User([User / Marketer]) -->|1. Uploads Guideline PDF/TXT| Ingestion[Guideline Ingestion]
-    Ingestion -->|2. Extract & Parse| Extractor[PyMuPDF Text Extractor]
-    Extractor -->|3. Chunk with Metadata| Chunker[Semantic Chunker]
-    Chunker -->|4. Generate Vectors| Embedder[Embedding Engine]
-    Embedder -->|5. Store Chunks & Vectors| Chroma[(ChromaDB + BM25)]
+    User([User / Marketer]) -->|1. Uploads Guideline PDF/TXT| Ingestion[Guideline Ingestion API]
+    Ingestion -->|2. Validate Magic Bytes| Validator[Format & Size Validator]
+    Validator -->|3. Extract Page by Page| Extractor[PyMuPDF Text Extractor]
+    Extractor -->|4. Split with 40-word Overlap| Chunker[Deterministic Chunker]
+    Chunker -->|5. 384-dim Vectors| Embedder[ONNX all-MiniLM-L6-v2 on CPU]
+    Embedder -->|6. Idempotent Upsert| Chroma[(Persistent ChromaDB: data/chroma)]
+    Ingestion -->|7. Update Status| SQLite[(SQLite Registry: data/documents.db)]
 
-    User -->|6. Submits Marketing Copy| ClaimParser[Claim Extractor]
-    ClaimParser -->|7. Atomic Claims| PreCheck[Deterministic Pre-Filter]
-    
-    PreCheck -->|8. Query Vectors & Terms| Chroma
-    Chroma -->|9. Top-K Relevant Evidence| LLMReview[Evidence-Grounded LLM Evaluator]
-    
-    LLMReview -->|10. Raw JSON Evaluation| Validator[Citation & Verdict Validator]
-    Validator -->|11. 3-Way Verdicts & Fixes| ReportGen[Structured Report Generator]
-    ReportGen -->|12. Interactive Dashboard| UI[React 18 Dashboard]
+    User -->|8. Natural Language Query| SearchAPI[Search API: /api/guidelines/search]
+    SearchAPI -->|9. Embed Query| Embedder
+    SearchAPI -->|10. Query Top-K + Doc Filter| Chroma
+    Chroma -->|11. Ranked Passages & Citations| SearchAPI
+    SearchAPI -->|12. Verbatim Results| User
 ```
-
----
-
-## 5. Security & Isolation Considerations
-- **No Hardcoded Keys**: API keys and secrets are injected strictly via `.env` files or runtime environment variables.
-- **Isolated File Storage**: User uploaded guidelines are sequestered in `data/uploads/` and ignored by version control.
-- **CORS Safeguards**: Backend strictly restricts CORS origins to authorized frontend development ports.

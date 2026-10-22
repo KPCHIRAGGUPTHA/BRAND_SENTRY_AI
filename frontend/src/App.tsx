@@ -1,6 +1,7 @@
 import React from 'react';
 import { Header } from './components/Header';
 import { HealthStatus } from './components/HealthStatus';
+import { GuidelineExplorer } from './components/GuidelineExplorer';
 import {
   FileText,
   Search,
@@ -23,7 +24,7 @@ export const App: React.FC = () => {
         <section className="hero-section">
           <div className="hero-pill">
             <span className="hero-pill-dot" />
-            <span>Round 2 — Phase 1 Initialized</span>
+            <span>Round 2 — Phase 2: Ingestion &amp; Retrieval Active</span>
           </div>
 
           <h2 className="hero-title">
@@ -37,20 +38,25 @@ export const App: React.FC = () => {
           </p>
 
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <a href="#architecture" className="btn btn-primary">
+            <a href="#explorer" className="btn btn-primary">
               <Sparkles size={16} />
-              Review Architecture
+              Try Guideline Search
             </a>
             <a
-              href="https://github.com"
+              href="http://127.0.0.1:8000/docs"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
             >
               <FileText size={16} />
-              Documentation
+              Interactive API Docs
             </a>
           </div>
+        </section>
+
+        {/* Phase 2 Interactive Guideline Ingestion & Retrieval Explorer */}
+        <section id="explorer">
+          <GuidelineExplorer />
         </section>
 
         {/* Status and Environment Grid */}
@@ -65,7 +71,7 @@ export const App: React.FC = () => {
                 <Database size={18} style={{ color: 'var(--purple)' }} />
                 Environment &amp; Stack Runtime
               </h3>
-              <span className="status-pill status-online">READY</span>
+              <span className="status-pill status-online">PHASE 2 READY</span>
             </div>
 
             <div className="meta-list">
@@ -74,20 +80,20 @@ export const App: React.FC = () => {
                 <span className="meta-value">FastAPI + Uvicorn (Py 3.14)</span>
               </div>
               <div className="meta-row">
-                <span className="meta-label">Frontend Framework</span>
-                <span className="meta-value">React 18 + TypeScript + Vite</span>
+                <span className="meta-label">Document Parser</span>
+                <span className="meta-value">PyMuPDF 2.0 (Page-Preserving)</span>
               </div>
               <div className="meta-row">
-                <span className="meta-label">Vector Storage (P2)</span>
-                <span className="meta-value">ChromaDB Persistent Store</span>
+                <span className="meta-label">Embedding Model</span>
+                <span className="meta-value">all-MiniLM-L6-v2 (ONNX CPU)</span>
               </div>
               <div className="meta-row">
-                <span className="meta-label">LLM Interface (P3)</span>
-                <span className="meta-value">Provider-Agnostic Service</span>
+                <span className="meta-label">Vector Storage</span>
+                <span className="meta-value">ChromaDB 1.5.9 (Persistent)</span>
               </div>
               <div className="meta-row">
-                <span className="meta-label">Strict Hackathon Deadline</span>
-                <span className="meta-value">25 Oct 2026, 10:00 AM IST</span>
+                <span className="meta-label">Metadata Registry</span>
+                <span className="meta-value">SQLite (data/documents.db)</span>
               </div>
             </div>
           </div>
@@ -112,35 +118,35 @@ export const App: React.FC = () => {
                 fontFamily: 'var(--font-mono)',
               }}
             >
-              Phases 2 – 5
+              Phases 1 &bull; 2 Active
             </span>
           </div>
 
           <div className="workflow-stepper">
-            <div className="step-box">
-              <span className="step-num">Step 01</span>
+            <div className="step-box" style={{ borderColor: 'var(--primary)' }}>
+              <span className="step-num" style={{ color: 'var(--success)' }}>Step 01 &bull; Verified</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FileText size={16} color="var(--primary)" />
                 <span className="step-title">Guideline Ingestion</span>
               </div>
               <p className="step-desc">
-                Upload brand rulebooks (PDF / TXT). PyMuPDF parses text with section-aware chunking.
+                Upload brand rulebooks (PDF / TXT). PyMuPDF parses text with page number preservation.
               </p>
             </div>
 
-            <div className="step-box">
-              <span className="step-num">Step 02</span>
+            <div className="step-box" style={{ borderColor: 'var(--purple)' }}>
+              <span className="step-num" style={{ color: 'var(--success)' }}>Step 02 &bull; Verified</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Layers size={16} color="var(--purple)" />
                 <span className="step-title">Vector Indexing</span>
               </div>
               <p className="step-desc">
-                Dense embeddings &amp; BM25 keyword indexes stored in persistent ChromaDB collections.
+                Dense embeddings &amp; page metadata indexed into persistent ChromaDB collections.
               </p>
             </div>
 
             <div className="step-box">
-              <span className="step-num">Step 03</span>
+              <span className="step-num">Step 03 &bull; Phase 3</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <FileSearch size={16} color="var(--warning)" />
                 <span className="step-title">Claim Extraction</span>
@@ -151,18 +157,18 @@ export const App: React.FC = () => {
             </div>
 
             <div className="step-box">
-              <span className="step-num">Step 04</span>
+              <span className="step-num">Step 04 &bull; Phase 3</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Search size={16} color="var(--primary)" />
                 <span className="step-title">Hybrid Retrieval</span>
               </div>
               <p className="step-desc">
-                Retrieve top-k policy clauses per claim. Exact matches for banned words &amp; regulations.
+                Retrieve top-k relevant policy clauses per claim. Exact matches for banned words.
               </p>
             </div>
 
             <div className="step-box">
-              <span className="step-num">Step 05</span>
+              <span className="step-num">Step 05 &bull; Phase 3</span>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <CheckCircle size={16} color="var(--success)" />
                 <span className="step-title">3-Way Verdict</span>
@@ -174,7 +180,7 @@ export const App: React.FC = () => {
           </div>
         </section>
 
-        {/* Phase 1 Verification Notice */}
+        {/* Phase 2 Verification Notice */}
         <section
           style={{
             padding: '20px 24px',
@@ -190,10 +196,10 @@ export const App: React.FC = () => {
         >
           <div>
             <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#fff' }}>
-              Phase 1 Deliverables Active
+              Phase 2 Ingestion &amp; Retrieval Foundation Complete
             </h4>
             <p style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-              FastAPI backend and React frontend are configured, tested, and ready for Phase 2 guideline indexing.
+              33 automated tests passing. Guideline upload, PyMuPDF text extraction, chunking, and ChromaDB retrieval verified.
             </p>
           </div>
           <span
@@ -206,14 +212,14 @@ export const App: React.FC = () => {
               color: 'var(--primary)',
             }}
           >
-            Awaiting Phase 2 Authorization <ArrowRight size={14} />
+            Awaiting Phase 3 Authorization <ArrowRight size={14} />
           </span>
         </section>
       </main>
 
       <footer className="app-footer">
         <div className="container">
-          BrandSentry AI &bull; Round 2 Engineering &bull; Hackathon Project
+          BrandSentry AI &bull; Round 2 Engineering &bull; Hackathon Project &bull; Deadline: 25 Oct 2026 10:00 AM IST
         </div>
       </footer>
     </div>

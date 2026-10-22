@@ -1,4 +1,9 @@
-import { HealthResponse } from '../types/api';
+import {
+  HealthResponse,
+  GuidelineUploadResponse,
+  GuidelineSearchResponse,
+  DocumentListResponse,
+} from '../types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -7,23 +12,18 @@ export async function fetchHealth(): Promise<HealthResponse> {
   const timeoutId = setTimeout(() => controller.abort(), 4000);
 
   try {
-    // Attempt direct URL first or relative via Vite proxy
     const response = await fetch(`${API_BASE_URL}/health`, {
       method: 'GET',
-      headers: {
-        'Accept': 'application/json',
-      },
+      headers: { Accept: 'application/json' },
       signal: controller.signal,
     });
-
     clearTimeout(timeoutId);
 
     if (!response.ok) {
       throw new Error(`Backend responded with HTTP status ${response.status} (${response.statusText})`);
     }
 
-    const data: HealthResponse = await response.json();
-    return data;
+    return await response.json();
   } catch (error: unknown) {
     clearTimeout(timeoutId);
     if (error instanceof Error) {
@@ -34,4 +34,65 @@ export async function fetchHealth(): Promise<HealthResponse> {
     }
     throw new Error('An unknown error occurred while connecting to the backend');
   }
+}
+
+export async function uploadGuideline(file: File): Promise<GuidelineUploadResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const response = await fetch(`${API_BASE_URL}/api/guidelines/upload`, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Upload failed with HTTP ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+export async function searchGuidelines(
+  query: string,
+  documentId?: string,
+  topK: number = 5
+): Promise<GuidelineSearchResponse> {
+  const payload: { query: string; document_id?: string; top_k: number } = {
+    query,
+    top_k: topK,
+  };
+  if (documentId) {
+    payload.document_id = documentId;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/guidelines/search`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Search failed with HTTP ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+export async function fetchGuidelines(): Promise<DocumentListResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/guidelines`, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.detail || `Fetching guidelines failed with HTTP ${response.status}`);
+  }
+
+  return await response.json();
 }

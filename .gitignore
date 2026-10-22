@@ -51,6 +51,8 @@ data/uploads/*
 !data/uploads/.gitkeep
 data/chroma/*
 !data/chroma/.gitkeep
+backend/data/
+scratch/
 *.db
 *.sqlite
 *.sqlite3
