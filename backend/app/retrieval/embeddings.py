@@ -46,7 +46,9 @@ class EmbeddingService:
                     onnx_err,
                 )
                 try:
-                    from sentence_transformers import SentenceTransformer
+                    import importlib
+                    st_module = importlib.import_module("sentence_transformers")
+                    SentenceTransformer = getattr(st_module, "SentenceTransformer")
                     st_model = SentenceTransformer(self.model_name, device="cpu")
                     self._embed_fn = lambda texts: st_model.encode(
                         texts, normalize_embeddings=True, convert_to_numpy=True
