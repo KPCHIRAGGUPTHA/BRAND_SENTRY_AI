@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Server, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, Server, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
 import { fetchHealth } from '../services/api';
 import { HealthResponse } from '../types/api';
 
@@ -34,26 +34,35 @@ export const HealthStatus: React.FC = () => {
   }, [checkHealth]);
 
   const isOnline = !loading && !error && data?.status === 'ok';
+  const isError = !loading && (error !== null || (data && data.status !== 'ok'));
 
   return (
-    <div className="glass-card">
-      <div className="card-header-row">
-        <h3 className="card-title">
-          <Server size={18} style={{ color: 'var(--primary)' }} />
-          Backend Service Status
-        </h3>
+    <div className="card" id="status">
+      <div className="card-header">
+        <div className="card-title-group">
+          <h3 className="card-title">
+            <Server size={18} style={{ color: 'var(--color-primary)' }} />
+            Backend Service Status
+          </h3>
+          <p className="card-description">
+            Live health verification with the FastAPI ASGI compliance backend.
+          </p>
+        </div>
         <div>
           {loading ? (
-            <span className="status-pill status-checking">
-              <span className="pulse-dot" /> CHECKING
+            <span className="badge badge-warning">
+              <span className="pulse-indicator" />
+              <span>Checking...</span>
             </span>
           ) : isOnline ? (
-            <span className="status-pill status-online">
-              <span className="pulse-dot" /> ONLINE
+            <span className="badge badge-success">
+              <CheckCircle2 size={13} />
+              <span>Connected</span>
             </span>
           ) : (
-            <span className="status-pill status-offline">
-              <span className="pulse-dot" /> DISCONNECTED
+            <span className="badge badge-error">
+              <XCircle size={13} />
+              <span>Unavailable</span>
             </span>
           )}
         </div>
@@ -61,7 +70,7 @@ export const HealthStatus: React.FC = () => {
 
       <div className="meta-list">
         <div className="meta-row">
-          <span className="meta-label">Target URL</span>
+          <span className="meta-label">Endpoint</span>
           <span className="meta-value">http://127.0.0.1:8000/health</span>
         </div>
 
@@ -88,61 +97,36 @@ export const HealthStatus: React.FC = () => {
         </div>
       </div>
 
-      {error && (
-        <div
-          style={{
-            marginTop: '16px',
-            padding: '12px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            display: 'flex',
-            alignItems: 'flex-start',
-            gap: '10px',
-            fontSize: '0.825rem',
-            color: '#FCA5A5',
-          }}
-        >
-          <AlertCircle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
+      {isError && (
+        <div className="alert alert-error" role="alert">
+          <AlertTriangle size={18} style={{ flexShrink: 0, marginTop: '2px' }} />
           <div>
-            <strong>Backend Connection Offline</strong>
-            <p style={{ marginTop: '4px', color: 'var(--text-muted)' }}>{error}</p>
-            <p style={{ marginTop: '6px', fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-              Tip: Start the backend with: <code>uvicorn backend.app.main:app --port 8000 --reload</code>
-            </p>
+            <strong style={{ display: 'block', marginBottom: '2px' }}>Backend Service Offline</strong>
+            <span>{error || 'Service responded with non-ok status.'}</span>
+            <div style={{ marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+              Start backend: <code style={{ fontFamily: 'var(--font-mono)', background: '#F4F6F8', padding: '2px 5px', borderRadius: '4px' }}>uvicorn backend.app.main:app --port 8000</code>
+            </div>
           </div>
         </div>
       )}
 
       {isOnline && (
-        <div
-          style={{
-            marginTop: '16px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            backgroundColor: 'rgba(16, 185, 129, 0.08)',
-            border: '1px solid rgba(16, 185, 129, 0.25)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            fontSize: '0.8rem',
-            color: '#86EFAC',
-          }}
-        >
-          <CheckCircle2 size={16} />
-          FastAPI ASGI service is healthy and accepting requests.
+        <div className="alert alert-success" role="status">
+          <CheckCircle2 size={16} style={{ flexShrink: 0, marginTop: '2px' }} />
+          <span>FastAPI backend is operational and accepting vector retrieval requests.</span>
         </div>
       )}
 
       <div style={{ marginTop: '16px', display: 'flex', justifyContent: 'flex-end' }}>
         <button
+          type="button"
           className="btn btn-secondary"
           onClick={checkHealth}
           disabled={loading}
           style={{ fontSize: '0.8rem', padding: '6px 14px' }}
         >
-          <RefreshCw size={14} className={loading ? 'pulse-dot' : ''} />
-          {loading ? 'Polling...' : 'Re-check Connection'}
+          <RefreshCw size={14} className={loading ? 'pulse-indicator' : ''} />
+          <span>{loading ? 'Polling...' : 'Re-check Connection'}</span>
         </button>
       </div>
     </div>
