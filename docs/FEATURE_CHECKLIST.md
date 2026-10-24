@@ -58,7 +58,7 @@ This section explicitly evaluates advanced architectural features, distinguishin
 | **ADV-03** | **Claim-Type Retrieval Routing** | Category-based routing (e.g. Safety vs. Guarantees vs. Pricing) to prioritize relevant guideline sections. | **Partially implemented** | Heuristic keyword section matching is implemented in `verdict_engine.py` (`test_guarantee_claim_cites_guarantee_rule_not_safety_rule`), but full automated taxonomy classification is not implemented. |
 | **ADV-04** | **Policy Versioning & Snapshots** | Immutable guideline snapshots with version history and diff tracking. | **Partially implemented** | Ingestion assigns immutable UUIDs and timestamps in SQLite, but git-like version diffing between guideline revisions is not implemented. |
 | **ADV-05** | **Exportable Compliance Reports** | PDF/JSON compliance summary export for legal audit records. | **Partially implemented** | Complete JSON review payload is returned by `/api/review` and copyable in UI, but automated PDF report generation is not implemented. |
-| **ADV-06** | **Semantic Drift Detection** | Vector and presupposition analysis to measure brand voice divergence across campaigns. | **Not implemented** | Documented architectural extension; requires historical brand corpus modeling. |
+| **ADV-06** | **Semantic Drift Detection** | Detects subtle changes in certainty, scope, numerical strength, conditions, temporality, causality, and comparison between claims and evidence. | **Tested** | Implemented in `backend/app/services/semantic_drift.py` and integrated into `VerdictEngine` and React UI. Covered by 15 dedicated tests in `test_semantic_drift.py` verifying all 7 categories and guardrails. |
 | **ADV-07** | **BM25 Hybrid Retrieval** | Sparse lexical search (BM25) fused with dense ChromaDB vector retrieval via Reciprocal Rank Fusion. | **Not implemented** | Current retrieval is purely dense vector search using ONNX `all-MiniLM-L6-v2`; sparse index is not implemented. |
 | **ADV-08** | **Graph-Based Policy Reasoning** | Knowledge graph modeling hierarchical policy rules, exceptions, and parent-child clause dependencies. | **Not implemented** | Future research roadmap item. Current logic uses deterministic multi-tier rule evaluation. |
 | **ADV-09** | **Bayesian Confidence Calibration** | Formal Bayesian probability scoring for verdict uncertainty. | **Not implemented** | Vector cosine similarity distances are reported; formal Bayesian calibration formulas are not implemented. |
@@ -73,9 +73,9 @@ This section explicitly evaluates advanced architectural features, distinguishin
 ## 📊 Summary of Status Breakdown
 
 * **Deployed**: 16 features (14 Core platform features + 2 Advanced features: Prohibited Phrase Pre-screening & SQLite Document Registry)
-* **Tested**: 16 features (All deployed features have comprehensive automated tests: 151 backend tests + frontend build check)
+* **Tested**: 17 features (All 16 deployed features + `ADV-06` Semantic Drift Detection; total 166 backend tests + frontend build check)
 * **Partially implemented**: 3 features (Claim-Type Retrieval Routing, Policy Versioning Snapshots, Exportable Reports)
-* **Not implemented**: 9 features (Semantic Drift, BM25 Hybrid Retrieval, Graph-Based Reasoning, Bayesian Calibration, Redis Caching, SSE Streaming, Authentication, Rate Limiting, Multimodal Visual Compliance)
+* **Not implemented**: 8 features (BM25 Hybrid Retrieval, Graph-Based Reasoning, Bayesian Calibration, Redis Caching, SSE Streaming, Authentication, Rate Limiting, Multimodal Visual Compliance)
 * **Implemented (untested)**: 0
 * **Not verified**: 0
 

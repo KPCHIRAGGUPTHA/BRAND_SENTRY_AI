@@ -3,7 +3,7 @@
 [![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
 [![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi)](https://brandsentry-api.onrender.com/docs)
 [![Health Status](https://img.shields.io/badge/Backend%20Status-Connected%20(200%20OK)-10B981?style=for-the-badge)](https://brandsentry-api.onrender.com/health)
-[![Tests](https://img.shields.io/badge/Test%20Suite-151%20Passed-success?style=for-the-badge&logo=pytest)](docs/EVALUATION_REPORT.md)
+[![Tests](https://img.shields.io/badge/Test%20Suite-166%20Passed-success?style=for-the-badge&logo=pytest)](docs/EVALUATION_REPORT.md)
 
 ---
 
@@ -78,6 +78,29 @@ flowchart TD
 
 ---
 
+## 🔍 Semantic Drift Detection Engine
+
+BrandSentry AI integrates an evidence-grounded **Semantic Drift Detection Engine** (`backend/app/services/semantic_drift.py`) directly into the review pipeline and user interface. 
+
+Semantic drift occurs when a marketing claim appears semantically related to an official policy or factual statement, but subtly changes its **meaning, strength, scope, certainty, qualifying conditions, temporality, causality, or comparison**.
+
+### Supported Drift Categories:
+1. **`CERTAINTY_SHIFT`**: Detects when qualified epistemic modality (*may*, *might*, *could*, *likely*, *aims to*) is escalated into an unconditional guarantee (*always*, *guaranteed*, *never*, *definitely*).
+2. **`SCOPE_EXPANSION`**: Detects when a restricted or qualified audience (*registered customers*, *enterprise clients*, *pilot cohort*) is broadened to universal scope (*all customers*, *everyone*).
+3. **`NUMERICAL_EXAGGERATION`**: Detects percentage inflation, multiplier expansion, or measurable figures exceeding source baselines (e.g., claiming *85%* when evidence documents *up to 15%*).
+4. **`CONDITION_OMISSION`**: Flags when essential prerequisites or constraints documented in the policy (*when unused*, *under suitable conditions*, *with prior approval*) are omitted from the marketing claim.
+5. **`TEMPORAL_SHIFT`**: Detects timeframe distortion or promises of instant/lifetime turnaround when guidelines specify measured turnaround periods (e.g., *within 30 days* vs. *instantly*).
+6. **`CAUSALITY_SHIFT`**: Flags when an observed statistical correlation or association (*associated with*, *linked to*) is rewritten as a proven cause (*causes*, *proves*, *cures*).
+7. **`COMPARISON_SHIFT`**: Flags when a balanced or qualified comparison (*comparable to*, *competitive*) is transformed into an unsubstantiated superlative (*fastest*, *outperforms every competitor*).
+
+### RAG Integration & Guardrails:
+* **Strict Grounding**: Every flagged drift issue links the exact phrase in the submitted claim to the corresponding source passage text, with an explainable reason and a safe suggested realignment.
+* **Non-Fabrication Default**: When evidence is missing or lacks topical overlap, the detector emits an explicit uncertainty indicator (`uncertainty: "..."`) rather than inventing findings.
+* **Verdict Preservation**: Drift analysis augments rather than blindly overrides existing verdicts. A claim without evidence remains `INSUFFICIENT_EVIDENCE`.
+* **Zero External Paid APIs**: Operates deterministically on local CPU, requiring no external API keys or recurring inference costs.
+
+---
+
 ## 🛠️ Technology Stack & Architecture
 
 ### Backend Stack
@@ -88,7 +111,7 @@ flowchart TD
 * **Embedding Model**: `sentence-transformers/all-MiniLM-L6-v2` via ONNX Runtime CPU inference (384-dim dense vectors, zero GPU requirement)
 * **Vector Store**: ChromaDB 1.5.x with persistent on-disk storage and cosine similarity
 * **Metadata Store**: SQLite (`data/documents.db`)
-* **Test Suite**: Pytest (151 unit, integration, and regression tests)
+* **Test Suite**: Pytest (166 unit, integration, and regression tests)
 
 ### Frontend Stack
 * **Framework**: React 18.3 with TypeScript
@@ -146,11 +169,17 @@ npm run dev
 
 ## 🧪 Testing & Validation
 
-### Run Backend Test Suite (151 Tests)
+### Run Full Backend Test Suite (166 Tests)
 ```powershell
 .\backend\venv\Scripts\pytest.exe -v
 ```
-All 151 tests validate health endpoints, PDF extraction, sliding-window chunking, ONNX embedding generation, vector store persistence, claim extraction, verdict classification, citation substring verification, and regression cases.
+All 166 tests validate health endpoints, PDF extraction, sliding-window chunking, ONNX embedding generation, vector store persistence, claim extraction, 3-way verdict classification, citation substring verification, regression cases, and semantic drift detection.
+
+### Run Semantic Drift Detection Test Suite Specifically
+```powershell
+.\backend\venv\Scripts\pytest.exe backend\tests\test_semantic_drift.py -v
+```
+Runs 15 targeted tests verifying all 7 semantic drift categories, edge cases, uncertainty handling, and schema backward compatibility.
 
 ### Run Frontend Build Check
 ```powershell

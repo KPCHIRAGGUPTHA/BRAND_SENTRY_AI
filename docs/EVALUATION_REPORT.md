@@ -26,10 +26,10 @@ The application's backend and frontend validation pipelines were executed locall
 ### 2.1 Backend Automated Test Suite (`pytest`)
 
 * **Execution Command:** `.\backend\venv\Scripts\pytest.exe -v`
-* **Total Collected Tests:** 151
-* **Passed:** 151 (100% of executed suite)
+* **Total Collected Tests:** 166
+* **Passed:** 166 (100% of executed suite)
 * **Failed:** 0
-* **Execution Duration:** 14.53 seconds (Pure CPU execution on Python 3.14 / Windows)
+* **Execution Duration:** 14.48 seconds (Pure CPU execution on Python 3.14 / Windows)
 * **Deprecation Warnings:** 4 (Pertaining to external upstream libraries: `fitz` import convention, `chromadb` asyncio coroutine inspection, and Starlette HTTP 422 constant name update)
 
 #### Module-by-Module Test Distribution
@@ -47,7 +47,8 @@ The application's backend and frontend validation pipelines were executed locall
 | `test_claim_extractor.py` | 16 | Sentence and clause boundary splitting, abbreviation protection (`e.g.`, `i.e.`, `U.S.`, `vs.`), whitespace sanitization, claim deduplication. | **PASSED** |
 | `test_review_api.py` | 17 | Review endpoint (`POST /api/review`), request schema validation, document scoping, evidence quote linkage, error responses. | **PASSED** |
 | `test_verdict_engine.py` | 52 | Three-way verdict classification, prohibited phrase rules, strict citation substring validation, evidence deduplication, suggested rewrites, regression tests. | **PASSED** |
-| **Total** | **151** | **Comprehensive Full-Stack Test Suite** | **151 PASSED** |
+| `test_semantic_drift.py` | 15 | Semantic drift detection across 7 categories (certainty, scope, numbers, condition, temporality, causality, comparison), edge cases, uncertainty, schema backward compatibility. | **PASSED** |
+| **Total** | **166** | **Comprehensive Full-Stack Test Suite** | **166 PASSED** |
 
 ---
 

@@ -59,6 +59,21 @@ export interface EvidenceItem {
   distance: number;
 }
 
+export interface SemanticDriftIssue {
+  category: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH' | string;
+  claim_phrase: string;
+  source_phrase: string;
+  explanation: string;
+  suggested_correction?: string | null;
+}
+
+export interface SemanticDriftResult {
+  detected: boolean;
+  issues: SemanticDriftIssue[];
+  uncertainty?: string | null;
+}
+
 export interface ClaimVerdict {
   claim_id: string;
   claim_text: string;
@@ -67,6 +82,7 @@ export interface ClaimVerdict {
   evidence: EvidenceItem[];
   suggested_correction?: string | null;
   deterministic_rule_fired?: boolean;
+  semantic_drift?: SemanticDriftResult | null;
 }
 
 export interface ReviewSummary {

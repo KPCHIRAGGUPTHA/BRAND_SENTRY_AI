@@ -20,6 +20,8 @@ from backend.app.schemas.review import (
     ClaimVerdictSchema,
     EvidenceItemSchema,
     ReviewSummary,
+    SemanticDriftResult,
+    SemanticDriftIssue,
 )
 from backend.app.services.document_registry import document_registry
 from backend.app.services.claim_extractor import claim_extractor
@@ -148,6 +150,26 @@ async def review_marketing_content(request: ReviewRequest):
             for e in cv.evidence
         ]
 
+        # Map semantic drift analysis if present
+        drift_schema = None
+        if getattr(cv, "semantic_drift", None) is not None:
+            sd = cv.semantic_drift
+            drift_schema = SemanticDriftResult(
+                detected=sd.detected,
+                issues=[
+                    SemanticDriftIssue(
+                        category=iss.category,
+                        severity=iss.severity,
+                        claim_phrase=iss.claim_phrase,
+                        source_phrase=iss.source_phrase,
+                        explanation=iss.explanation,
+                        suggested_correction=iss.suggested_correction,
+                    )
+                    for iss in sd.issues
+                ],
+                uncertainty=sd.uncertainty,
+            )
+
         claim_verdicts.append(
             ClaimVerdictSchema(
                 claim_id=cv.claim_id,
@@ -157,6 +179,7 @@ async def review_marketing_content(request: ReviewRequest):
                 evidence=evidence_schemas,
                 suggested_correction=cv.suggested_correction,
                 deterministic_rule_fired=cv.deterministic_rule_fired,
+                semantic_drift=drift_schema,
             )
         )
 

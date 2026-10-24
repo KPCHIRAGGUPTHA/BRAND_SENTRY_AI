@@ -59,6 +59,10 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional, Tuple
 
 from backend.app.core.config import settings
+from backend.app.services.semantic_drift import (
+    semantic_drift_detector,
+    SemanticDriftResult,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -237,6 +241,7 @@ class ClaimVerdict:
     evidence: List[EvidenceItem] = field(default_factory=list)
     suggested_correction: Optional[str] = None
     deterministic_rule_fired: bool = False
+    semantic_drift: Optional[SemanticDriftResult] = None
 
 
 # ---------------------------------------------------------------------------
@@ -259,6 +264,40 @@ class VerdictEngine:
         )
 
     def classify(
+        self,
+        claim_id: str,
+        claim_text: str,
+        retrieved_passages: List[Dict[str, Any]],
+    ) -> ClaimVerdict:
+        """
+        Produce a verdict for a single claim given its retrieved evidence passages,
+        and augment with semantic drift detection.
+        """
+        cv = self._classify_internal(claim_id, claim_text, retrieved_passages)
+
+        # Evaluate semantic drift against retrieved evidence
+        try:
+            cv.semantic_drift = semantic_drift_detector.analyze(
+                claim_text=claim_text,
+                retrieved_passages=retrieved_passages,
+            )
+            # If no suggested correction exists on the verdict, but drift detector generated one:
+            if not cv.suggested_correction and cv.semantic_drift and cv.semantic_drift.detected:
+                for issue in cv.semantic_drift.issues:
+                    if issue.suggested_correction:
+                        cv.suggested_correction = issue.suggested_correction
+                        break
+        except Exception as exc:
+            logger.warning("Semantic drift analysis failed for claim '%s': %s", claim_id, exc)
+            cv.semantic_drift = SemanticDriftResult(
+                detected=False,
+                issues=[],
+                uncertainty="Semantic drift analysis encountered an internal error.",
+            )
+
+        return cv
+
+    def _classify_internal(
         self,
         claim_id: str,
         claim_text: str,

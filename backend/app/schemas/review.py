@@ -54,6 +54,33 @@ class EvidenceItemSchema(BaseModel):
     )
 
 
+
+class SemanticDriftIssue(BaseModel):
+    """A detected semantic drift issue between claim and evidence."""
+    category: str = Field(description="Drift category (e.g. CERTAINTY_SHIFT, SCOPE_EXPANSION, NUMERICAL_EXAGGERATION).")
+    severity: str = Field(description="Severity of the drift: 'LOW' | 'MEDIUM' | 'HIGH'.")
+    claim_phrase: str = Field(description="Relevant phrase in the submitted marketing claim.")
+    source_phrase: str = Field(description="Corresponding factual or policy statement in the retrieved evidence.")
+    explanation: str = Field(description="Human-readable explanation of why this constitutes semantic drift.")
+    suggested_correction: Optional[str] = Field(
+        default=None,
+        description="Suggested adjustment to realign the claim with the evidence.",
+    )
+
+
+class SemanticDriftResult(BaseModel):
+    """Analysis of semantic drift for a marketing claim."""
+    detected: bool = Field(description="True if one or more semantic drift issues were identified.")
+    issues: List[SemanticDriftIssue] = Field(
+        default_factory=list,
+        description="List of detected drift issues.",
+    )
+    uncertainty: Optional[str] = Field(
+        default=None,
+        description="Explanation if evidence was insufficient or lacking topic overlap to evaluate drift.",
+    )
+
+
 class ClaimVerdictSchema(BaseModel):
     """Compliance verdict for a single extracted marketing claim."""
     claim_id: str = Field(description="Stable identifier: 'claim-1', 'claim-2', etc.")
@@ -85,6 +112,11 @@ class ClaimVerdictSchema(BaseModel):
         default=False,
         description="True when the verdict was determined by an explicit prohibited-phrase rule, not by retrieval.",
     )
+    semantic_drift: Optional[SemanticDriftResult] = Field(
+        default=None,
+        description="Detailed analysis of semantic drift between claim and retrieved evidence.",
+    )
+
 
 
 class ReviewSummary(BaseModel):

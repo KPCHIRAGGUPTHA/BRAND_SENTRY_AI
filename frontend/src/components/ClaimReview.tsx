@@ -8,7 +8,8 @@ import {
   RefreshCw,
   FileCheck,
   Sparkles,
-  Info
+  Info,
+  GitCompare
 } from 'lucide-react';
 import { reviewMarketingContent, fetchGuidelines } from '../services/api';
 import { ReviewResponse, DocumentSummary, ClaimVerdict } from '../types/api';
@@ -358,6 +359,131 @@ export const ClaimReview: React.FC = () => {
                       <p style={{ fontSize: '0.85rem', color: '#6A4A00', lineHeight: 1.45 }}>
                         {claim.suggested_correction}
                       </p>
+                    </div>
+                  )}
+
+                  {/* Semantic Drift Analysis */}
+                  {claim.semantic_drift && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <h5
+                          style={{
+                            fontSize: '0.78rem',
+                            fontWeight: 700,
+                            textTransform: 'uppercase',
+                            color: 'var(--color-text-secondary)',
+                            letterSpacing: '0.04em',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '6px',
+                            margin: 0,
+                          }}
+                        >
+                          <GitCompare size={14} style={{ color: 'var(--color-primary)' }} />
+                          Semantic Drift Analysis
+                        </h5>
+                        {claim.semantic_drift.detected ? (
+                          <span className="badge badge-warning" style={{ fontSize: '0.72rem' }}>
+                            Drift Detected ({claim.semantic_drift.issues.length})
+                          </span>
+                        ) : (
+                          <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>
+                            No Drift Detected
+                          </span>
+                        )}
+                      </div>
+
+                      {claim.semantic_drift.detected && claim.semantic_drift.issues.length > 0 ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {claim.semantic_drift.issues.map((iss, issIdx) => (
+                            <div
+                              key={issIdx}
+                              style={{
+                                padding: '12px 14px',
+                                background: '#FFF8F0',
+                                border: '1px solid #FFE3C2',
+                                borderRadius: 'var(--radius-sm)',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '6px',
+                              }}
+                            >
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.76rem', fontWeight: 700, color: '#A03800' }}>
+                                  {iss.category}
+                                </span>
+                                <span
+                                  className={
+                                    iss.severity === 'HIGH'
+                                      ? 'badge badge-error'
+                                      : iss.severity === 'MEDIUM'
+                                      ? 'badge badge-warning'
+                                      : 'badge badge-primary'
+                                  }
+                                  style={{ fontSize: '0.70rem', textTransform: 'uppercase' }}
+                                >
+                                  {iss.severity} Severity
+                                </span>
+                              </div>
+
+                              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '0.82rem', marginTop: '2px' }}>
+                                <div style={{ background: '#FFFFFF', padding: '6px 10px', borderRadius: '4px', border: '1px solid #F0E6D8' }}>
+                                  <span style={{ fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', display: 'block', fontWeight: 600 }}>
+                                    Claim Phrase:
+                                  </span>
+                                  <span style={{ fontWeight: 600, color: 'var(--color-deep-aubergine)' }}>
+                                    &ldquo;{iss.claim_phrase}&rdquo;
+                                  </span>
+                                </div>
+                                <div style={{ background: '#FFFFFF', padding: '6px 10px', borderRadius: '4px', border: '1px solid #F0E6D8' }}>
+                                  <span style={{ fontSize: '0.70rem', textTransform: 'uppercase', color: 'var(--color-text-secondary)', display: 'block', fontWeight: 600 }}>
+                                    Source Evidence:
+                                  </span>
+                                  <span style={{ fontStyle: 'italic', color: 'var(--color-text-primary)' }}>
+                                    &ldquo;{iss.source_phrase}&rdquo;
+                                  </span>
+                                </div>
+                              </div>
+
+                              <p style={{ fontSize: '0.84rem', color: '#5C3800', margin: '2px 0 0', lineHeight: 1.45 }}>
+                                {iss.explanation}
+                              </p>
+
+                              {iss.suggested_correction && (
+                                <div style={{ fontSize: '0.80rem', color: '#2B5740', background: '#F0F9F4', padding: '6px 10px', borderRadius: '4px', marginTop: '2px' }}>
+                                  <strong style={{ textTransform: 'uppercase', fontSize: '0.70rem' }}>Realigned Phrasing: </strong>
+                                  &ldquo;{iss.suggested_correction}&rdquo;
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      ) : claim.semantic_drift.uncertainty ? (
+                        <div
+                          style={{
+                            padding: '8px 12px',
+                            background: 'var(--color-surface-muted)',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.82rem',
+                            color: 'var(--color-text-secondary)',
+                          }}
+                        >
+                          {claim.semantic_drift.uncertainty}
+                        </div>
+                      ) : (
+                        <div
+                          style={{
+                            padding: '8px 12px',
+                            background: '#F0F9F4',
+                            border: '1px solid #D2EEDD',
+                            borderRadius: 'var(--radius-sm)',
+                            fontSize: '0.82rem',
+                            color: '#1B6A3B',
+                          }}
+                        >
+                          No material semantic drift was detected in the evidence examined.
+                        </div>
+                      )}
                     </div>
                   )}
 
