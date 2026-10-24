@@ -13,8 +13,7 @@ from backend.app.core.config import settings
 class DocumentRegistry:
     def __init__(self, db_path: Optional[str] = None):
         if db_path is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            self.db_path = os.path.abspath(os.path.join(base_dir, "data", "documents.db"))
+            self.db_path = os.path.abspath(settings.documents_db_path)
         else:
             self.db_path = os.path.abspath(db_path)
             

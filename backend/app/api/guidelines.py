@@ -108,8 +108,7 @@ async def upload_guideline(file: UploadFile = File(...)):
     stored_filename = f"{document_id}_{sanitized_name}"
 
     # Determine uploads directory
-    base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    uploads_dir = os.path.abspath(os.path.join(base_dir, "data", "uploads"))
+    uploads_dir = os.path.abspath(settings.uploads_dir)
     os.makedirs(uploads_dir, exist_ok=True)
     stored_path = os.path.join(uploads_dir, stored_filename)
 

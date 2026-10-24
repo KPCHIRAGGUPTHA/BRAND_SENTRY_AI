@@ -1,0 +1,40 @@
+# BrandSentry AI — Production Backend Dockerfile
+FROM python:3.11-slim
+
+# Prevent python from buffering stdout/stderr and writing .pyc files
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH=/app \
+    PORT=8000
+
+# Install minimal OS dependencies for health check
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy dependency definition and install Python packages
+COPY backend/requirements.txt /app/backend/requirements.txt
+RUN pip install --no-cache-dir -r /app/backend/requirements.txt
+
+# Pre-warm / pre-cache the ONNX embedding model inside image layer
+RUN python -c "from chromadb.utils import embedding_functions; fn = embedding_functions.DefaultEmbeddingFunction(); fn(['pre-warming embedding cache'])"
+
+# Copy backend application source code
+COPY backend/app /app/backend/app
+COPY backend/tests /app/backend/tests
+COPY pytest.ini /app/pytest.ini
+
+# Create persistent data directories
+RUN mkdir -p /app/backend/data/uploads /app/backend/data/chroma
+
+# Render passes dynamic $PORT at runtime
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:${PORT:-8000}/health || exit 1
+
+# Start Uvicorn bound to 0.0.0.0 and $PORT
+CMD ["sh", "-c", "exec uvicorn backend.app.main:app --host 0.0.0.0 --port ${PORT:-8000}"]

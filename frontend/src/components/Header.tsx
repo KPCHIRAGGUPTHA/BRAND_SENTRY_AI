@@ -1,5 +1,6 @@
 import React from 'react';
 import { ShieldCheck, ExternalLink } from 'lucide-react';
+import { API_BASE_URL } from '../services/api';
 
 export const Header: React.FC = () => {
   return (
@@ -29,7 +30,7 @@ export const Header: React.FC = () => {
             System Status
           </a>
           <a
-            href="http://127.0.0.1:8000/docs"
+            href={`${API_BASE_URL}/docs`}
             target="_blank"
             rel="noopener noreferrer"
             className="btn btn-secondary"

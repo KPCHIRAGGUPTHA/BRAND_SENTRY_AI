@@ -2,9 +2,13 @@
 Application Configuration Module for BrandSentry AI.
 Loads settings from environment variables or falls back to robust defaults.
 """
-from typing import List
+import os
+from typing import List, Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
+
+_BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+_DEFAULT_DATA_DIR = os.path.join(_BASE_DIR, "data")
 
 
 class Settings(BaseSettings):
@@ -20,12 +24,28 @@ class Settings(BaseSettings):
         default="http://localhost:5173,http://localhost:3000,http://127.0.0.1:5173,http://127.0.0.1:3000"
     )
 
-    # Storage paths
-    DATA_DIR: str = Field(default="../data")
-    UPLOADS_DIR: str = Field(default="../data/uploads")
-    CHROMA_PERSIST_DIR: str = Field(default="../data/chroma")
-    DOCUMENTS_DB_PATH: str = Field(default="../data/documents.db")
-    REVIEWS_DB_PATH: str = Field(default="../data/reviews.db")
+    # Storage paths (configurable for persistent volume mounts)
+    DATA_DIR: str = Field(default=_DEFAULT_DATA_DIR)
+    UPLOADS_DIR: Optional[str] = Field(default=None)
+    CHROMA_PERSIST_DIR: Optional[str] = Field(default=None)
+    DOCUMENTS_DB_PATH: Optional[str] = Field(default=None)
+    REVIEWS_DB_PATH: Optional[str] = Field(default=None)
+
+    @property
+    def uploads_dir(self) -> str:
+        return self.UPLOADS_DIR or os.path.join(self.DATA_DIR, "uploads")
+
+    @property
+    def chroma_persist_dir(self) -> str:
+        return self.CHROMA_PERSIST_DIR or os.path.join(self.DATA_DIR, "chroma")
+
+    @property
+    def documents_db_path(self) -> str:
+        return self.DOCUMENTS_DB_PATH or os.path.join(self.DATA_DIR, "documents.db")
+
+    @property
+    def reviews_db_path(self) -> str:
+        return self.REVIEWS_DB_PATH or os.path.join(self.DATA_DIR, "reviews.db")
 
     # Ingestion constraints
     MAX_UPLOAD_SIZE_MB: int = Field(default=10)

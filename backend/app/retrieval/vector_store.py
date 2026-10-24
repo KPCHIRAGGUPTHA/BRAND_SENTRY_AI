@@ -51,8 +51,7 @@ class VectorStoreService:
         collection_name: Optional[str] = None,
     ):
         if persist_dir is None:
-            base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            self.persist_dir = os.path.abspath(os.path.join(base_dir, "data", "chroma"))
+            self.persist_dir = os.path.abspath(settings.chroma_persist_dir)
         else:
             self.persist_dir = os.path.abspath(persist_dir)
 

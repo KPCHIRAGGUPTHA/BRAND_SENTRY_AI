@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, Server, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
-import { fetchHealth } from '../services/api';
+import { fetchHealth, API_BASE_URL } from '../services/api';
 import { HealthResponse } from '../types/api';
 
 export const HealthStatus: React.FC = () => {
@@ -71,7 +71,7 @@ export const HealthStatus: React.FC = () => {
       <div className="meta-list">
         <div className="meta-row">
           <span className="meta-label">Endpoint</span>
-          <span className="meta-value">http://127.0.0.1:8000/health</span>
+          <span className="meta-value">{API_BASE_URL}/health</span>
         </div>
 
         {isOnline && data && (

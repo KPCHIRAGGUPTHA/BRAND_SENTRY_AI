@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { HealthStatus } from './components/HealthStatus';
 import { GuidelineExplorer } from './components/GuidelineExplorer';
 import { ClaimReview } from './components/ClaimReview';
+import { API_BASE_URL } from './services/api';
 import {
   FileText,
   Search,
@@ -49,7 +50,7 @@ export const App: React.FC = () => {
               <span>Explore Evidence Search</span>
             </a>
             <a
-              href="http://127.0.0.1:8000/docs"
+              href={`${API_BASE_URL}/docs`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-secondary"
