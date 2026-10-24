@@ -42,10 +42,21 @@ class GuidelineChunkMatch(BaseModel):
     chunk_index: int = Field(description="Zero-based sequence index of the chunk in document")
     text: str = Field(description="Original extracted text passage for verifiable citation")
     distance: float = Field(
-        description="Vector distance score (lower represents closer semantic proximity). Note: this is a vector metric, not a calibrated probability."
+        description=(
+            "ChromaDB cosine distance for the collection metric 'hnsw:space=cosine'. "
+            "Range: [0.0, 1.0] where 0.0 = identical vectors and 1.0 = fully orthogonal. "
+            "Lower distance means higher semantic relatedness. "
+            "This is a vector-space metric — NOT a compliance confidence or probability score."
+        )
     )
     similarity_score: float = Field(
-        description="Normalized similarity metric (1.0 - normalized distance). Intended for ranking comparison only."
+        description=(
+            "Cosine similarity derived as (1.0 - cosine_distance). "
+            "Range: [0.0, 1.0] where 1.0 = identical and 0.0 = orthogonal. "
+            "Intended for result ranking only. "
+            "Must NOT be interpreted as compliance confidence, correctness probability, "
+            "or the probability that a brand claim is true or false."
+        )
     )
 
 

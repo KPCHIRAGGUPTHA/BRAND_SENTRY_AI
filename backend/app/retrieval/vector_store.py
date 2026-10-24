@@ -1,7 +1,32 @@
 """
 ChromaDB Persistent Vector Store Service for BrandSentry AI.
 Manages persistent collection storage, idempotent chunk upserts, and metadata filtering.
+
+Distance / Similarity Semantics
+--------------------------------
+The collection is created with ``metadata={"hnsw:space": "cosine"}``, which instructs
+ChromaDB's HNSW index to use **cosine distance**.
+
+ChromaDB's cosine distance is defined as::
+
+    cosine_distance = 1 - cosine_similarity
+
+This means the distance is bounded in **[0, 1]** for unit-normalised vectors:
+- 0.0  → vectors are identical  (cosine similarity = 1.0)
+- 1.0  → vectors are orthogonal (cosine similarity = 0.0)
+
+Note: the range is NOT [0, 2].  The ``/ 2`` divisor sometimes seen in the literature
+applies to a different convention (e.g. angular distance scaled from [-1, 1]).  Do
+*not* apply that divisor here — it would silently inflate similarity scores.
+
+Conventional cosine similarity is therefore recovered as::
+
+    cosine_similarity = 1.0 - distance
+
+This similarity is used only for **ranking / comparison** and must NEVER be presented
+as a compliance confidence, correctness probability, or truth probability.
 """
+import math
 import os
 import logging
 from typing import List, Dict, Any, Optional
@@ -9,6 +34,10 @@ from backend.app.core.config import settings
 from backend.app.services.chunking import GuidelineChunk
 
 logger = logging.getLogger(__name__)
+
+# Metric used by this service's ChromaDB collection.
+# Changing this constant requires a full re-index of all persistent data.
+_CHROMA_DISTANCE_METRIC: str = "cosine"
 
 
 class VectorStoreService:
@@ -48,12 +77,22 @@ class VectorStoreService:
 
     @property
     def collection(self):
-        """Lazy loader for the named guideline chunks collection."""
+        """
+        Lazy loader for the named guideline chunks collection.
+
+        Distance metric: ``cosine`` (see module docstring for semantics).
+        Embeddings are provided pre-computed by EmbeddingService; ChromaDB's
+        built-in embedding function is intentionally not used here.
+        """
         if self._collection is None:
-            # We provide precomputed embeddings from EmbeddingService
             self._collection = self.client.get_or_create_collection(
                 name=self.collection_name,
-                metadata={"hnsw:space": "cosine"},
+                metadata={"hnsw:space": _CHROMA_DISTANCE_METRIC},
+            )
+            logger.info(
+                "Opened ChromaDB collection '%s' (distance metric: %s).",
+                self.collection_name,
+                _CHROMA_DISTANCE_METRIC,
             )
         return self._collection
 
@@ -140,10 +179,33 @@ class VectorStoreService:
         distances = results["distances"][0] if results.get("distances") else []
 
         for i in range(len(ids)):
-            dist = float(distances[i]) if i < len(distances) else 0.0
-            # For cosine space in ChromaDB, distance is in [0, 2] where 0 is identical
-            # Normalized similarity score for comparison ranking: max(0.0, 1.0 - dist)
-            sim_score = max(0.0, round(1.0 - (dist / 2.0), 4))
+            raw_dist = float(distances[i]) if i < len(distances) else 0.0
+
+            # Validate: ChromaDB cosine distance must be a finite number in [0, 1].
+            # Any other value indicates a serious indexing or configuration problem.
+            if not math.isfinite(raw_dist):
+                logger.error(
+                    "Non-finite cosine distance (%s) returned for chunk '%s'. "
+                    "This indicates an indexing problem. Skipping result.",
+                    raw_dist,
+                    ids[i],
+                )
+                continue
+            if raw_dist < 0.0 or raw_dist > 1.0 + 1e-6:
+                logger.warning(
+                    "Cosine distance %s for chunk '%s' is outside expected [0, 1] range. "
+                    "Clamping for display but this may signal a metric mismatch.",
+                    raw_dist,
+                    ids[i],
+                )
+
+            # ChromaDB cosine distance is defined as:  distance = 1 - cosine_similarity
+            # Therefore:  cosine_similarity = 1.0 - distance
+            # Range: distance 0.0 → similarity 1.0 (identical)
+            #        distance 1.0 → similarity 0.0 (orthogonal)
+            # This similarity is for RANKING ONLY — not compliance confidence.
+            dist = max(0.0, min(raw_dist, 1.0))  # clamp only after logging
+            sim_score = round(1.0 - dist, 4)
 
             meta = metas[i] if i < len(metas) else {}
             matches.append(
@@ -154,7 +216,7 @@ class VectorStoreService:
                     "page_number": meta.get("page_number"),
                     "chunk_index": meta.get("chunk_index", 0),
                     "text": docs[i] if i < len(docs) else "",
-                    "distance": round(dist, 4),
+                    "distance": round(raw_dist, 4),
                     "similarity_score": sim_score,
                 }
             )

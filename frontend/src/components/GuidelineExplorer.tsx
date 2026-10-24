@@ -488,17 +488,17 @@ export const GuidelineExplorer: React.FC = () => {
                   <div className="evidence-metrics">
                     <span
                       className="badge badge-primary"
-                      title="Cosine-derived vector similarity to search query"
+                      title="Cosine similarity = 1 − cosine_distance. Range 0–1. For ranking only — not a compliance confidence or probability score."
                       style={{ fontSize: '0.72rem' }}
                     >
-                      Vector Similarity: {(match.similarity_score * 100).toFixed(1)}%
+                      Similarity: {(match.similarity_score * 100).toFixed(1)}%
                     </span>
                     <span
                       className="badge badge-neutral"
-                      title="L2 vector distance metric"
+                      title="ChromaDB cosine distance (hnsw:space=cosine). Range [0–1]: 0.0 = identical, 1.0 = orthogonal."
                       style={{ fontSize: '0.72rem', fontFamily: 'var(--font-mono)' }}
                     >
-                      Distance: {match.distance.toFixed(3)}
+                      Cosine Dist: {match.distance.toFixed(3)}
                     </span>
                   </div>
                 </div>
