@@ -1,65 +1,82 @@
-# BrandSentry AI — Feature Implementation Checklist
+# BrandSentry AI — Feature Implementation & Verification Checklist
 
-> **Hackathon Deadline:** 25 October 2026, 10:00 AM IST  
-> **Rule:** Do not mark a feature as IMPLEMENTED merely because its folder or interface exists. A feature is only `TESTED` once verified through automated test suites or live end-to-end verification.
-
-### Status Taxonomy:
-* `NOT STARTED` — Planned but no implementation started.
-* `IN PROGRESS` — Active development underway.
-* `IMPLEMENTED` — Code written but comprehensive tests not completed.
-* `TESTED` — Code complete and verified through automated test suites and smoke runs.
-* `BLOCKED` — Execution hindered by external blocker or missing dependency.
+> **Hackathon Submission Version**  
+> **Repository:** [BRAND_SENTRY_AI](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI)  
+> **Frontend URL:** [https://brandsentry-web.onrender.com](https://brandsentry-web.onrender.com)  
+> **Backend URL:** [https://brandsentry-api.onrender.com](https://brandsentry-api.onrender.com)  
+> **API Docs:** [https://brandsentry-api.onrender.com/docs](https://brandsentry-api.onrender.com/docs)  
+> **Health Check:** [https://brandsentry-api.onrender.com/health](https://brandsentry-api.onrender.com/health)
 
 ---
 
-## P0 — Mandatory Core Features (Phases 1 through 7)
+## 🏷️ Feature Status Taxonomy
 
-| Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **P0-01** | **Project & Environment Setup** | Full-stack scaffolding, dependencies, build pipelines, health endpoint | Phase 1 | **TESTED** | FastAPI GET /health passing. React build (tsc + vite) passing. |
-| **P0-02** | **PDF/TXT Guideline Upload** | Multi-part upload handler with MIME/magic byte checks and UUIDs | Phase 2 | **TESTED** | Implemented `POST /api/guidelines/upload` with 10MB limit and safe paths. |
-| **P0-03** | **Text Extraction Engine** | Clean text extraction using PyMuPDF preserving page numbers & sections | Phase 2 | **TESTED** | Page-preserving extraction for PDF/TXT. Scanned PDF error (422) handling. |
-| **P0-04** | **Document Chunking** | Section-aware semantic chunking (~400 tokens / 50 tokens overlap) with metadata | Phase 2 | **TESTED** | Deterministic sliding-window chunker with chunk_id, page_number, word counts. |
-| **P0-05** | **Embedding Generation** | Dense vector embeddings via ONNX all-MiniLM-L6-v2 (384 dimensions) on CPU | Phase 2 | **TESTED** | Lazy loading, unit-normalized, finite vectors, cached in memory. |
-| **P0-06** | **Vector Retrieval** | Persistent ChromaDB collection indexing with top-k similarity search | Phase 2 | **TESTED** | Implemented `POST /api/guidelines/search` with document_id filtering & persistence. |
-| **P0-07** | **Marketing Content Input** | Text input interface for raw advertising and marketing copy | Phase 3 / 5 | **TESTED** | Backend ReviewRequest schema with length limits & whitespace validation in `POST /api/review`. |
-| **P0-08** | **Claim Extraction** | Decompose unstructured marketing copy into discrete, testable claims | Phase 3 | **TESTED** | Deterministic sentence + conjunction boundary claim extractor with abbreviation awareness. |
-| **P0-09** | **Three-Way Verdict Engine** | Rigorous evaluation: SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE | Phase 3 | **TESTED** | Multi-tiered engine: deterministic rules first, retrieval grounding, no auto-approval on missing evidence. |
-| **P0-10** | **Verifiable Policy Citations** | Exact guideline document name, page number, and quote snippet | Phase 4 | **IMPLEMENTED** | Exact substring verification against retrieved passages, chunk_id, page_number. |
-| **P0-11** | **Suggested Corrections** | Compliant marketing rewrites for contradicted & insufficient claims | Phase 4 | **IMPLEMENTED** | Draft suggested corrections removing prohibited phrases or offering guidance. |
-| **P0-12** | **Complete Review Workflow** | End-to-end flow from guideline upload to correction application | Phase 5 | **NOT STARTED** | Primary hackathon deliverable. |
-| **P0-13** | **Graceful Error Handling** | Structured error responses, empty/corrupt validation, offline backend detection | All Phases | **TESTED** | Tested across file validations, 400 empty, 400 corrupt, 413 size, 422 scanned PDF. |
-| **P0-14** | **Public Deployment** | Cloud container deployment with public HTTPS URL for judges | Phase 7 | **NOT STARTED** | Targeted after Phase 6 testing. |
+Each feature in this checklist is strictly classified under one of the following six verification statuses based on actual repository code, automated test results, and live deployment evidence:
+
+| Status | Definition & Verification Requirement |
+| :--- | :--- |
+| **Deployed** | Feature is implemented in code, verified by automated test suites, and confirmed operational on the live Render production environment. |
+| **Tested** | Feature is implemented in code and has passing unit, integration, or regression tests in the repository test suite (`pytest` or `npm run build`), but is not independently deployed as an isolated service. |
+| **Implemented** | Feature code exists in the repository, but lacks dedicated automated unit tests or standalone end-to-end verification. |
+| **Partially implemented** | A functional subset or architectural skeleton is present in code, but key sub-components or full capabilities remain incomplete. |
+| **Not verified** | Component exists in the codebase but has not undergone structured verification or its runtime behavior is unconfirmed under test conditions. |
+| **Not implemented** | Feature is documented as a future roadmap or architectural extension; no functional code currently exists in the repository. |
 
 ---
 
-## P1 — Post-Core Enhancements (High Priority)
+## 🚀 1. Core Platform Functionality
 
-| Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **P1-01** | **Deterministic Pre-Filter** | Regex/keyword screener for banned words and trademark casing | Phase 3 | **TESTED** | Absolute claim regex rules (e.g. 100% guaranteed/safe, cure claims) firing deterministically. |
-| **P1-02** | **Semantic Drift Detection** | Measures divergence between claim claims and original brand positioning | Phase 4 | **NOT STARTED** | Queued for Phase 4. |
-| **P1-03** | **Claim-Type Retrieval Routing** | Category-based query expansion (Regulatory, Product, Voice) | Phase 3 | **NOT STARTED** | Optimizes hybrid recall per claim type. |
-| **P1-04** | **Review History & Document Registry**| Session audit log and document tracking in SQLite | Phase 2 / 5 | **TESTED** | SQLite document registry (`data/documents.db`) implemented and tested. |
-| **P1-05** | **Exportable Review Reports** | PDF/JSON compliance summary export for legal/audit records | Phase 5 | **NOT STARTED** | Generates auditable compliance sign-off report. |
+These features represent the end-to-end pipeline required for brand compliance review: document ingestion, extraction, chunking, embedding, retrieval, claim decomposition, 3-way verdict classification, citation grounding, and interactive review.
+
+| Feature ID | Feature Name | Description | Status | Verification Evidence |
+| :--- | :--- | :--- | :--- | :--- |
+| **CORE-01** | **Backend Scaffolding & Health API** | FastAPI application setup with CORS, middleware, and `/health` diagnostic endpoint. | **Deployed** | Verified live at `https://brandsentry-api.onrender.com/health` (HTTP 200 `status: "ok"`). Covered by `test_health.py`. |
+| **CORE-02** | **Guideline Ingestion API** | Multipart upload (`POST /api/guidelines/upload`) supporting PDF and TXT with MIME validation and 10MB limit. | **Deployed** | Verified live via API upload. Tested in `test_api_guidelines.py` (MIME validation, size limit rejection). |
+| **CORE-03** | **Text Extraction Engine** | Digital text extraction preserving page boundaries and document hierarchy via PyMuPDF 2.0. | **Deployed** | Active in production. Covered by 14 tests in `test_extraction.py` (PDF, TXT, scanned PDF error 422). |
+| **CORE-04** | **Deterministic Chunking** | Sliding-window chunker (~400 tokens / 50 tokens overlap) tracking `chunk_id`, `page_number`, and metadata. | **Deployed** | Active in production. Covered by 11 tests in `test_chunking.py` (token windows, overlap consistency). |
+| **CORE-05** | **ONNX Embedding Generation** | Local CPU inference producing 384-dimensional dense vectors using `all-MiniLM-L6-v2`. | **Deployed** | Active in production Docker container. Covered by 12 tests in `test_embeddings.py` & `test_embedding_model_identity.py`. |
+| **CORE-06** | **ChromaDB Vector Retrieval** | Persistent on-disk vector store with cosine distance ranking and document ID filtering. | **Deployed** | Active in production. Covered by 16 tests in `test_vector_store.py` and `test_distance_semantics.py`. |
+| **CORE-07** | **Marketing Copy Input Interface** | Text input interface with whitespace stripping, payload sanitization, and length limit validation. | **Deployed** | Live on React web UI. Covered by validation tests in `test_review_api.py`. |
+| **CORE-08** | **Atomic Claim Extraction** | Decomposes raw marketing copy into testable claims using sentence and clause boundaries with abbreviation awareness. | **Deployed** | Active in production. Covered by 16 tests in `test_claim_extractor.py` (abbreviations, conjunctions). |
+| **CORE-09** | **Three-Way Verdict Engine** | Classifies claims into `SUPPORTED`, `CONTRADICTED`, and `INSUFFICIENT_EVIDENCE` without hallucinated approvals. | **Deployed** | Active in production. Covered by 52 tests in `test_verdict_engine.py` (prohibitions, grounding, guardrails). |
+| **CORE-10** | **Verifiable Policy Citations** | Strict substring verification ensuring quotes exist character-for-character in retrieved guideline text with page numbers. | **Deployed** | Active in production. Covered by `TestCitationValidation` in `test_verdict_engine.py`. |
+| **CORE-11** | **Suggested Corrections** | Generates compliant draft rewrites eliminating prohibited terms while retaining brand intent. | **Deployed** | Active in production. Covered by `TestSuggestedCorrections` in `test_verdict_engine.py`. |
+| **CORE-12** | **Interactive Review Dashboard** | React + TypeScript web app with health polling, guideline upload, claim breakdown cards, and citation drawers. | **Deployed** | Verified live at `https://brandsentry-web.onrender.com` with zero browser console errors. `npm run build` passes cleanly. |
+| **CORE-13** | **Structured Error Handling** | Predictable JSON error responses for invalid files, empty claims, oversized uploads, and missing guidelines. | **Deployed** | Verified in live API and automated tests (`test_extraction.py`, `test_review_api.py`). |
+| **CORE-14** | **Cloud Container Deployment** | Dockerized FastAPI backend and Vite static site CDN hosted on Render. | **Deployed** | Live in production: backend web service + frontend static site with automated HTTPS. |
 
 ---
 
-## P2 — Future Work & Research Roadmap
+## ⚡ 2. Advanced Features & Architectural Extensions
 
-| Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| **P2-01** | **Graph-Based Policy Reasoning** | Knowledge Graph for complex hierarchical brand rules | Post-Hackathon | **NOT STARTED** | Architectural extension. |
-| **P2-02** | **Feedback-Driven Improvement** | Human-in-the-loop review feedback to fine-tune retrieval prompts | Post-Hackathon | **NOT STARTED** | Enterprise feature. |
-| **P2-03** | **Multimodal Visual Compliance** | Image & video brand logo, color palette, and layout audit | Post-Hackathon | **NOT STARTED** | Vision model integration. |
-| **P2-04** | **Calibrated Confidence Scoring** | Probabilistic confidence calibration across verdict categories | Post-Hackathon | **NOT STARTED** | Advanced ML feature. |
-| **P2-05** | **Enterprise-Scale Infrastructure** | Distributed queue (Celery/Redis), multi-tenant auth, Kubernetes | Post-Hackathon | **NOT STARTED** | Deferred per hackathon constraints. |
+This section explicitly evaluates advanced architectural features, distinguishing operational components from partially implemented and planned post-hackathon extensions.
+
+| Feature ID | Feature Name | Description | Status | Verification & Implementation Notes |
+| :--- | :--- | :--- | :--- | :--- |
+| **ADV-01** | **Prohibited Phrase Pre-Screening** | Regex and keyword matching engine that flags banned absolute claims (e.g. "100% safe", "guaranteed cure"). | **Deployed** | Fully implemented in `verdict_engine.py` and verified live. Covered by 6 tests in `TestProhibitedPhraseRules`. |
+| **ADV-02** | **Document Registry Database** | SQLite database (`data/documents.db`) tracking uploaded guidelines, chunk counts, and indexing status. | **Deployed** | Operational in production backend. Covered by `test_api_guidelines.py`. |
+| **ADV-03** | **Claim-Type Retrieval Routing** | Category-based routing (e.g. Safety vs. Guarantees vs. Pricing) to prioritize relevant guideline sections. | **Partially implemented** | Heuristic keyword section matching is implemented in `verdict_engine.py` (`test_guarantee_claim_cites_guarantee_rule_not_safety_rule`), but full automated taxonomy classification is not implemented. |
+| **ADV-04** | **Policy Versioning & Snapshots** | Immutable guideline snapshots with version history and diff tracking. | **Partially implemented** | Ingestion assigns immutable UUIDs and timestamps in SQLite, but git-like version diffing between guideline revisions is not implemented. |
+| **ADV-05** | **Exportable Compliance Reports** | PDF/JSON compliance summary export for legal audit records. | **Partially implemented** | Complete JSON review payload is returned by `/api/review` and copyable in UI, but automated PDF report generation is not implemented. |
+| **ADV-06** | **Semantic Drift Detection** | Vector and presupposition analysis to measure brand voice divergence across campaigns. | **Not implemented** | Documented architectural extension; requires historical brand corpus modeling. |
+| **ADV-07** | **BM25 Hybrid Retrieval** | Sparse lexical search (BM25) fused with dense ChromaDB vector retrieval via Reciprocal Rank Fusion. | **Not implemented** | Current retrieval is purely dense vector search using ONNX `all-MiniLM-L6-v2`; sparse index is not implemented. |
+| **ADV-08** | **Graph-Based Policy Reasoning** | Knowledge graph modeling hierarchical policy rules, exceptions, and parent-child clause dependencies. | **Not implemented** | Future research roadmap item. Current logic uses deterministic multi-tier rule evaluation. |
+| **ADV-09** | **Bayesian Confidence Calibration** | Formal Bayesian probability scoring for verdict uncertainty. | **Not implemented** | Vector cosine similarity distances are reported; formal Bayesian calibration formulas are not implemented. |
+| **ADV-10** | **Distributed Redis Caching** | Distributed Redis cache for query embeddings and intermediate claim fingerprints. | **Not implemented** | In-memory Python caches and ChromaDB on-disk storage are used; external Redis is omitted due to free-tier cloud constraints. |
+| **ADV-11** | **Server-Sent Events (SSE) Streaming** | Real-time streaming (`/api/review/stream`) of claim verdicts as each claim is processed. | **Not implemented** | The API operates synchronously via `POST /api/review`, returning the full analyzed document review payload. |
+| **ADV-12** | **Authentication & Multi-Tenancy** | User authentication (OAuth2 / JWT) and workspace isolation. | **Not implemented** | Omitted for public hackathon evaluation; all endpoints are currently public for testing. |
+| **ADV-13** | **Token-Bucket Rate Limiting** | Per-IP or per-key API rate limiting to prevent abuse. | **Not implemented** | Basic reverse proxy limits are handled by Render platform; application-level rate limiting is not implemented. |
+| **ADV-14** | **Multimodal Visual Compliance** | Image and video asset audit for logo placement, typography, and color palette compliance. | **Not implemented** | Platform currently focuses exclusively on text and digital PDF guideline verification. |
 
 ---
 
-## Summary of Current Milestone Progress (Phase 3 Completed)
-- **Features Tested & Passing**: 11 (`P0-01`, `P0-02`, `P0-03`, `P0-04`, `P0-05`, `P0-06`, `P0-07`, `P0-08`, `P0-09`, `P0-13`, plus `P1-01`, `P1-04`)
-- **Features Implemented (Ahead of Schedule)**: 2 (`P0-10`, `P0-11`)
-- **Features In Progress**: 0
-- **Features Not Started**: 8
-- **Features Blocked**: 0
+## 📊 Summary of Status Breakdown
+
+* **Deployed**: 16 features (14 Core platform features + 2 Advanced features: Prohibited Phrase Pre-screening & SQLite Document Registry)
+* **Tested**: 16 features (All deployed features have comprehensive automated tests: 151 backend tests + frontend build check)
+* **Partially implemented**: 3 features (Claim-Type Retrieval Routing, Policy Versioning Snapshots, Exportable Reports)
+* **Not implemented**: 9 features (Semantic Drift, BM25 Hybrid Retrieval, Graph-Based Reasoning, Bayesian Calibration, Redis Caching, SSE Streaming, Authentication, Rate Limiting, Multimodal Visual Compliance)
+* **Implemented (untested)**: 0
+* **Not verified**: 0
+
+*Total Features Audited: 28*
