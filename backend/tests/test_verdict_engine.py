@@ -383,3 +383,90 @@ class TestEvidenceDeduplication:
         p2 = _make_passage(sub_text, chunk_id="c2", document_id="doc-1")
         items = engine._build_evidence_items([p1, p2], "We are 100% guaranteed.")
         assert len(items) == 1
+
+
+# ---------------------------------------------------------------------------
+# Evidence Relevance & Specific Grounding Tests (100% safe vs 100% guaranteed)
+# ---------------------------------------------------------------------------
+
+class TestEvidenceRelevance:
+    def test_100_safe_prefers_safety_passage_over_guarantee(self, engine):
+        passage_guarantee = _make_passage(
+            "Section 1.1: Superlatives. Never claim our product is '100% Guaranteed' to work.",
+            chunk_id="cg",
+            document_id="doc-1",
+            similarity_score=0.90,  # even with higher similarity
+        )
+        passage_safety = _make_passage(
+            "Section 1.2: Safety Standards. Formulas must never be advertised as '100% safe' without certification.",
+            chunk_id="cs",
+            document_id="doc-1",
+            similarity_score=0.85,
+        )
+
+        cv = engine.classify("claim-1", "Our product is 100% safe.", [passage_guarantee, passage_safety])
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) >= 1
+        top_quote = cv.evidence[0].quote
+        assert "100% safe" in top_quote or "safe" in top_quote.lower()
+        assert "100% guaranteed" not in top_quote.lower()
+
+    def test_100_guaranteed_prefers_guarantee_passage_over_safety(self, engine):
+        passage_guarantee = _make_passage(
+            "Section 1.1: Superlatives. Never claim our product is '100% Guaranteed' to work.",
+            chunk_id="cg",
+            document_id="doc-1",
+            similarity_score=0.85,
+        )
+        passage_safety = _make_passage(
+            "Section 1.2: Safety Standards. Formulas must never be advertised as '100% safe' without certification.",
+            chunk_id="cs",
+            document_id="doc-1",
+            similarity_score=0.90,  # even with higher similarity
+        )
+
+        cv = engine.classify("claim-1", "Our product is 100% guaranteed.", [passage_safety, passage_guarantee])
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) >= 1
+        top_quote = cv.evidence[0].quote
+        assert "100% guaranteed" in top_quote.lower()
+        assert "100% safe" not in top_quote.lower()
+
+    def test_combined_passage_extracts_target_quote_for_100_safe(self, engine):
+        combined = _make_passage(
+            "Compliance Guide: Chapter 1. Never use absolute terms such as '100% guaranteed', "
+            "'100% safe', or 'cures all wrinkles'. All claims must reflect limits.",
+            chunk_id="c_comb",
+            document_id="doc-1",
+            similarity_score=0.88,
+        )
+        cv = engine.classify("claim-1", "Our product is 100% safe.", [combined])
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) >= 1
+        assert "100% safe" in cv.evidence[0].quote
+
+    def test_combined_passage_extracts_target_quote_for_100_guaranteed(self, engine):
+        combined = _make_passage(
+            "Compliance Guide: Chapter 1. Never use absolute terms such as '100% guaranteed', "
+            "'100% safe', or 'cures all wrinkles'. All claims must reflect limits.",
+            chunk_id="c_comb",
+            document_id="doc-1",
+            similarity_score=0.88,
+        )
+        cv = engine.classify("claim-1", "Our product is 100% guaranteed.", [combined])
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) >= 1
+        assert "100% guaranteed" in cv.evidence[0].quote.lower()
+
+    def test_no_false_evidence_when_guideline_does_not_support_safety(self, engine):
+        passage_guarantee = _make_passage(
+            "Section 1.1: Superlatives. Never claim our product is '100% Guaranteed'.",
+            chunk_id="cg",
+            document_id="doc-1",
+            similarity_score=0.85,
+        )
+        # Guideline only prohibits 100% guaranteed, says nothing about safety
+        cv = engine.classify("claim-1", "Our product is 100% safe.", [passage_guarantee])
+        assert cv.verdict == VERDICT_CONTRADICTED
+        # Evidence must NOT cite the unrelated guarantee rule as evidence for 100% safe
+        assert cv.evidence == []

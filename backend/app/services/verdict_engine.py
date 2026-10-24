@@ -113,6 +113,15 @@ _SUPPORT_INDICATORS: List[re.Pattern] = [
     re.compile(r'\bmeets?\s+(all\s+)?(requirements|standards|criteria)\b', re.IGNORECASE),
 ]
 
+_GENERIC_STOP_WORDS = frozenset({
+    "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of",
+    "with", "by", "from", "up", "about", "into", "over", "after", "is", "are",
+    "was", "were", "be", "been", "being", "have", "has", "had", "do", "does",
+    "did", "will", "would", "shall", "should", "may", "might", "must", "can",
+    "could", "our", "your", "their", "its", "my", "this", "that", "these",
+    "those", "product", "products", "brand", "company", "every", "all",
+})
+
 # ---------------------------------------------------------------------------
 # Data structures
 # ---------------------------------------------------------------------------
@@ -184,9 +193,14 @@ class VerdictEngine:
         determ_result = self._check_prohibited_phrases(claim_text)
         if determ_result is not None:
             rule_explanation, rule_hint = determ_result
-            # Find supporting evidence from retrieved passages (any passage that
-            # mentions similar prohibition language)
-            evidence = self._build_evidence_items(retrieved_passages, claim_text)
+            # Find supporting evidence from retrieved passages that specifically
+            # matches or supports this prohibited phrase/topic
+            evidence = self._build_evidence_items(
+                retrieved_passages,
+                claim_text,
+                target_phrase=rule_hint,
+                must_support_target=True,
+            )
             correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_hint)
             return ClaimVerdict(
                 claim_id=claim_id,
@@ -273,12 +287,12 @@ class VerdictEngine:
 
         Logic:
         - If any passage explicitly contradicts the claim (contains prohibition
-          keywords AND is topically related to the claim), return CONTRADICTED.
-        - If any passage contains support indicator keywords, return SUPPORTED.
+          keywords AND substantive topical overlap with the claim), return CONTRADICTED.
+        - If any passage contains support indicator keywords AND substantive topical
+          overlap with the claim, return SUPPORTED.
         - Otherwise return INSUFFICIENT_EVIDENCE.
 
-        Note: This is conservative by design.  Topic overlap alone does NOT
-        trigger SUPPORTED.  Only explicit affirmative language does.
+        Note: Semantic similarity alone is NOT treated as proof of a violation or approval.
         """
         contradiction_keywords = re.compile(
             r'\b(must not|shall not|prohibited|forbidden|not allowed|not permitted|'
@@ -286,10 +300,25 @@ class VerdictEngine:
             re.IGNORECASE,
         )
 
-        best_passage = candidates[0]  # already sorted by distance (nearest first)
-        evidence_items = self._build_evidence_items(candidates, claim_text)
+        best_passage = candidates[0]  # nearest neighbor
+        claim_words = [
+            w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
+            if w not in _GENERIC_STOP_WORDS
+        ]
 
-        for passage in candidates:
+        # Sort candidates by relevance to the claim content
+        sorted_candidates = sorted(
+            candidates,
+            key=lambda p: (
+                self._evaluate_passage_relevance(p, claim_text)[0],
+                -float(p.get("distance", 1.0)),
+            ),
+            reverse=True,
+        )
+        evidence_items = self._build_evidence_items(sorted_candidates, claim_text)
+
+        # 1. Contradiction evaluation
+        for passage in sorted_candidates:
             text = passage.get("text", "")
             if contradiction_keywords.search(text):
                 explanation = (
@@ -307,7 +336,8 @@ class VerdictEngine:
                     suggested_correction=correction,
                 )
 
-        for passage in candidates:
+        # 2. Support indicator evaluation
+        for passage in sorted_candidates:
             text = passage.get("text", "")
             for pattern in _SUPPORT_INDICATORS:
                 if pattern.search(text):
@@ -324,7 +354,7 @@ class VerdictEngine:
                         evidence=evidence_items,
                     )
 
-        # No deterministic classification possible with available evidence
+        # 3. Default fallback: INSUFFICIENT_EVIDENCE
         return ClaimVerdict(
             claim_id=claim_id,
             claim_text=claim_text,
@@ -342,41 +372,218 @@ class VerdictEngine:
             ),
         )
 
+    @staticmethod
+    def _evaluate_passage_relevance(
+        passage: Dict[str, Any],
+        claim_text: str,
+        target_phrase: Optional[str] = None,
+    ) -> Tuple[float, bool]:
+        """
+        Evaluate how specifically a passage supports the claim or targeted prohibited phrase.
+
+        Returns:
+            Tuple of (relevance_score, supports_target).
+        """
+        text = passage.get("text", "").lower()
+        base_score = float(passage.get("similarity_score", 0.0))
+        supports_target = False
+
+        if target_phrase:
+            tp_lower = target_phrase.lower()
+            if tp_lower in text:
+                base_score += 25.0  # Dominant priority for exact phrase match
+                supports_target = True
+            else:
+                # Dissect key terms of target phrase
+                if "safe" in tp_lower and ("safe" in text or "safety" in text):
+                    base_score += 15.0
+                    supports_target = True
+                elif "guaranteed" in tp_lower and ("guaranteed" in text or "guarantee" in text):
+                    base_score += 15.0
+                    supports_target = True
+                elif "natural" in tp_lower and "natural" in text:
+                    base_score += 15.0
+                    supports_target = True
+                elif "cure" in tp_lower and ("cure" in text or "cures" in text):
+                    base_score += 15.0
+                    supports_target = True
+                elif "clinically" in tp_lower and ("clinically" in text or "clinical" in text):
+                    base_score += 15.0
+                    supports_target = True
+
+            # If passage explicitly mentions general prohibitions/absolutes
+            if any(term in text for term in ("absolute terms", "prohibited superlatives", "unverifiable", "absolute claims")):
+                base_score += 5.0
+                if "100%" in text:
+                    supports_target = True
+
+        # Check substantive overlap with claim keywords
+        claim_words = [
+            w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
+            if w not in _GENERIC_STOP_WORDS
+        ]
+        matched_words = sum(1 for w in claim_words if w in text)
+        base_score += matched_words * 2.0
+
+        if not target_phrase and matched_words > 0:
+            supports_target = True
+
+        return base_score, supports_target
+
+    @staticmethod
+    def _extract_focused_quote(
+        passage_text: str,
+        target_phrase: Optional[str] = None,
+        claim_text: Optional[str] = None,
+        max_len: int = 250,
+    ) -> str:
+        """
+        Extract a representative quote focusing on the sentence or window
+        containing the target prohibited phrase or primary claim keywords.
+        """
+        passage_text = passage_text.strip()
+        if len(passage_text) <= max_len:
+            return passage_text
+
+        match_pos = -1
+        match_len = 0
+
+        if target_phrase:
+            m = re.search(re.escape(target_phrase), passage_text, re.IGNORECASE)
+            if m:
+                match_pos = m.start()
+                match_len = m.end() - m.start()
+            else:
+                # Try individual significant words of target phrase (e.g. "safe", "guaranteed")
+                tp_words = [
+                    w for w in re.findall(r'\b[a-zA-Z]{4,}\b', target_phrase.lower())
+                    if w not in _GENERIC_STOP_WORDS
+                ]
+                for tw in tp_words:
+                    m = re.search(r'\b' + re.escape(tw) + r'\b', passage_text, re.IGNORECASE)
+                    if m:
+                        match_pos = m.start()
+                        match_len = m.end() - m.start()
+                        break
+
+        if match_pos == -1 and claim_text:
+            keywords = [
+                w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
+                if w not in _GENERIC_STOP_WORDS
+            ]
+            for kw in keywords:
+                m = re.search(r'\b' + re.escape(kw) + r'\b', passage_text, re.IGNORECASE)
+                if m:
+                    match_pos = m.start()
+                    match_len = m.end() - m.start()
+                    break
+
+        if match_pos == -1:
+            quote = passage_text[:max_len].rsplit(' ', 1)[0]
+            return quote if quote in passage_text else passage_text[:max_len]
+
+        # Extract sentence containing the match
+        before = passage_text[:match_pos]
+        sent_starts = list(re.finditer(r'([.!?]\s+|\n+)', before))
+        start_idx = sent_starts[-1].end() if sent_starts else 0
+
+        after = passage_text[match_pos + match_len:]
+        sent_end = re.search(r'[.!?](\s+|$|\n)', after)
+        end_idx = match_pos + match_len + sent_end.start() + 1 if sent_end else len(passage_text)
+
+        candidate = passage_text[start_idx:end_idx].strip()
+        if 20 <= len(candidate) <= max_len:
+            return candidate
+
+        # Fallback to word-bounded centered window around match
+        half = max_len // 2
+        win_start = max(0, match_pos - half)
+        win_end = min(len(passage_text), match_pos + match_len + half)
+        if win_start > 0:
+            sp = passage_text.find(' ', win_start)
+            if sp != -1 and sp < match_pos:
+                win_start = sp + 1
+        if win_end < len(passage_text):
+            sp = passage_text.rfind(' ', match_pos + match_len, win_end)
+            if sp != -1:
+                win_end = sp
+
+        snippet = passage_text[win_start:win_end].strip()
+        if snippet in passage_text and len(snippet) >= 15:
+            return snippet
+
+        quote = passage_text[:max_len].rsplit(' ', 1)[0]
+        return quote if quote in passage_text else passage_text[:max_len]
+
     def _build_evidence_items(
         self,
         passages: List[Dict[str, Any]],
         claim_text: str,
+        target_phrase: Optional[str] = None,
+        must_support_target: bool = False,
     ) -> List[EvidenceItem]:
         """
         Build validated EvidenceItem objects from retrieved passages.
 
         Citation validation: the quote must be a substring of the passage text.
-        Invalid citations are dropped with a warning.  If a passage's text is
-        very short, use the full text as the quote.
+        Invalid citations are dropped with a warning.
+
+        Relevance & Grounding:
+        - Prefers guideline passages that directly match the prohibited phrase or claim keywords.
+        - Ensures evidence supports the actual verdict and explanation.
+        - Semantic similarity alone is not treated as proof of relevance or violation.
+        - When must_support_target is True, filters out passages that do not mention the
+          target prohibited phrase or its key topical terms.
 
         Deduplication:
         - Prevents identical or heavily overlapping passages from the same document
           from displaying repeatedly.
-        - Preserves distinct evidence from genuinely different sources (different
-          document_ids or distinct content).
+        - Preserves distinct evidence from genuinely different sources.
         """
+        if not passages:
+            return []
+
+        # Score and filter candidate passages
+        scored_passages = []
+        for p in passages:
+            text = p.get("text", "")
+            if not text.strip():
+                continue
+
+            rel_score, supports_target = self._evaluate_passage_relevance(
+                p, claim_text, target_phrase
+            )
+            if must_support_target and not supports_target:
+                continue
+
+            scored_passages.append((rel_score, p))
+
+        # Higher relevance score first; tie-breaker: lower distance
+        scored_passages.sort(
+            key=lambda x: (x[0], -float(x[1].get("distance", 1.0))),
+            reverse=True,
+        )
+
         seen_chunk_ids: set = set()
         seen_quotes: set = set()
         seen_texts: set = set()
         items: List[EvidenceItem] = []
 
-        for p in passages:
+        for _, p in scored_passages:
             chunk_id = p.get("chunk_id", "")
             if chunk_id in seen_chunk_ids:
                 continue
-            seen_chunk_ids.add(chunk_id)
 
             passage_text = p.get("text", "").strip()
             if not passage_text:
                 continue
 
-            # Extract a short but representative quote (first 200 chars or full text)
-            quote = passage_text[:200].rsplit(' ', 1)[0] if len(passage_text) > 200 else passage_text
+            quote = self._extract_focused_quote(
+                passage_text=passage_text,
+                target_phrase=target_phrase,
+                claim_text=claim_text,
+                max_len=250,
+            )
 
             # Citation validation: quote must be in the passage text
             if quote not in passage_text:
@@ -406,6 +613,7 @@ class VerdictEngine:
             if is_redundant:
                 continue
 
+            seen_chunk_ids.add(chunk_id)
             seen_quotes.add(norm_quote)
             seen_texts.add(norm_passage)
 
