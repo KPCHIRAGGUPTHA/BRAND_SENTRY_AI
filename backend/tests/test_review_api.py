@@ -259,3 +259,109 @@ class TestPhase2Regression:
         assert response.status_code in (200, 500)
         if response.status_code == 200:
             assert "results" in response.json()
+
+
+# ---------------------------------------------------------------------------
+# Document Scoping & Deduplication Regression Tests
+# ---------------------------------------------------------------------------
+
+class TestDocumentScopingAndDeduplicationRegression:
+    @patch("backend.app.api.review.document_registry")
+    @patch("backend.app.api.review.embedding_service")
+    @patch("backend.app.api.review.vector_store_service")
+    def test_document_scoping_strictly_enforced(self, mock_vs, mock_emb, mock_reg):
+        mock_emb.generate_query_embedding.return_value = _mock_embedding()
+        mock_vs.count.return_value = 2
+        mock_reg.get_document.side_effect = lambda doc_id: {
+            "document_id": doc_id,
+            "filename": f"{doc_id}.pdf",
+            "status": "indexed",
+        } if doc_id in ("doc-A", "doc-B") else None
+
+        def mock_search(query_embedding, document_id, top_k):
+            if document_id == "doc-A":
+                return [
+                    {
+                        "chunk_id": "cA",
+                        "document_id": "doc-A",
+                        "source_filename": "doc-A.pdf",
+                        "page_number": 1,
+                        "text": "Marketing claims must be supported by clinical studies.",
+                        "similarity_score": 0.85,
+                        "distance": 0.15,
+                    }
+                ]
+            return []
+
+        mock_vs.search.side_effect = mock_search
+
+        response = client.post(
+            "/api/review",
+            json={"content": "Our serum has proven efficacy.", "document_ids": ["doc-A"]},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["document_ids_searched"] == ["doc-A"]
+        for claim in data["claims"]:
+            for ev in claim["evidence"]:
+                assert ev["document_id"] == "doc-A"
+
+    @patch("backend.app.api.review.document_registry")
+    @patch("backend.app.api.review.embedding_service")
+    @patch("backend.app.api.review.vector_store_service")
+    def test_unscoped_review_includes_all_indexed_document_ids(self, mock_vs, mock_emb, mock_reg):
+        mock_emb.generate_query_embedding.return_value = _mock_embedding()
+        mock_vs.count.return_value = 2
+        mock_reg.list_documents.return_value = [
+            {"document_id": "doc-1", "status": "indexed"},
+            {"document_id": "doc-2", "status": "indexed"},
+            {"document_id": "doc-3", "status": "failed"},
+        ]
+        mock_vs.search.return_value = []
+
+        response = client.post(
+            "/api/review",
+            json={"content": "Our formula is effective."},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "doc-1" in data["document_ids_searched"]
+        assert "doc-2" in data["document_ids_searched"]
+        assert "doc-3" not in data["document_ids_searched"]
+
+    @patch("backend.app.api.review.embedding_service")
+    @patch("backend.app.api.review.vector_store_service")
+    def test_api_deduplicates_identical_evidence_passages(self, mock_vs, mock_emb):
+        mock_emb.generate_query_embedding.return_value = _mock_embedding()
+        mock_vs.count.return_value = 1
+        # Two chunks with identical text (e.g. from sliding chunker duplicate)
+        mock_vs.search.return_value = [
+            {
+                "chunk_id": "c1",
+                "document_id": "doc-1",
+                "source_filename": "policy.pdf",
+                "page_number": 1,
+                "text": "Absolute percentage claims such as 100% guaranteed are prohibited.",
+                "similarity_score": 0.90,
+                "distance": 0.10,
+            },
+            {
+                "chunk_id": "c2",
+                "document_id": "doc-1",
+                "source_filename": "policy.pdf",
+                "page_number": 1,
+                "text": "Absolute percentage claims such as 100% guaranteed are prohibited.",
+                "similarity_score": 0.89,
+                "distance": 0.11,
+            },
+        ]
+
+        response = client.post(
+            "/api/review",
+            json={"content": "Our formula is 100% guaranteed to work."},
+        )
+        assert response.status_code == 200
+        data = response.json()
+        for claim in data["claims"]:
+            # Should have deduplicated the identical passage
+            assert len(claim["evidence"]) == 1

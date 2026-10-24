@@ -353,14 +353,22 @@ class VerdictEngine:
         Citation validation: the quote must be a substring of the passage text.
         Invalid citations are dropped with a warning.  If a passage's text is
         very short, use the full text as the quote.
+
+        Deduplication:
+        - Prevents identical or heavily overlapping passages from the same document
+          from displaying repeatedly.
+        - Preserves distinct evidence from genuinely different sources (different
+          document_ids or distinct content).
         """
         seen_chunk_ids: set = set()
+        seen_quotes: set = set()
+        seen_texts: set = set()
         items: List[EvidenceItem] = []
 
         for p in passages:
             chunk_id = p.get("chunk_id", "")
             if chunk_id in seen_chunk_ids:
-                continue  # deduplicate
+                continue
             seen_chunk_ids.add(chunk_id)
 
             passage_text = p.get("text", "").strip()
@@ -379,10 +387,32 @@ class VerdictEngine:
                 )
                 quote = passage_text
 
+            norm_quote = re.sub(r'\s+', ' ', quote.strip().lower())
+            norm_passage = re.sub(r'\s+', ' ', passage_text.strip().lower())
+
+            # Exact quote or passage deduplication
+            if norm_quote in seen_quotes or norm_passage in seen_texts:
+                continue
+
+            # Redundancy check within the same document (e.g. sliding chunk overlap)
+            doc_id = p.get("document_id", "")
+            is_redundant = False
+            for prev_item in items:
+                if prev_item.document_id == doc_id:
+                    prev_norm_p = re.sub(r'\s+', ' ', prev_item.passage_text.strip().lower())
+                    if len(norm_quote) > 30 and norm_quote in prev_norm_p:
+                        is_redundant = True
+                        break
+            if is_redundant:
+                continue
+
+            seen_quotes.add(norm_quote)
+            seen_texts.add(norm_passage)
+
             items.append(
                 EvidenceItem(
                     chunk_id=chunk_id,
-                    document_id=p.get("document_id", ""),
+                    document_id=doc_id,
                     source_filename=p.get("source_filename", "unknown"),
                     page_number=p.get("page_number"),
                     quote=quote,
@@ -401,32 +431,117 @@ class VerdictEngine:
         prohibited_hint: str,
     ) -> str:
         """
-        Produce a conservative suggested correction for a contradicted claim.
-
-        This does NOT invent product specifications or endorsements.
-        The correction is explicitly labelled as a draft for human review.
+        Produce a conservative, grammatically correct suggested correction
+        for a contradicted claim.
 
         Rules:
-        - Remove or replace the prohibited phrase with a hedged alternative.
-        - Never substitute one absolute claim with another.
-        - Never promise legal compliance.
+        - Must be grammatically correct (avoids broken grammar like "designed to support to").
+        - Must be conservative: soften or remove absolute guarantees and unverified claims.
+        - Must NEVER introduce unsupported factual claims (e.g. do not invent claims of
+          'internal testing', clinical trials, or unverified ingredient origins).
+        - Explicitly labelled as a draft for human review.
         """
-        hedges = {
-            "100% guaranteed": "designed to support",
-            "100% safe": "formulated with care",
-            "100% natural": "made with natural-origin ingredients",
-            "clinically proven": "supported by internal testing",
-            "guaranteed to": "designed to",
-            "cures": "may help address",
-            "number 1 in the world": "a leading choice for",
-        }
-
         corrected = claim_text
-        for phrase, replacement in hedges.items():
-            corrected = re.sub(re.escape(phrase), replacement, corrected, flags=re.IGNORECASE)
+
+        # 1. "100% guaranteed to <verb>" -> "designed to <verb>"
+        # (e.g. "is 100% guaranteed to work" -> "is designed to work")
+        corrected = re.sub(
+            r'\b100\s*%\s*guaranteed\s+to\b',
+            'designed to',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 2. "100% guaranteed <adjective>" (e.g. "100% guaranteed effective")
+        # -> "designed to be <adjective>"
+        corrected = re.sub(
+            r'\b100\s*%\s*guaranteed\s+(effective|safe|pure|reliable)\b',
+            r'designed to be \1',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 3. Predicate "is/are 100% guaranteed" -> "is/are designed with a commitment to quality"
+        corrected = re.sub(
+            r'\b(is|are|was|were)\s+100\s*%\s*guaranteed\b',
+            r'\1 designed with a commitment to quality',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 4. Standalone "100% guaranteed" -> "quality-committed"
+        corrected = re.sub(
+            r'\b100\s*%\s*guaranteed\b',
+            'quality-focused',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 5. "100% safe" -> "formulated with care"
+        corrected = re.sub(
+            r'\b100\s*%\s*safe\b',
+            'formulated with care',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 6. "100% natural" / "100% organic" -> conservative without asserting unverified certifications
+        corrected = re.sub(
+            r'\b100\s*%\s*(natural|organic|pure)\b',
+            'carefully selected',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 7. "clinically proven to" -> "formulated to" (does not falsely claim testing)
+        corrected = re.sub(
+            r'\bclinically\s+proven\s+to\b',
+            'formulated to',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+        corrected = re.sub(
+            r'\bclinically\s+proven\b',
+            'specifically formulated',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 8. "guaranteed to" -> "designed to"
+        corrected = re.sub(
+            r'\bguaranteed\s+to\b',
+            'designed to',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 9. "cures" -> "is formulated to help address"
+        corrected = re.sub(
+            r'\bcures\b',
+            'is formulated to help address',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+        corrected = re.sub(
+            r'\bcure\b',
+            'help address',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # 10. "number 1 in the world" -> "a popular choice"
+        corrected = re.sub(
+            r'\bnumber\s+1\s+in\s+the\s+world\b',
+            'a popular choice',
+            corrected,
+            flags=re.IGNORECASE,
+        )
+
+        # Clean up repeated prepositions/verbs: "to to", "is is", "designed to designed to"
+        corrected = re.sub(r'\b(to|is|are|designed)\s+\1\b', r'\1', corrected, flags=re.IGNORECASE)
+        corrected = re.sub(r'\s+', ' ', corrected).strip()
 
         if corrected == claim_text:
-            # No specific replacement found — give general conservative advice
             return (
                 "[DRAFT — requires human review] Consider removing or softening absolute claims "
                 f"related to '{prohibited_hint}'. Avoid unverifiable guarantees. "

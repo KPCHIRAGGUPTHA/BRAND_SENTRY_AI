@@ -172,10 +172,22 @@ async def review_marketing_content(request: ReviewRequest):
         insufficient_evidence=insufficient,
     )
 
+    # Determine the actual searched document IDs:
+    # When document_ids are supplied, scope strictly to those.
+    # When omitted, document all currently indexed guidelines.
+    if validated_doc_ids:
+        searched_doc_ids = list(validated_doc_ids)
+    else:
+        searched_doc_ids = [
+            doc["document_id"]
+            for doc in document_registry.list_documents()
+            if doc.get("status") == "indexed"
+        ]
+
     return ReviewResponse(
         review_id=review_id,
         content_preview=content[:120] + ("…" if len(content) > 120 else ""),
-        document_ids_searched=validated_doc_ids,
+        document_ids_searched=searched_doc_ids,
         claims=claim_verdicts,
         summary=summary,
         created_at=created_at,
@@ -190,35 +202,55 @@ def _retrieve_evidence(
     """
     Embed the claim and retrieve top-k passages from ChromaDB.
 
-    If document_ids is non-empty, one search is performed per document_id
-    and results are merged, then deduplicated by chunk_id.
-    If document_ids is empty, a single search across all documents is performed.
+    If document_ids is non-empty, search is strictly scoped to the specified
+    document IDs, merged, and deduplicated.
+    If document_ids is empty, a search across all documents is performed and deduplicated.
     """
+    import re
     query_embedding = embedding_service.generate_query_embedding(claim_text)
     top_k = settings.REVIEW_EVIDENCE_TOP_K
 
     if not document_ids:
-        return vector_store_service.search(
+        raw_results = vector_store_service.search(
             query_embedding=query_embedding,
             document_id=None,
-            top_k=top_k,
+            top_k=top_k * 2,
         )
-
-    # Per-document search + merge + deduplicate
-    seen_chunk_ids: set = set()
-    merged: list = []
-    for doc_id in document_ids:
-        results = vector_store_service.search(
-            query_embedding=query_embedding,
-            document_id=doc_id,
-            top_k=top_k,
-        )
-        for r in results:
-            cid = r.get("chunk_id", "")
-            if cid not in seen_chunk_ids:
-                seen_chunk_ids.add(cid)
-                merged.append(r)
+    else:
+        raw_results = []
+        for doc_id in document_ids:
+            results = vector_store_service.search(
+                query_embedding=query_embedding,
+                document_id=doc_id,
+                top_k=top_k,
+            )
+            # Enforce strict document scoping
+            for r in results:
+                if r.get("document_id") == doc_id:
+                    raw_results.append(r)
 
     # Sort merged results by distance (nearest first)
-    merged.sort(key=lambda x: x.get("distance", 1.0))
-    return merged[:top_k]
+    raw_results.sort(key=lambda x: x.get("distance", 1.0))
+
+    # Deduplicate passages so the same passage is not repeated
+    seen_chunk_ids: set = set()
+    seen_texts: set = set()
+    deduped: list = []
+
+    for r in raw_results:
+        cid = r.get("chunk_id", "")
+        if cid in seen_chunk_ids:
+            continue
+
+        raw_text = r.get("text", "").strip()
+        norm_text = re.sub(r'\s+', ' ', raw_text.lower())
+        if norm_text in seen_texts:
+            continue
+
+        seen_chunk_ids.add(cid)
+        seen_texts.add(norm_text)
+        deduped.append(r)
+        if len(deduped) >= top_k:
+            break
+
+    return deduped

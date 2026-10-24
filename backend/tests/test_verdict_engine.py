@@ -316,14 +316,70 @@ class TestSuggestedCorrections:
     def test_correction_does_not_retain_prohibited_phrase(self, engine):
         cv = engine.classify("claim-1", "This is 100% guaranteed effective.", [])
         assert cv.verdict == VERDICT_CONTRADICTED
-        # The correction should not contain the exact prohibited phrase
         if cv.suggested_correction:
             assert "100% guaranteed" not in cv.suggested_correction.lower().replace(
                 "[draft", ""
             )
 
+    def test_100_percent_guaranteed_to_verb_grammar(self, engine):
+        cv = engine.classify("claim-1", "Our product is 100% guaranteed to work.", [])
+        assert cv.suggested_correction is not None
+        # Must be grammatically correct: "is designed to work", not "is designed to support to work"
+        assert "is designed to work" in cv.suggested_correction
+        assert "support to" not in cv.suggested_correction
+        assert "to to" not in cv.suggested_correction
+
+    def test_100_percent_guaranteed_adjective_grammar(self, engine):
+        cv = engine.classify("claim-1", "This formula is 100% guaranteed effective.", [])
+        assert cv.suggested_correction is not None
+        assert "designed to be effective" in cv.suggested_correction
+        assert "100% guaranteed" not in cv.suggested_correction.lower().replace("[draft", "")
+
+    def test_100_percent_guaranteed_predicate_grammar(self, engine):
+        cv = engine.classify("claim-1", "Our product is 100% guaranteed.", [])
+        assert cv.suggested_correction is not None
+        assert "designed with a commitment to quality" in cv.suggested_correction
+        assert "100% guaranteed" not in cv.suggested_correction.lower().replace("[draft", "")
+
+    def test_100_percent_guaranteed_does_not_introduce_unsupported_facts(self, engine):
+        cv = engine.classify("claim-1", "Our serum is 100% guaranteed to eliminate all wrinkles.", [])
+        assert cv.suggested_correction is not None
+        sc_lower = cv.suggested_correction.lower()
+        # Must not fabricate unsupported factual claims like clinical trials or internal testing
+        assert "internal testing" not in sc_lower
+        assert "clinical study" not in sc_lower
+        assert "peer-reviewed" not in sc_lower
+        assert "certified organic" not in sc_lower
+
     def test_insufficient_evidence_has_review_advice(self, engine):
         cv = engine.classify("claim-1", "Our product supports wellness.", [])
         assert cv.verdict == VERDICT_INSUFFICIENT
-        # Should have some guidance text
         assert cv.suggested_correction is not None or cv.explanation
+
+
+# ---------------------------------------------------------------------------
+# Evidence Deduplication tests
+# ---------------------------------------------------------------------------
+
+class TestEvidenceDeduplication:
+    def test_identical_passages_deduplicated(self, engine):
+        p1 = _make_passage("Absolute claims like 100% guaranteed are prohibited.", chunk_id="c1", document_id="doc-1")
+        p2 = _make_passage("Absolute claims like 100% guaranteed are prohibited.", chunk_id="c2", document_id="doc-1")
+        items = engine._build_evidence_items([p1, p2], "We are 100% guaranteed.")
+        assert len(items) == 1
+        assert items[0].chunk_id == "c1"
+
+    def test_distinct_evidence_from_different_sources_preserved(self, engine):
+        p1 = _make_passage("Policy 1: Absolute superlatives are strictly prohibited in marketing copy.", chunk_id="c1", document_id="doc-1", source_filename="policy_1.pdf")
+        p2 = _make_passage("Standard 2: All performance guarantees require prior compliance sign-off.", chunk_id="c2", document_id="doc-2", source_filename="policy_2.pdf")
+        items = engine._build_evidence_items([p1, p2], "We are 100% guaranteed.")
+        assert len(items) == 2
+        assert {item.document_id for item in items} == {"doc-1", "doc-2"}
+
+    def test_overlapping_sliding_chunk_redundancy_filtered(self, engine):
+        full_text = "Rule 1.1: Absolute Performance Bans. Never use absolute terms such as 100% guaranteed in ads."
+        sub_text = "Never use absolute terms such as 100% guaranteed in ads."
+        p1 = _make_passage(full_text, chunk_id="c1", document_id="doc-1")
+        p2 = _make_passage(sub_text, chunk_id="c2", document_id="doc-1")
+        items = engine._build_evidence_items([p1, p2], "We are 100% guaranteed.")
+        assert len(items) == 1
