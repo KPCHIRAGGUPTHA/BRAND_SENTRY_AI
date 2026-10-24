@@ -22,11 +22,11 @@
 | **P0-04** | **Document Chunking** | Section-aware semantic chunking (~400 tokens / 50 tokens overlap) with metadata | Phase 2 | **TESTED** | Deterministic sliding-window chunker with chunk_id, page_number, word counts. |
 | **P0-05** | **Embedding Generation** | Dense vector embeddings via ONNX all-MiniLM-L6-v2 (384 dimensions) on CPU | Phase 2 | **TESTED** | Lazy loading, unit-normalized, finite vectors, cached in memory. |
 | **P0-06** | **Vector Retrieval** | Persistent ChromaDB collection indexing with top-k similarity search | Phase 2 | **TESTED** | Implemented `POST /api/guidelines/search` with document_id filtering & persistence. |
-| **P0-07** | **Marketing Content Input** | Text input interface for raw advertising and marketing copy | Phase 3 / 5 | **NOT STARTED** | Scheduled for Phase 3/5. |
-| **P0-08** | **Claim Extraction** | Decompose unstructured marketing copy into discrete, testable claims | Phase 3 | **NOT STARTED** | Scheduled for Phase 3. |
-| **P0-09** | **Three-Way Verdict Engine** | Rigorous evaluation: SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE | Phase 3 | **NOT STARTED** | Strict rule: No automatic approval on missing evidence. Scheduled for Phase 3. |
-| **P0-10** | **Verifiable Policy Citations** | Exact guideline document name, page number, and quote snippet | Phase 4 | **NOT STARTED** | Hallucination-prevention check queued for Phase 4. |
-| **P0-11** | **Suggested Corrections** | Compliant marketing rewrites for contradicted & insufficient claims | Phase 4 | **NOT STARTED** | Prompt & rule-guided rewrite generator. |
+| **P0-07** | **Marketing Content Input** | Text input interface for raw advertising and marketing copy | Phase 3 / 5 | **TESTED** | Backend ReviewRequest schema with length limits & whitespace validation in `POST /api/review`. |
+| **P0-08** | **Claim Extraction** | Decompose unstructured marketing copy into discrete, testable claims | Phase 3 | **TESTED** | Deterministic sentence + conjunction boundary claim extractor with abbreviation awareness. |
+| **P0-09** | **Three-Way Verdict Engine** | Rigorous evaluation: SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE | Phase 3 | **TESTED** | Multi-tiered engine: deterministic rules first, retrieval grounding, no auto-approval on missing evidence. |
+| **P0-10** | **Verifiable Policy Citations** | Exact guideline document name, page number, and quote snippet | Phase 4 | **IMPLEMENTED** | Exact substring verification against retrieved passages, chunk_id, page_number. |
+| **P0-11** | **Suggested Corrections** | Compliant marketing rewrites for contradicted & insufficient claims | Phase 4 | **IMPLEMENTED** | Draft suggested corrections removing prohibited phrases or offering guidance. |
 | **P0-12** | **Complete Review Workflow** | End-to-end flow from guideline upload to correction application | Phase 5 | **NOT STARTED** | Primary hackathon deliverable. |
 | **P0-13** | **Graceful Error Handling** | Structured error responses, empty/corrupt validation, offline backend detection | All Phases | **TESTED** | Tested across file validations, 400 empty, 400 corrupt, 413 size, 422 scanned PDF. |
 | **P0-14** | **Public Deployment** | Cloud container deployment with public HTTPS URL for judges | Phase 7 | **NOT STARTED** | Targeted after Phase 6 testing. |
@@ -37,7 +37,7 @@
 
 | Feature ID | Feature Name | Description | Target Phase | Current Status | Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **P1-01** | **Deterministic Pre-Filter** | Regex/keyword screener for banned words and trademark casing | Phase 3 | **NOT STARTED** | Eliminates LLM latency/cost for obvious violations. |
+| **P1-01** | **Deterministic Pre-Filter** | Regex/keyword screener for banned words and trademark casing | Phase 3 | **TESTED** | Absolute claim regex rules (e.g. 100% guaranteed/safe, cure claims) firing deterministically. |
 | **P1-02** | **Semantic Drift Detection** | Measures divergence between claim claims and original brand positioning | Phase 4 | **NOT STARTED** | Queued for Phase 4. |
 | **P1-03** | **Claim-Type Retrieval Routing** | Category-based query expansion (Regulatory, Product, Voice) | Phase 3 | **NOT STARTED** | Optimizes hybrid recall per claim type. |
 | **P1-04** | **Review History & Document Registry**| Session audit log and document tracking in SQLite | Phase 2 / 5 | **TESTED** | SQLite document registry (`data/documents.db`) implemented and tested. |
@@ -57,8 +57,9 @@
 
 ---
 
-## Summary of Current Milestone Progress (Phase 2 Completed)
-- **Features Tested & Passing**: 7 (`P0-01`, `P0-02`, `P0-03`, `P0-04`, `P0-05`, `P0-06`, `P0-13`, plus `P1-04`)
+## Summary of Current Milestone Progress (Phase 3 Completed)
+- **Features Tested & Passing**: 11 (`P0-01`, `P0-02`, `P0-03`, `P0-04`, `P0-05`, `P0-06`, `P0-07`, `P0-08`, `P0-09`, `P0-13`, plus `P1-01`, `P1-04`)
+- **Features Implemented (Ahead of Schedule)**: 2 (`P0-10`, `P0-11`)
 - **Features In Progress**: 0
-- **Features Not Started**: 12
+- **Features Not Started**: 8
 - **Features Blocked**: 0
