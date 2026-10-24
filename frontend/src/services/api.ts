@@ -6,14 +6,76 @@ import {
   ReviewResponse,
 } from '../types/api';
 
-export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
-  'http://127.0.0.1:8000';
+/**
+ * Resolves the backend API base URL with safeguards:
+ * 1. Checks VITE_API_BASE_URL and VITE_API_URL.
+ * 2. If Render's blueprint injected a bare service name (e.g. "brandsentry-api" or "brandsentry-api:8000"),
+ *    maps it to the full HTTPS public domain "https://brandsentry-api.onrender.com".
+ * 3. If a naked domain without protocol was provided (e.g. "brandsentry-api.onrender.com"),
+ *    prefixes "https://".
+ * 4. In production deployed on *.onrender.com without env vars, infers "https://brandsentry-api.onrender.com".
+ * 5. In local development, falls back to "http://127.0.0.1:8000".
+ * 6. Strips any trailing slashes to prevent malformed double slashes.
+ */
+export function resolveApiBaseUrl(): string {
+  let url = (
+    import.meta.env.VITE_API_BASE_URL ||
+    import.meta.env.VITE_API_URL ||
+    ''
+  ).trim();
+
+  // If unset, detect if running on Render public domain
+  if (!url) {
+    if (typeof window !== 'undefined' && window.location.hostname.endsWith('.onrender.com')) {
+      return 'https://brandsentry-api.onrender.com';
+    }
+    return 'http://127.0.0.1:8000';
+  }
+
+  // Handle Render internal service names from Blueprint `property: host`
+  if (url === 'brandsentry-api' || url.startsWith('brandsentry-api:')) {
+    return 'https://brandsentry-api.onrender.com';
+  }
+
+  // If domain provided without protocol
+  if (!url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('/')) {
+    url = `https://${url}`;
+  }
+
+  return url.replace(/\/+$/, '');
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
+
+/**
+ * Safely parses response JSON with robust diagnostics for HTML (SPA redirects)
+ * and empty responses.
+ */
+export async function safeParseJson<T>(response: Response, context: string): Promise<T> {
+  const text = await response.text();
+  const trimmed = (text || '').trim();
+
+  if (!trimmed) {
+    throw new Error(`${context}: Empty response received from server (HTTP ${response.status})`);
+  }
+
+  if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html') || trimmed.startsWith('<?xml')) {
+    throw new Error(
+      `${context}: Server returned HTML instead of JSON (HTTP ${response.status}). Verify that the API URL '${response.url}' points to the backend server rather than the static frontend.`
+    );
+  }
+
+  try {
+    return JSON.parse(trimmed) as T;
+  } catch {
+    const snippet = trimmed.slice(0, 120);
+    throw new Error(`${context}: Invalid JSON payload (HTTP ${response.status}): ${snippet}`);
+  }
+}
 
 export async function fetchHealth(): Promise<HealthResponse> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 4000);
+  const timeoutId = setTimeout(() => controller.abort(), 8000);
 
   try {
     const response = await fetch(`${API_BASE_URL}/health`, {
@@ -27,7 +89,7 @@ export async function fetchHealth(): Promise<HealthResponse> {
       throw new Error(`Backend responded with HTTP status ${response.status} (${response.statusText})`);
     }
 
-    return await response.json();
+    return await safeParseJson<HealthResponse>(response, 'Health check');
   } catch (error: unknown) {
     clearTimeout(timeoutId);
     if (error instanceof Error) {
@@ -44,17 +106,32 @@ export async function uploadGuideline(file: File): Promise<GuidelineUploadRespon
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`${API_BASE_URL}/api/guidelines/upload`, {
+  const url = `${API_BASE_URL}/api/guidelines/upload`;
+  const response = await fetch(url, {
     method: 'POST',
     body: formData,
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Upload failed with HTTP ${response.status}`);
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Upload failed with HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) {
+        errorDetail = typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+      }
+    } catch {
+      const trimmed = errorText.trim();
+      if (trimmed.startsWith('<!doctype') || trimmed.startsWith('<html')) {
+        errorDetail = `Upload failed: Request reached static frontend (${url}) instead of backend API. Verify VITE_API_BASE_URL.`;
+      } else if (trimmed) {
+        errorDetail = `Upload failed (HTTP ${response.status}): ${trimmed.slice(0, 120)}`;
+      }
+    }
+    throw new Error(errorDetail);
   }
 
-  return await response.json();
+  return await safeParseJson<GuidelineUploadResponse>(response, 'Guideline upload');
 }
 
 export async function searchGuidelines(
@@ -70,7 +147,8 @@ export async function searchGuidelines(
     payload.document_id = documentId;
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/guidelines/search`, {
+  const url = `${API_BASE_URL}/api/guidelines/search`;
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -80,25 +158,48 @@ export async function searchGuidelines(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Search failed with HTTP ${response.status}`);
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Search failed with HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) {
+        errorDetail = typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+      }
+    } catch {
+      if (errorText.trim()) {
+        errorDetail = `Search failed: ${errorText.trim().slice(0, 120)}`;
+      }
+    }
+    throw new Error(errorDetail);
   }
 
-  return await response.json();
+  return await safeParseJson<GuidelineSearchResponse>(response, 'Guideline search');
 }
 
 export async function fetchGuidelines(): Promise<DocumentListResponse> {
-  const response = await fetch(`${API_BASE_URL}/api/guidelines`, {
+  const url = `${API_BASE_URL}/api/guidelines`;
+  const response = await fetch(url, {
     method: 'GET',
     headers: { Accept: 'application/json' },
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || `Fetching guidelines failed with HTTP ${response.status}`);
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Fetching guidelines failed with HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) {
+        errorDetail = typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+      }
+    } catch {
+      if (errorText.trim()) {
+        errorDetail = `Fetching guidelines failed: ${errorText.trim().slice(0, 120)}`;
+      }
+    }
+    throw new Error(errorDetail);
   }
 
-  return await response.json();
+  return await safeParseJson<DocumentListResponse>(response, 'Fetch guidelines');
 }
 
 export async function reviewMarketingContent(
@@ -112,7 +213,8 @@ export async function reviewMarketingContent(
     payload.document_ids = documentIds;
   }
 
-  const response = await fetch(`${API_BASE_URL}/api/review`, {
+  const url = `${API_BASE_URL}/api/review`;
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -122,14 +224,24 @@ export async function reviewMarketingContent(
   });
 
   if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    // FastAPI validation errors may return an array in `detail`
-    if (Array.isArray(errorData.detail)) {
-      const msg = errorData.detail.map((d: any) => d.msg || JSON.stringify(d)).join(', ');
-      throw new Error(msg);
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Review request failed with HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) {
+        if (Array.isArray(parsed.detail)) {
+          errorDetail = parsed.detail.map((d: any) => d.msg || JSON.stringify(d)).join(', ');
+        } else {
+          errorDetail = typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+        }
+      }
+    } catch {
+      if (errorText.trim()) {
+        errorDetail = `Review request failed: ${errorText.trim().slice(0, 120)}`;
+      }
     }
-    throw new Error(errorData.detail || `Review request failed with HTTP ${response.status}`);
+    throw new Error(errorDetail);
   }
 
-  return await response.json();
+  return await safeParseJson<ReviewResponse>(response, 'Claim review');
 }
