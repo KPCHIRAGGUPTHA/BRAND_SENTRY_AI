@@ -9,7 +9,7 @@ services:
     runtime: docker
     dockerfilePath: ./Dockerfile.backend
     region: oregon
-    plan: starter
+    plan: free
     envVars:
       - key: APP_ENV
         value: production
@@ -29,10 +29,6 @@ services:
         sync: false
       - key: VERDICT_SIMILARITY_THRESHOLD
         value: "0.25"
-    disk:
-      name: brandsentry-storage
-      mountPath: /app/backend/data
-      sizeGB: 1
 
   # ---------------------------------------------------------------------------
   # Frontend Static Site (React + TypeScript + Vite)
