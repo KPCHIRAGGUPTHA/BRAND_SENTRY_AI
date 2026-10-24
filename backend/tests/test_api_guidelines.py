@@ -167,3 +167,76 @@ def test_list_and_get_guidelines():
     doc_detail = get_res.json()
     assert doc_detail["document_id"] == first_doc_id
     assert doc_detail["status"] == "indexed"
+
+
+def test_repeated_upload_of_same_file_reuses_existing_record():
+    """Verify repeated upload of identical file bytes reuses existing document without duplicating registry rows."""
+    file_bytes = b"Standardized Brand Terms 2026: Always use approved typography."
+
+    # First upload
+    res1 = client.post(
+        "/api/guidelines/upload",
+        files={"file": ("typography.txt", io.BytesIO(file_bytes), "text/plain")},
+    )
+    assert res1.status_code == 201
+    doc_id1 = res1.json()["document_id"]
+
+    # Count before second upload
+    list1 = client.get("/api/guidelines").json()
+    total_before = list1["total"]
+
+    # Second upload of the exact same content
+    res2 = client.post(
+        "/api/guidelines/upload",
+        files={"file": ("typography.txt", io.BytesIO(file_bytes), "text/plain")},
+    )
+    assert res2.status_code == 201
+    data2 = res2.json()
+    # Should reuse existing document ID
+    assert data2["document_id"] == doc_id1
+    assert "reused" in data2.get("message", "").lower() or "already indexed" in data2.get("message", "").lower()
+
+    # Total unique documents in registry must not increase
+    list2 = client.get("/api/guidelines").json()
+    assert list2["total"] == total_before
+
+
+def test_two_different_documents_with_same_filename_both_preserved():
+    """Verify two distinct documents sharing the same filename are both registered and preserved."""
+    content_a = b"Division A Guideline: All headers must be Midnight Navy Blue."
+    content_b = b"Division B Guideline: All headers must be Forest Pine Green."
+    same_filename = "shared_style_guide.txt"
+
+    res_a = client.post(
+        "/api/guidelines/upload",
+        files={"file": (same_filename, io.BytesIO(content_a), "text/plain")},
+    )
+    assert res_a.status_code == 201
+    doc_id_a = res_a.json()["document_id"]
+
+    res_b = client.post(
+        "/api/guidelines/upload",
+        files={"file": (same_filename, io.BytesIO(content_b), "text/plain")},
+    )
+    assert res_b.status_code == 201
+    doc_id_b = res_b.json()["document_id"]
+
+    # Documents must have different IDs since their contents are different
+    assert doc_id_a != doc_id_b
+
+    # Both documents must exist in registry
+    list_docs = client.get("/api/guidelines").json()["documents"]
+    doc_ids_in_list = {d["document_id"] for d in list_docs}
+    assert doc_id_a in doc_ids_in_list
+    assert doc_id_b in doc_ids_in_list
+
+
+def test_registry_document_counts_and_refresh_consistency():
+    """Verify registry total count matches length of documents list and reflects unique records."""
+    res = client.get("/api/guidelines")
+    assert res.status_code == 200
+    data = res.json()
+    assert data["total"] == len(data["documents"])
+    # All document IDs in returned list must be unique
+    doc_ids = [d["document_id"] for d in data["documents"]]
+    assert len(doc_ids) == len(set(doc_ids))

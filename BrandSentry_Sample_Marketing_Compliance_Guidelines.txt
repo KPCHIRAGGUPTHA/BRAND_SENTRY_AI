@@ -1,0 +1,77 @@
+BRANDSENTRY AI — SAMPLE MARKETING COMPLIANCE GUIDELINES Document ID:
+BSAI-DEMO-001 Version: 1.0 Purpose: Demonstration guideline for testing
+evidence-grounded marketing claim review. Important: This is a fictional
+sample policy created for software demonstration, not legal advice.
+
+1.  GUARANTEES AND ABSOLUTE CLAIMS Marketing materials must not use the
+    phrase “100% guaranteed” unless the Legal team has provided written
+    approval. Marketing materials must not promise guaranteed outcomes
+    when results depend on customer circumstances. Claims using words
+    such as “always”, “never”, or “zero risk” must be supported by
+    documented evidence and approved before publication.
+
+2.  SAFETY CLAIMS Marketing materials must not describe a product as
+    “100% safe”. Safety statements must be limited to risks that have
+    been assessed and documented. Do not imply that a product has no
+    risks unless the claim has been substantiated and approved by Legal.
+
+3.  HEALTH AND MEDICAL CLAIMS Marketing materials must not claim that a
+    product cures, treats, or prevents a disease unless the claim has
+    been reviewed and approved through the applicable medical and
+    regulatory process. Do not imply that a product replaces
+    professional medical advice, diagnosis, or treatment. Health-related
+    performance claims must be supported by appropriate evidence and
+    reviewed before publication.
+
+4.  PERFORMANCE AND COMPARATIVE CLAIMS Claims about performance, speed,
+    savings, or effectiveness must be supported by current, reproducible
+    evidence. Comparisons with competitors must use fair, verifiable,
+    and up-to-date information. Do not state a specific percentage
+    improvement unless the underlying measurement and methodology are
+    documented.
+
+5.  CUSTOMER TESTIMONIALS Testimonials must reflect genuine customer
+    experiences and must not be edited in a way that changes their
+    meaning. Do not imply that an exceptional result is typical unless
+    representative evidence supports that implication. Any required
+    disclosure about incentives or material relationships must be
+    included.
+
+6.  PRICING AND DISCOUNTS Advertised prices and discounts must be
+    accurate and available under the stated conditions. A discount must
+    not be described as “the lowest price ever” unless historical
+    pricing records substantiate the claim. Material limitations, fees,
+    and eligibility conditions must be clearly disclosed.
+
+7.  ENVIRONMENTAL CLAIMS Environmental claims such as “eco-friendly”,
+    “green”, or “zero impact” must be specific and supported by
+    documented evidence. Avoid broad environmental claims when only a
+    limited product feature has been assessed. Do not claim a product is
+    carbon neutral unless the basis for that claim is documented and
+    approved.
+
+8.  DATA, PRIVACY, AND SECURITY CLAIMS Claims that customer data is
+    “completely secure” or “impossible to hack” must not be used.
+    Security and privacy statements must accurately reflect verified
+    controls and documented practices. Do not claim regulatory
+    certification or compliance unless the relevant status has been
+    verified.
+
+9.  EVIDENCE AND APPROVAL Every material factual marketing claim must
+    have a traceable evidence source. Evidence must be current, relevant
+    to the exact claim, and retained for review. Claims that are
+    unsupported or ambiguous must be escalated for verification rather
+    than presented as established fact. Where this guideline does not
+    address a claim, the reviewer must record that the available
+    guideline provides insufficient evidence.
+
+10. REVIEW OUTCOMES SUPPORTED: The available guideline evidence
+    affirmatively supports the claim. CONTRADICTED: The available
+    guideline evidence directly conflicts with the claim. INSUFFICIENT
+    EVIDENCE: The available guideline evidence does not establish
+    whether the claim complies. A semantic similarity score alone is not
+    proof that a claim is supported or contradicted. Reviewers must cite
+    the actual source passage and page where available. They must not
+    invent quotations, page numbers, or policy requirements.
+
+END OF SAMPLE GUIDELINE

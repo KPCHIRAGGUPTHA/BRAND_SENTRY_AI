@@ -2,6 +2,7 @@
 FastAPI Router for Guideline Ingestion and Retrieval.
 Handles file uploads, text extraction, chunking, indexing, and semantic passage search.
 """
+import hashlib
 import os
 import re
 import uuid
@@ -52,6 +53,7 @@ async def upload_guideline(file: UploadFile = File(...)):
     """
     Accepts PDF or TXT brand guideline files.
     Extracts text, splits into semantic chunks, generates embeddings, and persists in ChromaDB.
+    Reuses existing records if identical file content was previously uploaded and indexed.
     """
     filename = file.filename or "unknown"
     sanitized_name = _sanitize_filename(filename)
@@ -78,6 +80,28 @@ async def upload_guideline(file: UploadFile = File(...)):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="The uploaded file is empty (0 bytes).",
+        )
+
+    # Stable content hash for duplicate detection
+    content_hash = hashlib.sha256(content).hexdigest()
+
+    # Safe deduplication: If this exact file content has already been successfully indexed,
+    # reuse the existing document record without repeated vector indexing.
+    existing_doc = document_registry.get_document_by_content_hash(content_hash)
+    if existing_doc and existing_doc.get("status") == "indexed":
+        logger.info(
+            "Identical file content already indexed (%s: %s). Reusing existing record.",
+            existing_doc["document_id"],
+            existing_doc["filename"],
+        )
+        return GuidelineUploadResponse(
+            document_id=existing_doc["document_id"],
+            filename=sanitized_name,
+            status="indexed",
+            page_count=existing_doc.get("page_count"),
+            extracted_characters=existing_doc.get("character_count", 0),
+            chunk_count=existing_doc.get("chunk_count", 0),
+            message="Document already indexed. Existing record reused.",
         )
 
     document_id = str(uuid.uuid4())
@@ -127,6 +151,7 @@ async def upload_guideline(file: UploadFile = File(...)):
         file_size=len(content),
         stored_path=stored_path,
         status="processing",
+        content_hash=content_hash,
     )
 
     # 4. Chunk document

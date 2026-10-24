@@ -3,6 +3,7 @@ import {
   GuidelineUploadResponse,
   GuidelineSearchResponse,
   DocumentListResponse,
+  ReviewResponse,
 } from '../types/api';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
@@ -92,6 +93,39 @@ export async function fetchGuidelines(): Promise<DocumentListResponse> {
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(errorData.detail || `Fetching guidelines failed with HTTP ${response.status}`);
+  }
+
+  return await response.json();
+}
+
+export async function reviewMarketingContent(
+  content: string,
+  documentIds?: string[]
+): Promise<ReviewResponse> {
+  const payload: { content: string; document_ids?: string[] } = {
+    content,
+  };
+  if (documentIds && documentIds.length > 0) {
+    payload.document_ids = documentIds;
+  }
+
+  const response = await fetch(`${API_BASE_URL}/api/review`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    // FastAPI validation errors may return an array in `detail`
+    if (Array.isArray(errorData.detail)) {
+      const msg = errorData.detail.map((d: any) => d.msg || JSON.stringify(d)).join(', ');
+      throw new Error(msg);
+    }
+    throw new Error(errorData.detail || `Review request failed with HTTP ${response.status}`);
   }
 
   return await response.json();

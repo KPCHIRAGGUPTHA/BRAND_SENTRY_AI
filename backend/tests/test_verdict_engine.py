@@ -470,3 +470,185 @@ class TestEvidenceRelevance:
         assert cv.verdict == VERDICT_CONTRADICTED
         # Evidence must NOT cite the unrelated guarantee rule as evidence for 100% safe
         assert cv.evidence == []
+
+
+class TestTask4RegressionScenarios:
+    """Explicit regression tests for Task 2, Task 3, and Task 4 compliance specifications."""
+
+    def test_guarantee_claim_cites_guarantee_rule_not_safety_rule(self, engine):
+        """Ensure guarantee claims cite guarantee rules when both safety and guarantee rules are retrieved."""
+        guarantee_passage = _make_passage(
+            "Consumer Ad Policy: Never use '100% Guaranteed' under any circumstances.",
+            chunk_id="chunk-guarantee",
+            source_filename="guarantee_policy.pdf",
+            similarity_score=0.85,
+        )
+        safety_passage = _make_passage(
+            "Product Safety Guide: All ingredients must be safety-certified by toxicologists.",
+            chunk_id="chunk-safety",
+            source_filename="safety_policy.pdf",
+            similarity_score=0.84,
+        )
+        passages = [guarantee_passage, safety_passage]
+        cv = engine.classify("claim-1", "Our product is 100% guaranteed to deliver results.", passages)
+
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) == 1
+        assert cv.evidence[0].chunk_id == "chunk-guarantee"
+        assert "guaranteed" in cv.evidence[0].quote.lower()
+        assert "safety-certified" not in cv.evidence[0].quote.lower()
+
+    def test_safety_claim_cites_safety_rule_not_guarantee_rule(self, engine):
+        """Ensure safety claims cite safety rules when both safety and guarantee rules are retrieved."""
+        guarantee_passage = _make_passage(
+            "Consumer Ad Policy: Never use '100% Guaranteed' under any circumstances.",
+            chunk_id="chunk-guarantee",
+            source_filename="guarantee_policy.pdf",
+            similarity_score=0.85,
+        )
+        safety_passage = _make_passage(
+            "Brand Safety Guidelines: Never claim a product is '100% Safe' without peer-reviewed data.",
+            chunk_id="chunk-safety",
+            source_filename="safety_policy.pdf",
+            similarity_score=0.84,
+        )
+        passages = [guarantee_passage, safety_passage]
+        cv = engine.classify("claim-2", "Our product is 100% safe for sensitive skin.", passages)
+
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) == 1
+        assert cv.evidence[0].chunk_id == "chunk-safety"
+        assert "safe" in cv.evidence[0].quote.lower()
+        assert "100% guaranteed" not in cv.evidence[0].quote.lower()
+
+    def test_unsupported_claims_return_insufficient_evidence_without_fabricated_citations(self, engine):
+        """Ensure claims without relevant support return INSUFFICIENT_EVIDENCE with zero citations."""
+        unrelated_passage = _make_passage(
+            "Shipping Information: Ground delivery takes 3 to 5 business days across the continental US.",
+            chunk_id="chunk-shipping",
+            similarity_score=0.30,
+        )
+        cv = engine.classify(
+            "claim-3",
+            "Our software increases employee productivity by 85%.",
+            [unrelated_passage],
+        )
+
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        # Crucial constraint: absolutely zero fabricated citations
+        assert cv.evidence == []
+        assert "sufficient evidence" in cv.explanation.lower()
+        assert "human review" in cv.explanation.lower()
+
+    def test_distinguishes_explicit_rules_from_general_recommendations(self, engine):
+        """Ensure explanations distinguish explicit policy rules ('must not') from recommendations ('avoid')."""
+        explicit_passage = _make_passage(
+            "Marketing Standards: Copywriters must not state or imply immediate efficacy.",
+            chunk_id="chunk-exp",
+            similarity_score=0.85,
+        )
+        cv_explicit = engine.classify(
+            "claim-exp",
+            "Our solution provides immediate efficacy.",
+            [explicit_passage],
+        )
+        assert cv_explicit.verdict == VERDICT_CONTRADICTED
+        assert "explicit policy rule" in cv_explicit.explanation.lower()
+
+        recommendation_passage = _make_passage(
+            "Style Guide: Writers should avoid absolute statements in promotional teasers.",
+            chunk_id="chunk-rec",
+            similarity_score=0.85,
+        )
+        cv_rec = engine.classify(
+            "claim-rec",
+            "Our solution offers absolute excellence.",
+            [recommendation_passage],
+        )
+        assert cv_rec.verdict == VERDICT_CONTRADICTED
+        assert "recommendation" in cv_rec.explanation.lower()
+
+    def test_regression_test_a_evidence_traceability_supported(self, engine):
+        """Test A: Directly supporting evidence must not be overridden by unrelated discount prohibition."""
+        sample_passages = [
+            _make_passage(
+                "6. PRICING AND DISCOUNTS Advertised prices and discounts must be accurate. "
+                "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim.",
+                chunk_id="chunk-discount",
+                source_filename="BrandSentry_Sample_Marketing_Compliance_Guidelines.txt",
+                similarity_score=0.82,
+            ),
+            _make_passage(
+                "9. EVIDENCE AND APPROVAL Every material factual marketing claim must have a traceable evidence source. "
+                "Evidence must be current, relevant to the exact claim, and retained for review.",
+                chunk_id="chunk-evidence",
+                source_filename="BrandSentry_Sample_Marketing_Compliance_Guidelines.txt",
+                similarity_score=0.89,
+            ),
+        ]
+        cv = engine.classify(
+            "claim-test-a",
+            "Our marketing materials must include traceable evidence sources for every material factual claim.",
+            sample_passages,
+        )
+        assert cv.verdict == VERDICT_SUPPORTED
+        assert cv.suggested_correction is None
+        assert len(cv.evidence) >= 1
+        assert "traceable evidence source" in cv.evidence[0].quote.lower()
+        assert "discount" not in cv.explanation.lower()
+
+    def test_regression_test_b_100_pct_safe_contradicted(self, engine):
+        """Test B: 100% safe claim is CONTRADICTED citing Section 2 Safety Claims."""
+        safety_passage = _make_passage(
+            "2. SAFETY CLAIMS Marketing materials must not describe a product as '100% safe'. "
+            "Safety statements must be limited to risks that have been assessed and documented.",
+            chunk_id="chunk-safety-sec2",
+            source_filename="BrandSentry_Sample_Marketing_Compliance_Guidelines.txt",
+            similarity_score=0.88,
+        )
+        cv = engine.classify(
+            "claim-test-b",
+            "Our product is 100% safe.",
+            [safety_passage],
+        )
+        assert cv.verdict == VERDICT_CONTRADICTED
+        assert len(cv.evidence) >= 1
+        assert "100% safe" in cv.evidence[0].quote.lower()
+        assert cv.deterministic_rule_fired is True
+
+    def test_regression_test_c_100_pct_organic_cotton_insufficient(self, engine):
+        """Test C: 100% organic cotton returns INSUFFICIENT_EVIDENCE against BSAI-DEMO-001."""
+        env_passage = _make_passage(
+            "7. ENVIRONMENTAL CLAIMS Environmental claims such as 'eco-friendly', 'green', or 'zero impact' "
+            "must be specific and supported by documented evidence. Do not claim a product is carbon neutral.",
+            chunk_id="chunk-env",
+            source_filename="BrandSentry_Sample_Marketing_Compliance_Guidelines.txt",
+            similarity_score=0.35,
+        )
+        cv = engine.classify(
+            "claim-test-c",
+            "Our product is made from 100% organic cotton.",
+            [env_passage],
+        )
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.evidence == []
+        assert "sufficient evidence" in cv.explanation.lower() or "not establish" in cv.explanation.lower()
+
+    def test_regression_test_d_50_pct_faster_competitor_insufficient(self, engine):
+        """Test D: 50% faster than every competitor returns INSUFFICIENT_EVIDENCE under Section 4."""
+        perf_passage = _make_passage(
+            "4. PERFORMANCE AND COMPARATIVE CLAIMS Claims about performance, speed, savings, or effectiveness "
+            "must be supported by current, reproducible evidence. Comparisons with competitors must use fair, "
+            "verifiable, and up-to-date information. Do not state a specific percentage improvement unless "
+            "the underlying measurement and methodology are documented.",
+            chunk_id="chunk-perf",
+            source_filename="BrandSentry_Sample_Marketing_Compliance_Guidelines.txt",
+            similarity_score=0.80,
+        )
+        cv = engine.classify(
+            "claim-test-d",
+            "Our software is 50% faster than every competitor.",
+            [perf_passage],
+        )
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert "sufficient evidence" in cv.explanation.lower() or "require" in cv.explanation.lower() or "documentation" in cv.explanation.lower()

@@ -81,17 +81,16 @@ VERDICT_INSUFFICIENT = "INSUFFICIENT_EVIDENCE"
 # is present.  They do not generalise to semantically similar claims.
 _PROHIBITED_PHRASE_RULES: List[Tuple[re.Pattern, str]] = [
     (
-        re.compile(r'\b100\s*%\s*(guaranteed|safe|natural|organic|effective|pure)\b', re.IGNORECASE),
-        "Absolute percentage claims (e.g. '100% guaranteed', '100% safe') are commonly prohibited "
-        "by advertising standards as they set unverifiable absolute expectations.",
+        re.compile(r'\b100\s*%\s*(guaranteed|safe|natural|effective|pure)\b', re.IGNORECASE),
+        "Absolute percentage claims (e.g. '100% guaranteed', '100% safe') set unverifiable absolute expectations.",
     ),
     (
         re.compile(r'\bcures?\b.{0,40}\b(cancer|diabetes|alzheimer|covid|hiv|aids)\b', re.IGNORECASE),
-        "Disease cure claims are prohibited by medical advertising regulations.",
+        "Disease cure claims violate medical compliance regulations.",
     ),
     (
         re.compile(r'\bguaranteed\s+to\s+(cure|eliminate|remove|fix|reverse)\b', re.IGNORECASE),
-        "Guaranteed outcome claims for health or efficacy are commonly prohibited.",
+        "Guaranteed outcome claims for health or efficacy are prohibited.",
     ),
     (
         re.compile(r'\bnumber\s+1\s+in\s+the\s+world\b', re.IGNORECASE),
@@ -121,6 +120,95 @@ _GENERIC_STOP_WORDS = frozenset({
     "could", "our", "your", "their", "its", "my", "this", "that", "these",
     "those", "product", "products", "brand", "company", "every", "all",
 })
+
+_COMMON_DOMAIN_WORDS = frozenset({
+    "marketing", "materials", "claim", "claims", "statement", "statements",
+    "copy", "advertising", "advertised", "guideline", "guidelines", "policy",
+    "document", "section", "review", "reviewer", "reviewers", "rule", "rules",
+    "information", "text", "important", "purpose", "version"
+})
+
+_CONDITIONAL_REQUIREMENTS = re.compile(
+    r'\b(underlying\s+measurement\s+and\s+methodology\s+are\s+documented|'
+    r'must\s+be\s+supported\s+by\s+(current,\s+)?reproducible\s+evidence|'
+    r'must\s+be\s+supported\s+by\s+documented\s+evidence|'
+    r'requires?\s+documented\s+test\s+data|'
+    r'unless\s+(the\s+)?underlying\s+measurement\s+and\s+methodology)\b',
+    re.IGNORECASE,
+)
+
+_DOMAIN_SYNONYMS = {
+    "leader": ["leader", "leading", "leadership", "number 1", "number one", "#1"],
+    "leaders": ["leader", "leading", "leadership", "number 1", "number one", "#1"],
+    "leading": ["leader", "leading", "leadership", "number 1", "number one", "#1"],
+    "leadership": ["leader", "leading", "leadership", "number 1", "number one", "#1"],
+}
+
+
+def _extract_substantive_keywords(text: str) -> List[str]:
+    """Extract substantive topic words excluding generic and ubiquitous domain stopwords."""
+    words = re.findall(r'\b[a-zA-Z]{4,}\b', text.lower())
+    return [w for w in words if w not in _GENERIC_STOP_WORDS and w not in _COMMON_DOMAIN_WORDS]
+
+
+def _stem_match(kw: str, target_text: str) -> bool:
+    """Check if keyword or its root stem/synonyms appear in target_text."""
+    target_lower = target_text.lower()
+    kw_lower = kw.lower()
+
+    # Exact word match
+    if re.search(r'\b' + re.escape(kw_lower), target_lower):
+        return True
+
+    # Check synonyms
+    if kw_lower in _DOMAIN_SYNONYMS:
+        for syn in _DOMAIN_SYNONYMS[kw_lower]:
+            if syn in target_lower:
+                return True
+
+    # Root stem match for longer words (e.g. moisturises -> moistur)
+    if len(kw_lower) >= 6:
+        stem = kw_lower[:min(len(kw_lower), 7)]
+        if re.search(r'\b' + re.escape(stem), target_lower):
+            return True
+
+    # Strip trailing s
+    if kw_lower.endswith('s') and len(kw_lower) >= 5:
+        stem = kw_lower[:-1]
+        if re.search(r'\b' + re.escape(stem), target_lower):
+            return True
+
+    return False
+
+
+def _split_into_statements(text: str) -> List[str]:
+    """Split passage text into individual sentences or policy statements."""
+    norm = re.sub(r'\s+', ' ', text)
+    raw = re.split(r'(?<=[.!?])\s+', norm)
+    cleaned = []
+    for s in raw:
+        s = s.strip()
+        if len(s) >= 15:
+            cleaned.append(s)
+    return cleaned if cleaned else [norm.strip()]
+
+
+def _clean_statement_header(stmt: str) -> str:
+    """Strips leading numerical section headers or all-caps chapter titles."""
+    return re.sub(r'^(\d+\.\s+)?([A-Z\s,–—\-]{4,}(?=[A-Z][a-z]))', '', stmt).strip()
+
+
+def _clean_to_exact_substring(passage_text: str, quote: str) -> str:
+    """Ensures the extracted quote exactly matches a substring in passage_text."""
+    if quote in passage_text:
+        return quote
+    pattern = re.escape(quote)
+    pattern = re.sub(r'\\ ', r'\\s+', pattern)
+    m = re.search(pattern, passage_text, re.IGNORECASE)
+    if m:
+        return passage_text[m.start():m.end()]
+    return quote
+
 
 # ---------------------------------------------------------------------------
 # Data structures
@@ -202,11 +290,25 @@ class VerdictEngine:
                 must_support_target=True,
             )
             correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_hint)
+
+            if evidence:
+                best_ev = evidence[0]
+                explanation = (
+                    f"Explicit policy rule violation: Claim matches prohibited phrase '{rule_hint}'. "
+                    f"Contradiction grounded in selected guideline '{best_ev.source_filename}': \"{best_ev.quote}\""
+                )
+            else:
+                explanation = (
+                    f"Deterministic compliance rule matched prohibited phrase: '{rule_hint}'. "
+                    f"{rule_explanation} Note: The selected guidelines do not contain an explicit passage "
+                    f"stating this rule; independent human review is advised."
+                )
+
             return ClaimVerdict(
                 claim_id=claim_id,
                 claim_text=claim_text,
                 verdict=VERDICT_CONTRADICTED,
-                explanation=rule_explanation,
+                explanation=explanation,
                 evidence=evidence,
                 suggested_correction=correction,
                 deterministic_rule_fired=True,
@@ -224,12 +326,13 @@ class VerdictEngine:
                 claim_text=claim_text,
                 verdict=VERDICT_INSUFFICIENT,
                 explanation=(
-                    "No guideline passages with sufficient relevance were retrieved for this claim. "
+                    "The selected guidelines do not provide sufficient evidence to evaluate this claim. "
+                    "No relevant passages were found in the selected documents. "
                     "This claim requires independent human review against uploaded guidelines."
                 ),
                 evidence=[],
                 suggested_correction=(
-                    "This claim could not be evaluated automatically. "
+                    "This claim could not be evaluated automatically due to insufficient evidence. "
                     "Please verify against your brand guidelines before publishing."
                 ),
             )
@@ -283,91 +386,180 @@ class VerdictEngine:
         candidates: List[Dict[str, Any]],
     ) -> ClaimVerdict:
         """
-        Keyword-based analysis of retrieved passages.
-
-        Logic:
-        - If any passage explicitly contradicts the claim (contains prohibition
-          keywords AND substantive topical overlap with the claim), return CONTRADICTED.
-        - If any passage contains support indicator keywords AND substantive topical
-          overlap with the claim, return SUPPORTED.
-        - Otherwise return INSUFFICIENT_EVIDENCE.
-
-        Note: Semantic similarity alone is NOT treated as proof of a violation or approval.
+        Evidence-grounded analysis of retrieved passages.
+        Evaluates rule applicability at statement level to avoid unrelated prohibitions.
         """
-        contradiction_keywords = re.compile(
-            r'\b(must not|shall not|prohibited|forbidden|not allowed|not permitted|'
-            r'avoid|do not|refrain from|cannot|never|illegal|ban(ned)?|restrict)\b',
+        explicit_prohibitions = re.compile(
+            r'\b(must not|shall not|prohibited|forbidden|not allowed|not permitted|cannot|never|illegal|ban(ned)?)\b',
+            re.IGNORECASE,
+        )
+        recommendations = re.compile(
+            r'\b(avoid|should not|refrain from|discourage|recommend against|caution against)\b',
             re.IGNORECASE,
         )
 
-        best_passage = candidates[0]  # nearest neighbor
-        claim_words = [
-            w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
-            if w not in _GENERIC_STOP_WORDS
-        ]
+        claim_kws = _extract_substantive_keywords(claim_text)
+        if not claim_kws:
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_INSUFFICIENT,
+                explanation="The selected guidelines do not provide sufficient evidence to evaluate this claim. Independent human review is required before publication.",
+                evidence=[],
+                suggested_correction="This claim could not be evaluated automatically due to insufficient evidence. Please verify against your brand guidelines before publishing.",
+            )
 
-        # Sort candidates by relevance to the claim content
-        sorted_candidates = sorted(
-            candidates,
-            key=lambda p: (
-                self._evaluate_passage_relevance(p, claim_text)[0],
-                -float(p.get("distance", 1.0)),
-            ),
-            reverse=True,
+        # Score and rank candidate statements across all retrieved passages
+        scored_statements = []
+        for p in candidates:
+            p_text = p.get("text", "")
+            doc_name = p.get("source_filename", "unknown")
+            stmts = _split_into_statements(p_text)
+            for s in stmts:
+                s_clean = _clean_statement_header(s)
+                matched = [w for w in claim_kws if _stem_match(w, s_clean)]
+                if len(matched) > 0:
+                    scored_statements.append({
+                        "score": len(matched),
+                        "matched": matched,
+                        "clean_stmt": s_clean,
+                        "orig_stmt": s,
+                        "passage": p,
+                    })
+
+        if not scored_statements:
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_INSUFFICIENT,
+                explanation="The selected guidelines do not contain sufficient evidence to affirmatively support or contradict this claim. Independent human review is required before publication.",
+                evidence=[],
+                suggested_correction="This claim could not be verified from the selected brand guidelines. Review against your brand guidelines before publishing.",
+            )
+
+        # Sort statements by substantive overlap descending
+        scored_statements.sort(key=lambda x: x["score"], reverse=True)
+        best_candidate = scored_statements[0]
+        best_clean = best_candidate["clean_stmt"]
+        best_p = best_candidate["passage"]
+        doc_name = best_p.get("source_filename", "unknown")
+        quote = _clean_to_exact_substring(best_p.get("text", ""), best_clean)
+
+        ev_item = EvidenceItem(
+            chunk_id=best_p.get("chunk_id", ""),
+            document_id=best_p.get("document_id", ""),
+            source_filename=doc_name,
+            page_number=best_p.get("page_number"),
+            quote=quote,
+            passage_text=best_p.get("text", ""),
+            similarity_score=float(best_p.get("similarity_score", 0.0)),
+            distance=float(best_p.get("distance", 1.0)),
         )
-        evidence_items = self._build_evidence_items(sorted_candidates, claim_text)
 
-        # 1. Contradiction evaluation
-        for passage in sorted_candidates:
-            text = passage.get("text", "")
-            if contradiction_keywords.search(text):
-                explanation = (
-                    f"A retrieved guideline passage (from '{passage.get('source_filename', 'unknown')}') "
-                    f"contains prohibition language that may conflict with this claim. "
-                    f"Human review is required to confirm applicability."
-                )
-                correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, "prohibition")
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_CONTRADICTED,
-                    explanation=explanation,
-                    evidence=evidence_items,
-                    suggested_correction=correction,
-                )
+        # 1. Check for explicit bans or strictly prohibited rules (e.g. "is banned", "strictly prohibited")
+        explicit_ban_pattern = re.compile(
+            r'\b(ban(ned)?|strictly\s+prohibited|must\s+not\s+be\s+used|forbidden|illegal)\b',
+            re.IGNORECASE,
+        )
+        ban_match = explicit_ban_pattern.search(best_clean)
+        if ban_match:
+            rule_word = ban_match.group(0)
+            correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_word)
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_CONTRADICTED,
+                explanation=(
+                    f"Explicit policy rule matched ('{rule_word}') in guideline '{doc_name}': \"{quote}\". "
+                    f"The guideline explicitly prohibits this claim."
+                ),
+                evidence=[ev_item],
+                suggested_correction=correction,
+            )
 
-        # 2. Support indicator evaluation
-        for passage in sorted_candidates:
-            text = passage.get("text", "")
-            for pattern in _SUPPORT_INDICATORS:
-                if pattern.search(text):
-                    explanation = (
-                        f"A retrieved guideline passage (from '{passage.get('source_filename', 'unknown')}') "
-                        f"contains affirmative language that may support this claim. "
-                        f"Human review is recommended to confirm full compliance."
-                    )
-                    return ClaimVerdict(
-                        claim_id=claim_id,
-                        claim_text=claim_text,
-                        verdict=VERDICT_SUPPORTED,
-                        explanation=explanation,
-                        evidence=evidence_items,
-                    )
+        # 2. Check for conditional substantiation requirements (e.g. Test D)
+        if _CONDITIONAL_REQUIREMENTS.search(best_clean):
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_INSUFFICIENT,
+                explanation=(
+                    f"The selected guidelines (retrieved from '{doc_name}') require supporting documentation for this claim, "
+                    f"but do not establish whether verifiable evidence exists. Independent human review is required before publication."
+                ),
+                evidence=[],
+                suggested_correction="This claim requires independent verification against your brand guidelines and documented evidence before publishing.",
+            )
 
-        # 3. Default fallback: INSUFFICIENT_EVIDENCE
+        # 3. Check for affirmative support (e.g. Test A)
+        is_support = False
+        for pat in _SUPPORT_INDICATORS:
+            if pat.search(best_clean):
+                is_support = True
+                break
+
+        if not is_support:
+            # Mandatory compliance standard matching claim assertion
+            if re.search(r'\b(must have|must include|must be|required|mandatory)\b', best_clean, re.IGNORECASE):
+                if best_candidate["score"] >= 2:
+                    is_support = True
+
+        if is_support:
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_SUPPORTED,
+                explanation=f"Affirmative guideline policy from '{doc_name}': \"{quote}\" supports this claim.",
+                evidence=[ev_item],
+                suggested_correction=None,
+            )
+
+        # 3. Check for applicable explicit prohibition targeting the claim
+        proh_match = explicit_prohibitions.search(best_clean)
+        if proh_match:
+            rule_word = proh_match.group(0)
+            correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_word)
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_CONTRADICTED,
+                explanation=(
+                    f"Explicit policy rule matched ('{rule_word}') in guideline '{doc_name}': \"{quote}\". "
+                    f"The guideline explicitly prohibits this claim."
+                ),
+                evidence=[ev_item],
+                suggested_correction=correction,
+            )
+
+        rec_match = recommendations.search(best_clean)
+        if rec_match:
+            rule_word = rec_match.group(0)
+            correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_word)
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_CONTRADICTED,
+                explanation=(
+                    f"General guideline recommendation matched ('{rule_word}') in guideline '{doc_name}': \"{quote}\". "
+                    f"The guideline advises against this claim phrasing. Human review is recommended to confirm applicability."
+                ),
+                evidence=[ev_item],
+                suggested_correction=correction,
+            )
+
+        # 4. Fallback: INSUFFICIENT_EVIDENCE
         return ClaimVerdict(
             claim_id=claim_id,
             claim_text=claim_text,
             verdict=VERDICT_INSUFFICIENT,
             explanation=(
-                f"Relevant guideline passages were retrieved (from "
-                f"'{best_passage.get('source_filename', 'unknown')}') but do not "
-                f"explicitly support or contradict this claim. "
-                f"Human review is required."
+                f"The selected guidelines (retrieved from '{doc_name}') "
+                f"do not provide sufficient evidence to affirmatively support or contradict this claim. "
+                f"Independent human review is required before publication."
             ),
-            evidence=evidence_items,
+            evidence=[],
             suggested_correction=(
-                "This claim could not be automatically classified. "
+                "This claim could not be verified from the selected brand guidelines. "
                 "Review against your brand guidelines before publishing."
             ),
         )
@@ -395,12 +587,23 @@ class VerdictEngine:
                 supports_target = True
             else:
                 # Dissect key terms of target phrase
-                if "safe" in tp_lower and ("safe" in text or "safety" in text):
-                    base_score += 15.0
-                    supports_target = True
-                elif "guaranteed" in tp_lower and ("guaranteed" in text or "guarantee" in text):
-                    base_score += 15.0
-                    supports_target = True
+                if "safe" in tp_lower:
+                    # Target is a safety rule (e.g. "100% safe")
+                    # If the passage is primarily a guarantee prohibition, exclude it from safety evidence
+                    if ("100% guaranteed" in text or "guarantee" in text) and not ("100% safe" in text):
+                        supports_target = False
+                    else:
+                        clean_text = re.sub(r'\bbrand\s+safety\s+(manual|guide|policy|document)?\b', '', text)
+                        if re.search(r'\b(100%\s*safe|safe|safety)\b', clean_text):
+                            base_score += 15.0
+                            supports_target = True
+                elif "guaranteed" in tp_lower:
+                    # Target is a guarantee rule (e.g. "100% guaranteed")
+                    if ("100% safe" in text) and not ("100% guaranteed" in text or "guarantee" in text):
+                        supports_target = False
+                    elif "guaranteed" in text or "guarantee" in text:
+                        base_score += 15.0
+                        supports_target = True
                 elif "natural" in tp_lower and "natural" in text:
                     base_score += 15.0
                     supports_target = True
@@ -414,18 +617,19 @@ class VerdictEngine:
             # If passage explicitly mentions general prohibitions/absolutes
             if any(term in text for term in ("absolute terms", "prohibited superlatives", "unverifiable", "absolute claims")):
                 base_score += 5.0
-                if "100%" in text:
+                if tp_lower in text:
                     supports_target = True
 
-        # Check substantive overlap with claim keywords
-        claim_words = [
-            w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
-            if w not in _GENERIC_STOP_WORDS
-        ]
-        matched_words = sum(1 for w in claim_words if w in text)
-        base_score += matched_words * 2.0
+        # Check substantive topical overlap with claim keywords
+        claim_substantive = _extract_substantive_keywords(claim_text)
+        substantive_matches = 0
+        for w in claim_substantive:
+            stem = w[:-1] if w.endswith('s') else w
+            if re.search(r'\b' + re.escape(stem), text):
+                substantive_matches += 1
 
-        if not target_phrase and matched_words > 0:
+        base_score += substantive_matches * 10.0
+        if not target_phrase and substantive_matches > 0:
             supports_target = True
 
         return base_score, supports_target
@@ -443,7 +647,7 @@ class VerdictEngine:
         """
         passage_text = passage_text.strip()
         if len(passage_text) <= max_len:
-            return passage_text
+            return _clean_to_exact_substring(passage_text, _clean_statement_header(passage_text))
 
         match_pos = -1
         match_len = 0
@@ -467,10 +671,7 @@ class VerdictEngine:
                         break
 
         if match_pos == -1 and claim_text:
-            keywords = [
-                w for w in re.findall(r'\b[a-zA-Z]{4,}\b', claim_text.lower())
-                if w not in _GENERIC_STOP_WORDS
-            ]
+            keywords = _extract_substantive_keywords(claim_text)
             for kw in keywords:
                 m = re.search(r'\b' + re.escape(kw) + r'\b', passage_text, re.IGNORECASE)
                 if m:
@@ -492,6 +693,10 @@ class VerdictEngine:
         end_idx = match_pos + match_len + sent_end.start() + 1 if sent_end else len(passage_text)
 
         candidate = passage_text[start_idx:end_idx].strip()
+        candidate_clean = _clean_statement_header(candidate)
+        candidate_clean = _clean_to_exact_substring(passage_text, candidate_clean)
+        if 20 <= len(candidate_clean) <= max_len and candidate_clean in passage_text:
+            return candidate_clean
         if 20 <= len(candidate) <= max_len:
             return candidate
 

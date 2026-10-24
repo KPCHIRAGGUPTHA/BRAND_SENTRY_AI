@@ -48,3 +48,45 @@ export interface DocumentListResponse {
   total: number;
   documents: DocumentSummary[];
 }
+
+export interface EvidenceItem {
+  chunk_id: string;
+  document_id: string;
+  source_filename: string;
+  page_number: number | null;
+  quote: string;
+  similarity_score: number;
+  distance: number;
+}
+
+export interface ClaimVerdict {
+  claim_id: string;
+  claim_text: string;
+  verdict: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE' | string;
+  explanation: string;
+  evidence: EvidenceItem[];
+  suggested_correction?: string | null;
+  deterministic_rule_fired?: boolean;
+}
+
+export interface ReviewSummary {
+  total_claims: number;
+  supported: number;
+  contradicted: number;
+  insufficient_evidence: number;
+}
+
+export interface ReviewResponse {
+  review_id: string;
+  content_preview: string;
+  document_ids_searched: string[];
+  claims: ClaimVerdict[];
+  summary: ReviewSummary;
+  created_at: string;
+  warning?: string | null;
+}
+
+export interface ReviewRequest {
+  content: string;
+  document_ids?: string[];
+}

@@ -2,6 +2,7 @@
 Document Registry Service for BrandSentry AI.
 Lightweight SQLite-backed metadata tracking for uploaded guidelines.
 """
+import hashlib
 import os
 import sqlite3
 from datetime import datetime, timezone
@@ -40,10 +41,39 @@ class DocumentRegistry:
                     chunk_count INTEGER DEFAULT 0,
                     status TEXT NOT NULL,
                     created_at TEXT NOT NULL,
-                    error_message TEXT
+                    error_message TEXT,
+                    content_hash TEXT
                 )
                 """
             )
+            # Check if content_hash column exists (for pre-existing tables)
+            cur = conn.cursor()
+            cur.execute("PRAGMA table_info(documents)")
+            columns = [col[1] for col in cur.fetchall()]
+            if "content_hash" not in columns:
+                conn.execute("ALTER TABLE documents ADD COLUMN content_hash TEXT")
+            conn.execute("CREATE INDEX IF NOT EXISTS idx_documents_content_hash ON documents(content_hash)")
+
+            # Safe backfill: compute content_hash for legacy records without content_hash
+            cur.execute("SELECT document_id, stored_path, filename, file_type, file_size FROM documents WHERE content_hash IS NULL")
+            rows_to_backfill = cur.fetchall()
+            for row in rows_to_backfill:
+                doc_id = row[0]
+                stored_path = row[1]
+                h = hashlib.sha256()
+                if stored_path and os.path.exists(stored_path):
+                    try:
+                        with open(stored_path, "rb") as f:
+                            while chunk := f.read(65536):
+                                h.update(chunk)
+                        c_hash = h.hexdigest()
+                    except Exception:
+                        fallback = f"{row[2]}_{row[3]}_{row[4]}".encode("utf-8")
+                        c_hash = hashlib.sha256(fallback).hexdigest()
+                else:
+                    fallback = f"{row[2]}_{row[3]}_{row[4]}".encode("utf-8")
+                    c_hash = hashlib.sha256(fallback).hexdigest()
+                conn.execute("UPDATE documents SET content_hash = ? WHERE document_id = ?", (c_hash, doc_id))
             conn.commit()
 
     def register_document(
@@ -54,16 +84,17 @@ class DocumentRegistry:
         file_size: int,
         stored_path: str,
         status: str = "uploaded",
+        content_hash: Optional[str] = None,
     ) -> Dict[str, Any]:
         created_at = datetime.now(timezone.utc).isoformat()
         with self._get_connection() as conn:
             conn.execute(
                 """
                 INSERT INTO documents (
-                    document_id, filename, file_type, file_size, stored_path, status, created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    document_id, filename, file_type, file_size, stored_path, status, created_at, content_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
-                (document_id, filename, file_type, file_size, stored_path, status, created_at),
+                (document_id, filename, file_type, file_size, stored_path, status, created_at, content_hash),
             )
             conn.commit()
         return self.get_document(document_id) or {}
@@ -108,10 +139,47 @@ class DocumentRegistry:
                 return dict(row)
         return None
 
-    def list_documents(self) -> List[Dict[str, Any]]:
+    def get_document_by_content_hash(self, content_hash: str) -> Optional[Dict[str, Any]]:
+        """Retrieve existing indexed document matching content SHA-256 hash."""
         with self._get_connection() as conn:
             cur = conn.cursor()
-            cur.execute("SELECT * FROM documents ORDER BY created_at DESC")
+            cur.execute(
+                "SELECT * FROM documents WHERE content_hash = ? AND status = 'indexed' ORDER BY created_at DESC LIMIT 1",
+                (content_hash,),
+            )
+            row = cur.fetchone()
+            if row:
+                return dict(row)
+        return None
+
+    def list_documents(self, deduplicate: bool = True) -> List[Dict[str, Any]]:
+        """
+        Lists registered documents.
+        When deduplicate=True (default), groups identical uploads by content_hash,
+        returning the most recent record per unique file content while keeping all records in SQLite.
+        Preserves different documents even if their filenames match.
+        """
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            if deduplicate:
+                cur.execute(
+                    """
+                    SELECT document_id, filename, file_type, file_size, stored_path,
+                           page_count, character_count, chunk_count, status, created_at,
+                           error_message, content_hash
+                    FROM (
+                        SELECT *, ROW_NUMBER() OVER (
+                            PARTITION BY COALESCE(content_hash, document_id)
+                            ORDER BY created_at DESC
+                        ) as rn
+                        FROM documents
+                    )
+                    WHERE rn = 1
+                    ORDER BY created_at DESC
+                    """
+                )
+            else:
+                cur.execute("SELECT * FROM documents ORDER BY created_at DESC")
             rows = cur.fetchall()
             return [dict(row) for row in rows]
 

@@ -16,7 +16,10 @@ export const Header: React.FC = () => {
         </a>
 
         <nav className="header-nav" aria-label="Main Navigation">
-          <a href="#guidelines" className="nav-link active">
+          <a href="#review" className="nav-link active">
+            Claim Review
+          </a>
+          <a href="#guidelines" className="nav-link">
             Guidelines
           </a>
           <a href="#search" className="nav-link">

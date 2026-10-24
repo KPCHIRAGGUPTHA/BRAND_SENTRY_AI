@@ -2,13 +2,13 @@ import React from 'react';
 import { Header } from './components/Header';
 import { HealthStatus } from './components/HealthStatus';
 import { GuidelineExplorer } from './components/GuidelineExplorer';
+import { ClaimReview } from './components/ClaimReview';
 import {
   FileText,
   Search,
   CheckCircle,
   FileSearch,
   Upload,
-  ArrowRight,
   Shield,
   Layers,
   Database,
@@ -25,7 +25,7 @@ export const App: React.FC = () => {
         <section className="hero-section">
           <div className="hero-badge">
             <span className="hero-badge-dot" />
-            <span>Enterprise Compliance Engine &bull; Phase 2 Retrieval Active</span>
+            <span>Enterprise Compliance Engine &bull; Phase 3 Claim Review Operational</span>
           </div>
 
           <h1 className="hero-title">BrandSentry AI</h1>
@@ -36,7 +36,11 @@ export const App: React.FC = () => {
           </p>
 
           <div className="hero-actions">
-            <a href="#guidelines" className="btn btn-primary">
+            <a href="#review" className="btn btn-primary">
+              <FileSearch size={16} />
+              <span>Review Marketing Copy</span>
+            </a>
+            <a href="#guidelines" className="btn btn-secondary">
               <Upload size={16} />
               <span>Upload Guidelines</span>
             </a>
@@ -55,6 +59,9 @@ export const App: React.FC = () => {
             </a>
           </div>
         </section>
+
+        {/* Phase 3 Claim Review Engine */}
+        <ClaimReview />
 
         {/* Primary Workflow: Guideline Ingestion, Registry, & Semantic Search */}
         <GuidelineExplorer />
@@ -116,7 +123,7 @@ export const App: React.FC = () => {
                 Systematic architecture ensuring zero ungrounded compliance claims or hallucinations.
               </p>
             </div>
-            <span className="badge badge-neutral">Phases 1 &bull; 2 Operational</span>
+            <span className="badge badge-success">Phases 1 &bull; 2 &bull; 3 Operational</span>
           </div>
 
           <div
@@ -184,20 +191,20 @@ export const App: React.FC = () => {
                 padding: '16px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border)',
-                background: '#FFFFFF',
+                background: 'var(--color-surface-muted)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Stage 03
                 </span>
-                <span className="badge badge-neutral" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Phase 3</span>
+                <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Active</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <FileSearch size={16} style={{ color: 'var(--color-accent)' }} />
+                <FileSearch size={16} style={{ color: 'var(--color-primary)' }} />
                 <strong style={{ fontSize: '0.9rem', color: 'var(--color-deep-aubergine)' }}>Claim Decomposition</strong>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
@@ -210,20 +217,20 @@ export const App: React.FC = () => {
                 padding: '16px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border)',
-                background: '#FFFFFF',
+                background: 'var(--color-surface-muted)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Stage 04
                 </span>
-                <span className="badge badge-neutral" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Phase 3</span>
+                <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Active</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Search size={16} style={{ color: 'var(--color-accent)' }} />
+                <Search size={16} style={{ color: 'var(--color-primary)' }} />
                 <strong style={{ fontSize: '0.9rem', color: 'var(--color-deep-aubergine)' }}>Hybrid Retrieval</strong>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
@@ -236,20 +243,20 @@ export const App: React.FC = () => {
                 padding: '16px',
                 borderRadius: 'var(--radius-sm)',
                 border: '1px solid var(--color-border)',
-                background: '#FFFFFF',
+                background: 'var(--color-surface-muted)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '8px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--color-success)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   Stage 05
                 </span>
-                <span className="badge badge-neutral" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Phase 3</span>
+                <span className="badge badge-success" style={{ fontSize: '0.68rem', padding: '1px 6px' }}>Active</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <CheckCircle size={16} style={{ color: 'var(--color-accent)' }} />
+                <CheckCircle size={16} style={{ color: 'var(--color-primary)' }} />
                 <strong style={{ fontSize: '0.9rem', color: 'var(--color-deep-aubergine)' }}>Compliance Verdict</strong>
               </div>
               <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: 1.45 }}>
@@ -275,13 +282,13 @@ export const App: React.FC = () => {
         >
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span className="badge badge-success">33 Tests Passing</span>
+              <span className="badge badge-success">138 Tests Passing</span>
               <strong style={{ fontSize: '0.9rem', color: 'var(--color-deep-aubergine)' }}>
-                Ingestion &amp; Vector Retrieval Foundation Verified
+                Evidence-Grounded Compliance Verdict Engine Verified
               </strong>
             </div>
             <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-              Guideline parsing, PyMuPDF text extraction, chunking, and ChromaDB search operational.
+              Claim extraction, hybrid evidence retrieval, deterministic rule checking, and citation grounding operational.
             </p>
           </div>
           <span
@@ -291,10 +298,11 @@ export const App: React.FC = () => {
               gap: '6px',
               fontSize: '0.8rem',
               fontWeight: 600,
-              color: 'var(--color-deep-aubergine)',
+              color: 'var(--color-success)',
             }}
           >
-            Awaiting Phase 3 Authorization <ArrowRight size={14} />
+            <CheckCircle size={15} style={{ color: 'var(--color-success)' }} />
+            Phase 3 Fully Operational
           </span>
         </div>
       </main>
