@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { uploadGuideline, searchGuidelines, fetchGuidelines } from '../services/api';
 import { GuidelineChunkMatch, DocumentSummary } from '../types/api';
+import { useBackendConnection } from '../hooks/useBackendConnection';
 
 export const GuidelineExplorer: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
@@ -33,6 +34,8 @@ export const GuidelineExplorer: React.FC = () => {
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [loadingDocs, setLoadingDocs] = useState<boolean>(false);
   const [selectedDocId, setSelectedDocId] = useState<string>('');
+
+  const { status } = useBackendConnection();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -54,6 +57,13 @@ export const GuidelineExplorer: React.FC = () => {
   useEffect(() => {
     loadDocuments();
   }, []);
+
+  // Reload guidelines automatically when backend reconnects
+  useEffect(() => {
+    if (status === 'connected' && documents.length === 0) {
+      loadDocuments();
+    }
+  }, [status, documents.length]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';

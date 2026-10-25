@@ -4,6 +4,7 @@ import { HealthStatus } from './components/HealthStatus';
 import { GuidelineExplorer } from './components/GuidelineExplorer';
 import { ClaimReview } from './components/ClaimReview';
 import { API_BASE_URL } from './services/api';
+import { BackendConnectionProvider } from './hooks/useBackendConnection';
 import {
   FileText,
   Search,
@@ -18,7 +19,8 @@ import {
 
 export const App: React.FC = () => {
   return (
-    <div className="app-wrapper">
+    <BackendConnectionProvider>
+      <div className="app-wrapper">
       <Header />
 
       <main className="container" style={{ flex: 1, paddingBottom: '48px' }}>
@@ -314,5 +316,6 @@ export const App: React.FC = () => {
         </div>
       </footer>
     </div>
+    </BackendConnectionProvider>
   );
 };

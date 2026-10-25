@@ -73,9 +73,26 @@ export async function safeParseJson<T>(response: Response, context: string): Pro
   }
 }
 
-export async function fetchHealth(): Promise<HealthResponse> {
+export async function fetchHealth(signal?: AbortSignal, timeoutMs: number = 10000): Promise<HealthResponse> {
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 8000);
+  let timedOut = false;
+  const timeoutId = setTimeout(() => {
+    timedOut = true;
+    controller.abort();
+  }, timeoutMs);
+
+  const onExternalAbort = () => {
+    controller.abort();
+  };
+
+  if (signal) {
+    if (signal.aborted) {
+      clearTimeout(timeoutId);
+      controller.abort();
+    } else {
+      signal.addEventListener('abort', onExternalAbort, { once: true });
+    }
+  }
 
   try {
     const response = await fetch(`${API_BASE_URL}/health`, {
@@ -84,6 +101,9 @@ export async function fetchHealth(): Promise<HealthResponse> {
       signal: controller.signal,
     });
     clearTimeout(timeoutId);
+    if (signal) {
+      signal.removeEventListener('abort', onExternalAbort);
+    }
 
     if (!response.ok) {
       throw new Error(`Backend responded with HTTP status ${response.status} (${response.statusText})`);
@@ -92,9 +112,15 @@ export async function fetchHealth(): Promise<HealthResponse> {
     return await safeParseJson<HealthResponse>(response, 'Health check');
   } catch (error: unknown) {
     clearTimeout(timeoutId);
+    if (signal) {
+      signal.removeEventListener('abort', onExternalAbort);
+    }
+    if (timedOut) {
+      throw new Error('Connection timed out while reaching backend service');
+    }
     if (error instanceof Error) {
       if (error.name === 'AbortError') {
-        throw new Error('Connection timed out while reaching backend service');
+        throw new Error('Health check aborted');
       }
       throw error;
     }

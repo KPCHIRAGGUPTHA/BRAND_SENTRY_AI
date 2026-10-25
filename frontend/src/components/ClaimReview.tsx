@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { reviewMarketingContent, fetchGuidelines } from '../services/api';
 import { ReviewResponse, DocumentSummary, ClaimVerdict } from '../types/api';
+import { useBackendConnection } from '../hooks/useBackendConnection';
 
 export const ClaimReview: React.FC = () => {
   const [content, setContent] = useState<string>('');
@@ -21,6 +22,8 @@ export const ClaimReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
+
+  const { status, checkHealth, isChecking } = useBackendConnection();
 
   const loadDocuments = async () => {
     try {
@@ -35,13 +38,39 @@ export const ClaimReview: React.FC = () => {
     loadDocuments();
   }, []);
 
+  // When backend reconnects after being offline/waking, load guidelines if empty
+  useEffect(() => {
+    if (status === 'connected' && documents.length === 0) {
+      loadDocuments();
+    }
+  }, [status, documents.length]);
+
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    // Prevent duplicate claim submissions
+    if (loading) return;
+
     setError(null);
 
     const trimmed = content.trim();
     if (!trimmed) {
       setError('Marketing copy cannot be empty or whitespace-only. Please provide text to review.');
+      return;
+    }
+
+    // Verify backend availability before submitting
+    if (status === 'connecting' || status === 'waking') {
+      setError(
+        'Backend service is currently waking up from standby (Render cold start). Please wait a moment for the connection to establish before analyzing claims.'
+      );
+      checkHealth();
+      return;
+    }
+
+    if (status === 'temporarily unavailable') {
+      setError(
+        'Backend service is temporarily unavailable. Please verify connectivity and retry.'
+      );
       return;
     }
 
@@ -52,11 +81,14 @@ export const ClaimReview: React.FC = () => {
       setReviewResult(res);
       setError(null);
     } catch (err: unknown) {
+      // Preserve the user's entered claim and selected document upon failure
       if (err instanceof Error) {
         setError(err.message);
       } else {
         setError('An unexpected error occurred while reviewing marketing copy.');
       }
+      // Re-verify backend connection if a network-level error occurred
+      checkHealth();
     } finally {
       setLoading(false);
     }
@@ -213,9 +245,23 @@ export const ClaimReview: React.FC = () => {
 
         {/* Error Alert */}
         {error && (
-          <div id="review-error-alert" className="alert alert-warning" role="alert" style={{ marginTop: '4px' }}>
-            <AlertTriangle size={16} style={{ flexShrink: 0 }} />
-            <span>{error}</span>
+          <div id="review-error-alert" className="alert alert-warning" role="alert" style={{ marginTop: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <AlertTriangle size={16} style={{ flexShrink: 0 }} />
+              <span>{error}</span>
+            </div>
+            {status !== 'connected' && (
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => checkHealth(true)}
+                disabled={isChecking}
+                style={{ fontSize: '0.75rem', padding: '4px 10px', height: 'auto', flexShrink: 0 }}
+              >
+                <RefreshCw size={12} className={isChecking ? 'spinning' : ''} />
+                <span>{isChecking ? 'Checking...' : 'Check Status'}</span>
+              </button>
+            )}
           </div>
         )}
       </form>
