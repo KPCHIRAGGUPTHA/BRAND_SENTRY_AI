@@ -201,8 +201,6 @@ export const ClaimReview: React.FC = () => {
             <select
               id="guideline-scope-select"
               value={selectedDocId}
-              onFocus={loadDocuments}
-              onClick={loadDocuments}
               onChange={(e) => setSelectedDocId(e.target.value)}
               style={{
                 padding: '6px 12px',

@@ -257,15 +257,18 @@ export const BackendConnectionProvider: React.FC<{
     };
   }, [clearScheduledTimer]);
 
-  const value: BackendConnectionState = {
-    status,
-    data,
-    error,
-    lastChecked,
-    retryCount,
-    isChecking,
-    checkHealth,
-  };
+  const value = useMemo<BackendConnectionState>(
+    () => ({
+      status,
+      data,
+      error,
+      lastChecked,
+      retryCount,
+      isChecking,
+      checkHealth,
+    }),
+    [status, data, error, lastChecked, retryCount, isChecking, checkHealth]
+  );
 
   return (
     <BackendConnectionContext.Provider value={value}>

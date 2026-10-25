@@ -5,9 +5,11 @@ Handles file uploads, text extraction, chunking, indexing, and semantic passage 
 import hashlib
 import os
 import re
+import time
 import uuid
 import logging
 from typing import Optional
+import anyio
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
 from backend.app.core.config import settings
 from backend.app.schemas.guideline import (
@@ -43,6 +45,126 @@ def _sanitize_filename(name: str) -> str:
     return sanitized or "document"
 
 
+def _process_upload_sync(
+    content: bytes,
+    sanitized_name: str,
+    content_hash: str,
+) -> GuidelineUploadResponse:
+    """
+    Synchronous document extraction, chunking, embedding, and indexing pipeline.
+    Executed in a worker thread via anyio.to_thread.run_sync to keep the FastAPI
+    event loop unblocked.
+    """
+    t_start = time.perf_counter()
+    document_id = str(uuid.uuid4())
+    stored_filename = f"{document_id}_{sanitized_name}"
+
+    uploads_dir = os.path.abspath(settings.uploads_dir)
+    os.makedirs(uploads_dir, exist_ok=True)
+    stored_path = os.path.join(uploads_dir, stored_filename)
+
+    # 1. Format validation & text extraction
+    t_ext_start = time.perf_counter()
+    try:
+        extracted_doc = DocumentExtractor.extract_text(sanitized_name, content)
+    except UnsupportedFormatError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except EmptyDocumentError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except ScannedPDFError as exc:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
+    except CorruptedDocumentError as exc:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
+    except Exception as exc:
+        logger.exception("Unexpected error during text extraction: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred during text extraction: {str(exc)}",
+        )
+    t_ext_ms = (time.perf_counter() - t_ext_start) * 1000
+
+    # 2. Persist raw file securely
+    try:
+        with open(stored_path, "wb") as f:
+            f.write(content)
+    except Exception as exc:
+        logger.error("Failed to write uploaded file to disk: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to store uploaded file on server.",
+        )
+
+    # 3. Register initial status in document registry
+    document_registry.register_document(
+        document_id=document_id,
+        filename=sanitized_name,
+        file_type=extracted_doc.file_type,
+        file_size=len(content),
+        stored_path=stored_path,
+        status="processing",
+        content_hash=content_hash,
+    )
+
+    # 4. Chunk document
+    try:
+        t_chunk_start = time.perf_counter()
+        chunks = document_chunker.chunk_document(document_id, extracted_doc)
+        if not chunks:
+            raise EmptyDocumentError("No valid text chunks could be produced from document.")
+        t_chunk_ms = (time.perf_counter() - t_chunk_start) * 1000
+
+        # 5. Generate embeddings
+        t_emb_start = time.perf_counter()
+        chunk_texts = [c.text for c in chunks]
+        embeddings = embedding_service.generate_embeddings(chunk_texts)
+        t_emb_ms = (time.perf_counter() - t_emb_start) * 1000
+
+        # 6. Index into ChromaDB vector store
+        t_idx_start = time.perf_counter()
+        vector_store_service.add_chunks(chunks, embeddings)
+        t_idx_ms = (time.perf_counter() - t_idx_start) * 1000
+
+        # 7. Update status to indexed
+        document_registry.update_status(
+            document_id=document_id,
+            status="indexed",
+            page_count=extracted_doc.page_count,
+            character_count=extracted_doc.total_characters,
+            chunk_count=len(chunks),
+        )
+
+        t_total_ms = (time.perf_counter() - t_start) * 1000
+        logger.info(
+            "Document %s ('%s') indexed in %.2fms | Extraction: %.2fms | Chunking: %.2fms | "
+            "Embedding: %.2fms | ChromaDB: %.2fms | Chunks: %d",
+            document_id, sanitized_name, t_total_ms, t_ext_ms, t_chunk_ms, t_emb_ms, t_idx_ms, len(chunks),
+        )
+
+        return GuidelineUploadResponse(
+            document_id=document_id,
+            filename=sanitized_name,
+            status="indexed",
+            page_count=extracted_doc.page_count,
+            extracted_characters=extracted_doc.total_characters,
+            chunk_count=len(chunks),
+            message="Document successfully processed, chunked, and indexed into vector store.",
+        )
+
+    except HTTPException:
+        raise
+    except Exception as exc:
+        logger.exception("Failed during indexing pipeline: %s", exc)
+        document_registry.update_status(
+            document_id=document_id,
+            status="failed",
+            error_message=str(exc),
+        )
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Document indexing failed: {str(exc)}",
+        )
+
+
 @router.post(
     "/upload",
     response_model=GuidelineUploadResponse,
@@ -54,6 +176,7 @@ async def upload_guideline(file: UploadFile = File(...)):
     Accepts PDF or TXT brand guideline files.
     Extracts text, splits into semantic chunks, generates embeddings, and persists in ChromaDB.
     Reuses existing records if identical file content was previously uploaded and indexed.
+    Runs extraction and indexing in a worker thread to keep the event loop non-blocking.
     """
     filename = file.filename or "unknown"
     sanitized_name = _sanitize_filename(filename)
@@ -104,98 +227,13 @@ async def upload_guideline(file: UploadFile = File(...)):
             message="Document already indexed. Existing record reused.",
         )
 
-    document_id = str(uuid.uuid4())
-    stored_filename = f"{document_id}_{sanitized_name}"
-
-    # Determine uploads directory
-    uploads_dir = os.path.abspath(settings.uploads_dir)
-    os.makedirs(uploads_dir, exist_ok=True)
-    stored_path = os.path.join(uploads_dir, stored_filename)
-
-    # 1. Format validation & text extraction
-    try:
-        extracted_doc = DocumentExtractor.extract_text(sanitized_name, content)
-    except UnsupportedFormatError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
-    except EmptyDocumentError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
-    except ScannedPDFError as exc:
-        # 422 Unprocessable Entity for scanned PDFs needing OCR
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc))
-    except CorruptedDocumentError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc))
-    except Exception as exc:
-        logger.exception("Unexpected error during text extraction: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred during text extraction: {str(exc)}",
-        )
-
-    # 2. Persist raw file securely
-    try:
-        with open(stored_path, "wb") as f:
-            f.write(content)
-    except Exception as exc:
-        logger.error("Failed to write uploaded file to disk: %s", exc)
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to store uploaded file on server.",
-        )
-
-    # 3. Register initial status in document registry
-    document_registry.register_document(
-        document_id=document_id,
-        filename=sanitized_name,
-        file_type=extracted_doc.file_type,
-        file_size=len(content),
-        stored_path=stored_path,
-        status="processing",
-        content_hash=content_hash,
+    # Run CPU-heavy extraction and indexing in worker threadpool
+    return await anyio.to_thread.run_sync(
+        _process_upload_sync,
+        content,
+        sanitized_name,
+        content_hash,
     )
-
-    # 4. Chunk document
-    try:
-        chunks = document_chunker.chunk_document(document_id, extracted_doc)
-        if not chunks:
-            raise EmptyDocumentError("No valid text chunks could be produced from document.")
-
-        # 5. Generate embeddings
-        chunk_texts = [c.text for c in chunks]
-        embeddings = embedding_service.generate_embeddings(chunk_texts)
-
-        # 6. Index into ChromaDB vector store
-        vector_store_service.add_chunks(chunks, embeddings)
-
-        # 7. Update status to indexed
-        document_registry.update_status(
-            document_id=document_id,
-            status="indexed",
-            page_count=extracted_doc.page_count,
-            character_count=extracted_doc.total_characters,
-            chunk_count=len(chunks),
-        )
-
-        return GuidelineUploadResponse(
-            document_id=document_id,
-            filename=sanitized_name,
-            status="indexed",
-            page_count=extracted_doc.page_count,
-            extracted_characters=extracted_doc.total_characters,
-            chunk_count=len(chunks),
-            message="Document successfully processed, chunked, and indexed into vector store.",
-        )
-
-    except Exception as exc:
-        logger.exception("Failed during indexing pipeline: %s", exc)
-        document_registry.update_status(
-            document_id=document_id,
-            status="failed",
-            error_message=str(exc),
-        )
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Document indexing failed: {str(exc)}",
-        )
 
 
 @router.post(

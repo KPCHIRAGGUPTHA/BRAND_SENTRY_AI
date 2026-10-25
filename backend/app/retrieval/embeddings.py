@@ -32,7 +32,9 @@ arithmetic to  ``distance = 1 - dot(a, b)``).
 """
 import logging
 import math
-from typing import List, Optional
+import threading
+from collections import OrderedDict
+from typing import List, Optional, Dict
 import numpy as np
 from backend.app.core.config import settings
 
@@ -71,6 +73,9 @@ class EmbeddingService:
         self._embed_fn = None
         self._active_engine: str = "uninitialised"
         self._dimension: int = _EXPECTED_DIMENSION
+        self._cache: OrderedDict[str, List[float]] = OrderedDict()
+        self._cache_max_size: int = 2048
+        self._cache_lock = threading.Lock()
 
     @property
     def embed_fn(self):
@@ -185,40 +190,67 @@ class EmbeddingService:
         # embedding-engine errors; the caller should avoid submitting such texts.
         processed_texts = [t.strip() if t.strip() else " " for t in texts]
 
-        try:
-            raw_embeddings = self.embed_fn(processed_texts)
-        except Exception as exc:
-            raise RuntimeError(f"Embedding generation failed: {exc}") from exc
+        # 1. Check cache for already-computed embeddings
+        result_embeddings: List[Optional[List[float]]] = [None] * len(processed_texts)
+        missing_indices: List[int] = []
+        missing_texts_map: Dict[str, List[int]] = {}
 
-        embeddings_np = np.array(raw_embeddings, dtype=np.float32)
+        with self._cache_lock:
+            for i, text in enumerate(processed_texts):
+                cached_vec = self._cache.get(text)
+                if cached_vec is not None:
+                    result_embeddings[i] = cached_vec
+                    self._cache.move_to_end(text)
+                else:
+                    if text not in missing_texts_map:
+                        missing_texts_map[text] = []
+                    missing_texts_map[text].append(i)
 
-        if embeddings_np.ndim != 2 or embeddings_np.shape[1] != _EXPECTED_DIMENSION:
-            raise RuntimeError(
-                f"Embedding engine returned unexpected shape {embeddings_np.shape}; "
-                f"expected (n, {_EXPECTED_DIMENSION})."
-            )
+        # 2. If any texts are missing from cache, generate them in a single batch pass
+        if missing_texts_map:
+            unique_missing_texts = list(missing_texts_map.keys())
+            try:
+                raw_embeddings = self.embed_fn(unique_missing_texts)
+            except Exception as exc:
+                raise RuntimeError(f"Embedding generation failed: {exc}") from exc
 
-        if not np.all(np.isfinite(embeddings_np)):
-            raise ValueError(
-                "Generated embeddings contain non-finite values (NaN or Inf). "
-                f"Active engine: {self._active_engine}."
-            )
+            embeddings_np = np.array(raw_embeddings, dtype=np.float32)
 
-        # L2-normalise to unit length for cosine-distance correctness.
-        # Vectors returned by the ONNX path are already normalised, but we
-        # re-normalise defensively to guarantee unit length regardless of engine.
-        norms = np.linalg.norm(embeddings_np, axis=1, keepdims=True)
-        zero_norm_mask = norms[:, 0] == 0.0
-        if zero_norm_mask.any():
-            logger.warning(
-                "%d zero-norm embedding(s) detected; replacing with zero vectors. "
-                "Check input texts for degenerate content.",
-                zero_norm_mask.sum(),
-            )
-            norms[zero_norm_mask] = 1.0  # avoid divide-by-zero; result stays zero vector
-        normalized = embeddings_np / norms
+            if embeddings_np.ndim != 2 or embeddings_np.shape[1] != _EXPECTED_DIMENSION:
+                raise RuntimeError(
+                    f"Embedding engine returned unexpected shape {embeddings_np.shape}; "
+                    f"expected (n, {_EXPECTED_DIMENSION})."
+                )
 
-        return normalized.tolist()
+            if not np.all(np.isfinite(embeddings_np)):
+                raise ValueError(
+                    "Generated embeddings contain non-finite values (NaN or Inf). "
+                    f"Active engine: {self._active_engine}."
+                )
+
+            # L2-normalise to unit length for cosine-distance correctness.
+            norms = np.linalg.norm(embeddings_np, axis=1, keepdims=True)
+            zero_norm_mask = norms[:, 0] == 0.0
+            if zero_norm_mask.any():
+                logger.warning(
+                    "%d zero-norm embedding(s) detected; replacing with zero vectors. "
+                    "Check input texts for degenerate content.",
+                    zero_norm_mask.sum(),
+                )
+                norms[zero_norm_mask] = 1.0  # avoid divide-by-zero; result stays zero vector
+            normalized = (embeddings_np / norms).tolist()
+
+            # Populate results and update LRU cache under lock
+            with self._cache_lock:
+                for text, norm_vec in zip(unique_missing_texts, normalized):
+                    indices = missing_texts_map[text]
+                    for idx in indices:
+                        result_embeddings[idx] = norm_vec
+                    self._cache[text] = norm_vec
+                    if len(self._cache) > self._cache_max_size:
+                        self._cache.popitem(last=False)
+
+        return [vec for vec in result_embeddings if vec is not None]
 
     def generate_query_embedding(self, query: str) -> List[float]:
         """

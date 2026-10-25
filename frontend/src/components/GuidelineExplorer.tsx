@@ -186,16 +186,16 @@ export const GuidelineExplorer: React.FC = () => {
         </div>
 
         <form onSubmit={handleUpload}>
-          <div
+          <label
+            htmlFor="guideline-file-input"
             className={`upload-dropzone ${isDragOver ? 'drag-active' : ''}`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            role="button"
             tabIndex={0}
             onKeyDown={(e) => {
               if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
                 fileInputRef.current?.click();
               }
             }}
@@ -212,14 +212,17 @@ export const GuidelineExplorer: React.FC = () => {
                 Accepts PDF or TXT files up to 25MB (PyMuPDF page-preserving parser)
               </p>
             </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.txt"
-              style={{ display: 'none' }}
-              onChange={(e) => handleFileSelection(e.target.files?.[0] || null)}
-            />
-          </div>
+          </label>
+
+          <input
+            id="guideline-file-input"
+            ref={fileInputRef}
+            type="file"
+            accept=".pdf,.txt"
+            style={{ position: 'absolute', width: '1px', height: '1px', padding: 0, margin: '-1px', overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', border: 0 }}
+            onChange={(e) => handleFileSelection(e.target.files?.[0] || null)}
+            disabled={uploading}
+          />
 
           {file && (
             <div className="upload-selected-file">
@@ -232,6 +235,7 @@ export const GuidelineExplorer: React.FC = () => {
                 <button
                   type="button"
                   className="btn btn-secondary"
+                  disabled={uploading}
                   style={{ padding: '4px 8px', fontSize: '0.75rem' }}
                   onClick={(e) => {
                     e.stopPropagation();
@@ -249,8 +253,17 @@ export const GuidelineExplorer: React.FC = () => {
                   className="btn btn-primary"
                   style={{ padding: '6px 16px', fontSize: '0.85rem' }}
                 >
-                  <FileCheck size={16} />
-                  <span>{uploading ? 'Extracting & Indexing...' : 'Upload & Index'}</span>
+                  {uploading ? (
+                    <>
+                      <RefreshCw size={14} className="spinning" />
+                      <span>Extracting & Indexing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FileCheck size={16} />
+                      <span>Upload & Index</span>
+                    </>
+                  )}
                 </button>
               </div>
             </div>

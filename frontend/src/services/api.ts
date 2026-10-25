@@ -128,6 +128,15 @@ export async function fetchHealth(signal?: AbortSignal, timeoutMs: number = 1000
   }
 }
 
+let cachedDocuments: DocumentListResponse | null = null;
+let cachedDocumentsTimestamp = 0;
+const DOCUMENTS_CACHE_TTL_MS = 15000;
+
+export function invalidateDocumentsCache(): void {
+  cachedDocuments = null;
+  cachedDocumentsTimestamp = 0;
+}
+
 export async function uploadGuideline(file: File): Promise<GuidelineUploadResponse> {
   const formData = new FormData();
   formData.append('file', file);
@@ -157,6 +166,7 @@ export async function uploadGuideline(file: File): Promise<GuidelineUploadRespon
     throw new Error(errorDetail);
   }
 
+  invalidateDocumentsCache();
   return await safeParseJson<GuidelineUploadResponse>(response, 'Guideline upload');
 }
 
@@ -202,7 +212,15 @@ export async function searchGuidelines(
   return await safeParseJson<GuidelineSearchResponse>(response, 'Guideline search');
 }
 
-export async function fetchGuidelines(): Promise<DocumentListResponse> {
+export async function fetchGuidelines(forceRefresh: boolean = false): Promise<DocumentListResponse> {
+  if (
+    !forceRefresh &&
+    cachedDocuments &&
+    Date.now() - cachedDocumentsTimestamp < DOCUMENTS_CACHE_TTL_MS
+  ) {
+    return cachedDocuments;
+  }
+
   const url = `${API_BASE_URL}/api/guidelines`;
   const response = await fetch(url, {
     method: 'GET',
@@ -225,7 +243,10 @@ export async function fetchGuidelines(): Promise<DocumentListResponse> {
     throw new Error(errorDetail);
   }
 
-  return await safeParseJson<DocumentListResponse>(response, 'Fetch guidelines');
+  const data = await safeParseJson<DocumentListResponse>(response, 'Fetch guidelines');
+  cachedDocuments = data;
+  cachedDocumentsTimestamp = Date.now();
+  return data;
 }
 
 export async function reviewMarketingContent(
