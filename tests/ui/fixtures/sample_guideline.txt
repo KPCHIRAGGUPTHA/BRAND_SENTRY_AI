@@ -1,0 +1,12 @@
+BRAND COMPLIANCE POLICY 2026 — AUTOMATED TEST FIXTURE
+Doc ID: E2E-TEST-001
+Version: 1.0
+
+1. Absolute Guarantees:
+Marketing copy must not state that any product is "100% guaranteed" or delivers guaranteed outcomes without prior written legal verification. Claims using terms such as "always", "never", or "zero risk" must be supported by documented evidence.
+
+2. Safety and Zero Risk:
+Never describe software or products as "100% safe" or "impossible to hack". Statements regarding security and safety must accurately reflect verified controls.
+
+3. Performance and Productivity:
+Specific percentage improvement claims, such as increasing employee productivity or delivering exact numerical benefits, must be supported by current reproducible evidence and benchmark documentation.

@@ -63,6 +63,8 @@ scratch/
 htmlcov/
 coverage.xml
 *.lcov
+test-results/
+
 
 # IDEs & System
 .vscode/

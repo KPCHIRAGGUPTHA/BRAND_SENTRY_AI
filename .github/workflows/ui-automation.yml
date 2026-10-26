@@ -1,0 +1,80 @@
+name: Selenium UI Automation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  ui-smoke-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: 'frontend/package-lock.json'
+
+      - name: Install Google Chrome
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget curl unzip libnss3 libgconf-2-4 libxi6
+          sudo apt-get install -y google-chrome-stable || true
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+          pip install -r tests/ui/requirements.txt
+
+      - name: Install frontend dependencies and build
+        run: |
+          cd frontend
+          npm ci || npm install
+          npm run build
+
+      - name: Run existing backend unit tests
+        run: |
+          python -m pytest -q
+
+      - name: Start backend service
+        run: |
+          uvicorn backend.app.main:app --port 8000 &
+          sleep 5
+          curl -f http://127.0.0.1:8000/health || (echo "Backend health check failed" && exit 1)
+
+      - name: Start frontend dev server
+        run: |
+          cd frontend
+          npm run preview -- --port 5173 &
+          sleep 3
+
+      - name: Run Selenium UI test suite
+        env:
+          BRANDSENTRY_BASE_URL: http://localhost:5173
+          BRANDSENTRY_BACKEND_URL: http://127.0.0.1:8000
+          BRANDSENTRY_HEADLESS: "true"
+          BRANDSENTRY_RUN_LIVE_REVIEW: "true"
+        run: |
+          python -m pytest tests/ui -v
+
+      - name: Upload failure diagnostics artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selenium-failure-diagnostics
+          path: test-results/
+          if-no-files-found: ignore
