@@ -3,7 +3,7 @@
 [![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
 [![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi)](https://brandsentry-api.onrender.com/docs)
 [![Health Status](https://img.shields.io/badge/Backend%20Status-Connected%20(200%20OK)-10B981?style=for-the-badge)](https://brandsentry-api.onrender.com/health)
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-200%20Passed-success?style=for-the-badge&logo=pytest)](docs/TEST_REPORT.md)
+[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-204%20Passed-success?style=for-the-badge&logo=pytest)](docs/TEST_REPORT.md)
 [![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-15%20Passed-success?style=for-the-badge&logo=vitest)](docs/TEST_REPORT.md)
 
 ---
@@ -29,8 +29,8 @@ BrandSentry AI is deployed in production on Render:
 - **Sparse Lexical Search (BM25Okapi)**: Tokenized keyword inverted index indexing identical guideline passages, preserving chunk IDs, document IDs, source filenames, and page numbers with JSON persistence.
 - **Reciprocal Rank Fusion (RRF)**: Fuses dense semantic search (`all-MiniLM-L6-v2` via ChromaDB) with BM25 lexical scores using the formula $RRF(d) = \sum \frac{1}{k + rank(d)}$ ($k=60$), combined with string deduplication to eliminate redundant evidence citations.
 - **Empirical Evaluation Benchmark**: 60 meticulously labelled ground-truth scenarios across 10 failure categories (Exact Phrase, Semantic Paraphrase, Numerical Thresholds, Prohibited Phrases, Exceptions, Negation, Temporal, Scope, Missing Evidence, Similar Passages).
-  - **Verdict Accuracy**: Hybrid (56.67%) vs Dense (55.00%) vs BM25 (55.00%).
-  - **Latency**: Hybrid yields sub-8ms retrieval on CPU infrastructure.
+  - **Verdict Accuracy**: Hybrid (63.33%) vs Dense (61.67%) vs BM25 (60.00%).
+  - **Latency**: Hybrid yields ~5ms retrieval on standard CPU infrastructure.
   - Complete report: [`docs/RETRIEVAL_EVALUATION.md`](docs/RETRIEVAL_EVALUATION.md).
 
 ### 2. Policy Governance & Auditable Reviews
@@ -161,7 +161,7 @@ npm run dev
 
 ## 🧪 Automated Testing & Verification
 
-### Run Backend Test Suite (200 Tests Passing)
+### Run Backend Test Suite (204 Tests Passing)
 ```bash
 python -m pytest -q
 ```

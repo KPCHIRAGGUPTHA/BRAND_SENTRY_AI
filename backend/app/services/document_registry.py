@@ -307,10 +307,66 @@ class DocumentRegistry:
             conn.commit()
         return True
 
+    def resolve_version_to_document_id(self, identifier: str) -> Optional[str]:
+        """
+        Resolves an identifier (either version_id or document_id) to the underlying indexed document_id.
+        """
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            # 1. Check if it's a version_id
+            cur.execute("SELECT document_id FROM policy_versions WHERE version_id = ?", (identifier,))
+            row = cur.fetchone()
+            if row:
+                return row[0]
+            # 2. Check if it's directly a document_id
+            cur.execute("SELECT document_id FROM documents WHERE document_id = ?", (identifier,))
+            row = cur.fetchone()
+            if row:
+                return row[0]
+        return None
+
+    def get_version_id_for_document(self, document_id: str) -> Optional[str]:
+        """Returns the version_id corresponding to a document_id, prioritizing active versions."""
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT version_id FROM policy_versions WHERE document_id = ? ORDER BY is_active DESC, created_at DESC",
+                (document_id,)
+            )
+            row = cur.fetchone()
+            if row:
+                return row[0]
+        return None
+
+    def get_active_document_ids(self) -> List[str]:
+        """
+        Returns document_ids of all currently active policy versions.
+        Prevents archived historical guideline versions from leaking into un-scoped reviews.
+        Fallback to all indexed documents if no policy versions are registered yet.
+        """
+        with self._get_connection() as conn:
+            cur = conn.cursor()
+            cur.execute(
+                """
+                SELECT DISTINCT pv.document_id 
+                FROM policy_versions pv
+                JOIN documents d ON pv.document_id = d.document_id
+                WHERE pv.is_active = 1 AND d.status = 'indexed'
+                """
+            )
+            rows = cur.fetchall()
+            if rows:
+                return [r[0] for r in rows]
+
+            # Fallback for fresh/legacy DB without policy_versions
+            cur.execute("SELECT document_id FROM documents WHERE status = 'indexed'")
+            return [r[0] for r in cur.fetchall()]
+
     def delete_document(self, document_id: str) -> bool:
         with self._get_connection() as conn:
             cur = conn.cursor()
             cur.execute("DELETE FROM documents WHERE document_id = ?", (document_id,))
+            cur.execute("DELETE FROM policy_versions WHERE document_id = ?", (document_id,))
             conn.commit()
             return cur.rowcount > 0
 

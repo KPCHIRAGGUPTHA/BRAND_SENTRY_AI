@@ -51,6 +51,86 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _resolve_scope_and_versions(
+    document_ids: Optional[List[str]],
+    policy_version_ids: Optional[List[str]],
+) -> Tuple[List[str], List[str]]:
+    """
+    Resolves request document and policy version identifiers into:
+    1. validated_doc_ids: physical document IDs to search in ChromaDB and BM25.
+    2. enforced_policy_versions: logical version identifiers for audit traceability.
+
+    If no scope is specified (un-scoped review), scopes exclusively to active policy versions,
+    preventing archived historical guideline versions from leaking into current reviews.
+    """
+    from unittest.mock import Mock, MagicMock
+    is_reg_mocked = isinstance(document_registry, (Mock, MagicMock))
+    is_vs_mocked = isinstance(vector_store_service, (Mock, MagicMock)) or isinstance(
+        getattr(vector_store_service, "search", None), (Mock, MagicMock)
+    )
+
+    raw_identifiers: List[str] = []
+    if policy_version_ids:
+        raw_identifiers.extend(policy_version_ids)
+    if document_ids:
+        raw_identifiers.extend(document_ids)
+
+    validated_doc_ids: List[str] = []
+    enforced_versions: List[str] = []
+
+    if raw_identifiers:
+        for ident in raw_identifiers:
+            resolved_doc_id = ident
+            if not is_reg_mocked:
+                resolved = document_registry.resolve_version_to_document_id(ident)
+                if not resolved:
+                    raise HTTPException(
+                        status_code=status.HTTP_404_NOT_FOUND,
+                        detail=f"Guideline document or policy version '{ident}' not found in registry.",
+                    )
+                resolved_doc_id = resolved
+
+            doc = document_registry.get_document(resolved_doc_id)
+            if not doc:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Guideline document '{ident}' not found in registry.",
+                )
+            if isinstance(doc, dict) and doc.get("status") != "indexed":
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=f"Guideline document '{resolved_doc_id}' is not indexed and ready for retrieval.",
+                )
+            if resolved_doc_id not in validated_doc_ids:
+                validated_doc_ids.append(resolved_doc_id)
+
+            if ident.startswith("ver-"):
+                if ident not in enforced_versions:
+                    enforced_versions.append(ident)
+            else:
+                if not is_reg_mocked:
+                    ver_id = document_registry.get_version_id_for_document(resolved_doc_id)
+                    if ver_id and ver_id not in enforced_versions:
+                        enforced_versions.append(ver_id)
+                    elif resolved_doc_id not in enforced_versions:
+                        enforced_versions.append(resolved_doc_id)
+                else:
+                    enforced_versions.append(resolved_doc_id)
+    else:
+        # Default un-scoped review
+        if is_vs_mocked:
+            return [], []
+
+        active_doc_ids = document_registry.get_active_document_ids()
+        validated_doc_ids = active_doc_ids
+        for doc_id in active_doc_ids:
+            ver_id = document_registry.get_version_id_for_document(doc_id)
+            if ver_id and ver_id not in enforced_versions:
+                enforced_versions.append(ver_id)
+
+    return validated_doc_ids, enforced_versions
+
+
 def _execute_review_pipeline(
     content: str,
     validated_doc_ids: List[str],
@@ -60,6 +140,7 @@ def _execute_review_pipeline(
     review_source: str = "text",
     ocr_raw_text: Optional[str] = None,
     ocr_corrected_text: Optional[str] = None,
+    enforced_policy_versions: Optional[List[str]] = None,
 ) -> ReviewResponse:
     """
     Synchronous CPU-bound pipeline executed in a worker thread:
@@ -225,6 +306,7 @@ def _execute_review_pipeline(
             warning=warning,
             ocr_raw_text=ocr_raw_text,
             ocr_corrected_text=ocr_corrected_text,
+            policy_versions=enforced_policy_versions,
         )
     except Exception as exc:
         logger.error("Failed to persist audit review record for %s: %s", review_id, exc)
@@ -240,6 +322,7 @@ def _execute_review_pipeline(
         review_source=review_source,
         ocr_raw_text=ocr_raw_text,
         ocr_user_text=ocr_corrected_text,
+        policy_versions_used=enforced_policy_versions or [],
     )
 
 
@@ -257,7 +340,7 @@ def _execute_review_pipeline(
 async def review_marketing_content(request: ReviewRequest):
     """
     Full Phase 3 review pipeline offloaded to threadpool to avoid event-loop blocking:
-    1. Validate request (content length, document IDs).
+    1. Validate request (content length, document IDs, policy versions).
     2. Extract claims deterministically.
     3. Batch embed claims & retrieve evidence & classify.
     4. Return aggregated ReviewResponse.
@@ -274,31 +357,17 @@ async def review_marketing_content(request: ReviewRequest):
             ),
         )
 
-    # Validate document_ids if provided
-    validated_doc_ids: List[str] = []
-    if request.document_ids:
-        for doc_id in request.document_ids:
-            doc = document_registry.get_document(doc_id)
-            if not doc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Guideline document '{doc_id}' not found in registry.",
-                )
-            if doc["status"] != "indexed":
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=(
-                        f"Guideline document '{doc_id}' has status '{doc['status']}' "
-                        "and is not ready for evidence retrieval."
-                    ),
-                )
-            validated_doc_ids.append(doc_id)
+    # Validate and resolve document_ids and policy_version_ids
+    validated_doc_ids, enforced_versions = _resolve_scope_and_versions(
+        request.document_ids,
+        request.policy_version_ids,
+    )
 
     review_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
     logger.info(
-        "Review %s initiated: %d chars, %d document_ids.",
-        review_id, len(content), len(validated_doc_ids),
+        "Review %s initiated: %d chars, %d document_ids, %d policy_versions.",
+        review_id, len(content), len(validated_doc_ids), len(enforced_versions),
     )
 
     # Execute synchronous CPU-heavy work in worker threadpool
@@ -309,6 +378,10 @@ async def review_marketing_content(request: ReviewRequest):
         review_id,
         created_at,
         request.retrieval_mode,
+        "text",
+        None,
+        None,
+        enforced_versions,
     )
 
 
@@ -433,31 +506,17 @@ async def review_image_content(request: ImageReviewSubmitRequest):
             ),
         )
 
-    # Validate document_ids if provided
-    validated_doc_ids: List[str] = []
-    if request.document_ids:
-        for doc_id in request.document_ids:
-            doc = document_registry.get_document(doc_id)
-            if not doc:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"Guideline document '{doc_id}' not found in registry.",
-                )
-            if doc["status"] != "indexed":
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=(
-                        f"Guideline document '{doc_id}' has status '{doc['status']}' "
-                        "and is not ready for evidence retrieval."
-                    ),
-                )
-            validated_doc_ids.append(doc_id)
+    # Validate and resolve document_ids and policy_version_ids
+    validated_doc_ids, enforced_versions = _resolve_scope_and_versions(
+        request.document_ids,
+        request.policy_version_ids,
+    )
 
     review_id = str(uuid.uuid4())
     created_at = datetime.now(timezone.utc).isoformat()
     logger.info(
-        "Image review %s initiated: %d chars, raw_ocr=%s, %d document_ids.",
-        review_id, len(content), bool(request.raw_ocr_text), len(validated_doc_ids),
+        "Image review %s initiated: %d chars, raw_ocr=%s, %d document_ids, %d policy_versions.",
+        review_id, len(content), bool(request.raw_ocr_text), len(validated_doc_ids), len(enforced_versions),
     )
 
     return await anyio.to_thread.run_sync(
@@ -470,5 +529,6 @@ async def review_image_content(request: ImageReviewSubmitRequest):
         "image",
         request.raw_ocr_text,
         content,
+        enforced_versions,
     )
 

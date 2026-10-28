@@ -123,11 +123,13 @@ export interface ReviewResponse {
   review_source?: string;
   ocr_raw_text?: string | null;
   ocr_user_text?: string | null;
+  policy_versions_used?: string[];
 }
 
 export interface ReviewRequest {
   content: string;
   document_ids?: string[];
+  policy_version_ids?: string[];
   retrieval_mode?: 'hybrid' | 'dense' | 'bm25';
 }
 
@@ -151,6 +153,7 @@ export interface ImageReviewSubmitRequest {
   corrected_text: string;
   raw_ocr_text?: string;
   document_ids?: string[];
+  policy_version_ids?: string[];
   retrieval_mode?: 'hybrid' | 'dense' | 'bm25';
 }
 

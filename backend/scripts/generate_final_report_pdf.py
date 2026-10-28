@@ -211,7 +211,7 @@ def build_pdf(output_path: str):
         [Paragraph("<b>Live Web Application:</b>", table_cell_bold), Paragraph("https://brandsentry-web.onrender.com", table_cell_style)],
         [Paragraph("<b>Live FastAPI Backend:</b>", table_cell_bold), Paragraph("https://brandsentry-api.onrender.com", table_cell_style)],
         [Paragraph("<b>Interactive API Docs:</b>", table_cell_bold), Paragraph("https://brandsentry-api.onrender.com/docs", table_cell_style)],
-        [Paragraph("<b>Backend Test Suite:</b>", table_cell_bold), Paragraph("<b>200 Tests Collected & Passed</b> (0 Failures, 14.28s execution)", table_cell_style)],
+        [Paragraph("<b>Backend Test Suite:</b>", table_cell_bold), Paragraph("<b>204 Tests Collected & Passed</b> (0 Failures, 13.10s execution)", table_cell_style)],
         [Paragraph("<b>Frontend Test Suite:</b>", table_cell_bold), Paragraph("<b>15 Tests Collected & Passed</b> (Vitest) • Production Build Verified", table_cell_style)],
         [Paragraph("<b>Retrieval Benchmark:</b>", table_cell_bold), Paragraph("60 Labelled Ground-Truth Cases Across 10 Failure Categories", table_cell_style)],
     ]
@@ -268,7 +268,7 @@ def build_pdf(output_path: str):
         [
             Paragraph("<b>Reliability & Robustness</b>", table_cell_bold),
             Paragraph("20", table_cell_style),
-            Paragraph("200 backend pytest tests passing cleanly (14.28s). 15 frontend vitest tests passing. Bounded cold-start retries, honest progress indicators, zero hallucinations.", table_cell_style)
+            Paragraph("204 backend pytest tests passing cleanly (13.10s). 15 frontend vitest tests passing. Bounded cold-start retries, honest progress indicators, zero hallucinations.", table_cell_style)
         ],
         [
             Paragraph("<b>Usability & Real-World Fit</b>", table_cell_bold),
@@ -474,8 +474,8 @@ def build_pdf(output_path: str):
             Paragraph("0.3433", table_cell_style),
             Paragraph("0.9667", table_cell_style),
             Paragraph("0.9361", table_cell_style),
-            Paragraph("55.00%", table_cell_style),
-            Paragraph("400.1 ms", table_cell_style),
+            Paragraph("61.67%", table_cell_style),
+            Paragraph("261.8 ms", table_cell_style),
         ],
         [
             Paragraph("<b>BM25 Only</b><br/>(Lexical Okapi)", table_cell_bold),
@@ -484,8 +484,8 @@ def build_pdf(output_path: str):
             Paragraph("0.2000", table_cell_style),
             Paragraph("0.7500", table_cell_style),
             Paragraph("0.7375", table_cell_style),
-            Paragraph("55.00%", table_cell_style),
-            Paragraph("<b>2.5 ms</b>", table_cell_bold),
+            Paragraph("60.00%", table_cell_style),
+            Paragraph("<b>1.7 ms</b>", table_cell_bold),
         ],
         [
             Paragraph("<b>Hybrid (RRF)</b><br/>(Dense + BM25, k=60)", table_cell_bold),
@@ -494,8 +494,8 @@ def build_pdf(output_path: str):
             Paragraph("0.3433", table_cell_style),
             Paragraph("0.9667", table_cell_style),
             Paragraph("0.9033", table_cell_style),
-            Paragraph("<b>56.67%</b>", table_cell_bold),
-            Paragraph("<b>7.6 ms</b>", table_cell_bold),
+            Paragraph("<b>63.33%</b>", table_cell_bold),
+            Paragraph("<b>5.1 ms</b>", table_cell_bold),
         ],
     ]
 
@@ -514,10 +514,10 @@ def build_pdf(output_path: str):
 
     story.append(Paragraph("Key Findings & Comparative Engineering Analysis", h2_style))
     story.append(Paragraph(
-        "1. <b>End-to-End Verdict Accuracy Outperformance:</b> Hybrid retrieval achieved the highest overall compliance verdict accuracy (<b>56.67%</b>), "
-        "outperforming both dense-only (55.00%) and BM25-only (55.00%). The fusion mechanism successfully prevented false negatives on technical phrases.<br/>"
-        "2. <b>Latency Efficiency on CPU:</b> BM25 lookup executed in 2.5ms, and the complete Hybrid RRF search executed in <b>7.6ms</b> on standard CPU. "
-        "This is over <b>50x faster</b> than unoptimized sequential embedding queries (400ms), proving high responsiveness on CPU-based infrastructure.<br/>"
+        "1. <b>End-to-End Verdict Accuracy Outperformance:</b> Hybrid retrieval achieved the highest overall compliance verdict accuracy (<b>63.33%</b>, 38/60), "
+        "outperforming dense-only (61.67%) and BM25-only (60.00%). Refinements in exception handling and disclaimer awareness resolved earlier false negatives.<br/>"
+        "2. <b>Latency Efficiency on CPU:</b> BM25 lookup executed in 1.7ms, and the complete Hybrid RRF search executed in <b>5.1ms</b> on standard CPU. "
+        "This is over <b>50x faster</b> than unoptimized embedding queries, proving high responsiveness on CPU-based infrastructure.<br/>"
         "3. <b>Dense vs. BM25 Tradeoffs:</b> BM25 excels at exact keyword match (e.g. '100% money-back', 'FDA 21 CFR 101'), while Dense captures conceptual paraphrases. "
         "Combining them via RRF eliminates the vulnerability where dense embeddings assign high similarity to superficially related but non-compliant copy.<br/>"
         "4. <b>Transparent Metric Reporting:</b> In strict adherence to Rule 4 (No fake completion), we honestly report that Dense-only achieved slightly higher raw P@3 (0.4611 vs 0.4556) due to dense embeddings dominating semantic categories; however, Hybrid RRF produced the highest <i>actionable verdict accuracy</i> when fed to the compliance decision engine.",
@@ -728,7 +728,7 @@ def build_pdf(output_path: str):
     story.append(Paragraph(
         "Every capability in BrandSentry AI is verified through automated test suites. "
         "No test was skipped, weakened, or deleted to achieve a passing status. "
-        "The complete suite of <b>200 backend tests</b> and <b>15 frontend tests</b> passed cleanly with zero failures:",
+        "The complete suite of <b>204 backend tests</b> and <b>15 frontend tests</b> passed cleanly with zero failures:",
         body_style
     ))
     story.append(Spacer(1, 6))
@@ -745,16 +745,16 @@ def build_pdf(output_path: str):
         [
             Paragraph("<b>Policy Governance</b>", table_cell_bold),
             Paragraph("`test_policy_governance.py`", table_cell_style),
-            Paragraph("12", table_cell_style),
-            Paragraph("<font color='#1B6A3B'><b>12 PASSED</b></font>", table_cell_style),
-            Paragraph("Immutable versions, SHA-256 hashes, activation toggles, SQLite audit roundtrip, CSV/JSON/PDF exports, dashboard stats.", table_cell_style),
+            Paragraph("13", table_cell_style),
+            Paragraph("<font color='#1B6A3B'><b>13 PASSED</b></font>", table_cell_style),
+            Paragraph("Immutable versions, SHA-256 hashes, activation toggles, SQLite audit roundtrip, CSV/JSON/PDF exports, policy isolation.", table_cell_style),
         ],
         [
             Paragraph("<b>Multimodal OCR</b>", table_cell_bold),
             Paragraph("`test_ocr_multimodal.py`", table_cell_style),
-            Paragraph("13", table_cell_style),
-            Paragraph("<font color='#1B6A3B'><b>13 PASSED</b></font>", table_cell_style),
-            Paragraph("PNG/JPEG validation, 0-byte/corrupt rejection, size limits, OCR extraction, text correction pipeline, audit logging.", table_cell_style),
+            Paragraph("16", table_cell_style),
+            Paragraph("<font color='#1B6A3B'><b>16 PASSED</b></font>", table_cell_style),
+            Paragraph("PNG/JPEG/WebP validation, 0-byte/corrupt rejection, size limits, OCR extraction, text correction pipeline, audit logging.", table_cell_style),
         ],
         [
             Paragraph("<b>Review Pipeline</b>", table_cell_bold),
@@ -808,9 +808,9 @@ def build_pdf(output_path: str):
         [
             Paragraph("<b>Total Test Suite</b>", table_cell_bold),
             Paragraph("<b>17 Test Files Across Repos</b>", table_cell_bold),
-            Paragraph("<b>215</b>", table_cell_bold),
-            Paragraph("<font color='#1B6A3B'><b>215 PASSED</b></font>", table_cell_bold),
-            Paragraph("<b>0 Failures • 0 Skips • Execution Duration: 20.47s total</b>", table_cell_bold),
+            Paragraph("<b>219</b>", table_cell_bold),
+            Paragraph("<font color='#1B6A3B'><b>219 PASSED</b></font>", table_cell_bold),
+            Paragraph("<b>0 Failures • 0 Skips • Execution Duration: 23.31s total</b>", table_cell_bold),
         ],
     ]
 
@@ -968,7 +968,7 @@ def build_pdf(output_path: str):
         "<b>Improvement 1 (Hybrid Retrieval):</b> Dense search verified [OK] • BM25 search verified [OK] • RRF (k=60) fusion verified [OK] • Evidence deduplication verified [OK] • Document scoping enforced [OK] • 60-example labelled benchmark executed [OK] • Measured metrics documented [OK]",
         "<b>Improvement 2 (Policy Governance):</b> Immutable policy versioning verified [OK] • SHA-256 integrity verified [OK] • SQLite review audit persistence verified [OK] • Policy version tracking per review verified [OK] • JSON export verified [OK] • CSV export verified [OK] • PDF export verified [OK]",
         "<b>Improvement 3 (Multimodal Visual Compliance):</b> Image upload verified [OK] • Format & dimension validation verified [OK] • OCR text extraction verified [OK] • Human-in-the-loop text correction verified [OK] • Pipeline reuse verified [OK] • Image audit logging verified [OK]",
-        "<b>Reliability & Verification:</b> 200 backend tests passing [OK] • 15 frontend vitest tests passing [OK] • Frontend production build verified [OK] • Honest progress indicators [OK] • Ephemeral storage limitations documented [OK]",
+        "<b>Reliability & Verification:</b> 204 backend tests passing [OK] • 15 frontend vitest tests passing [OK] • Frontend production build verified [OK] • Honest progress indicators [OK] • Ephemeral storage limitations documented [OK]",
     ]
 
     for item in gate_items:

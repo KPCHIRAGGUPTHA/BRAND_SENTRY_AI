@@ -278,3 +278,89 @@ class TestGovernanceAPIEndpoints:
         resp = self.client.get("/api/guidelines/versions/list")
         assert resp.status_code == 200
         assert isinstance(resp.json(), list)
+
+    def test_review_enforces_policy_version_scoping(self):
+        import uuid
+        from backend.app.services.document_registry import document_registry
+        uid = uuid.uuid4().hex[:8]
+        doc1_id = f"doc-scope-{uid}-1"
+        doc2_id = f"doc-scope-{uid}-2"
+        pol_id = f"pol-scope-{uid}"
+
+        try:
+            # Register doc and version v1
+            document_registry.register_document(
+                document_id=doc1_id,
+                filename="scope_test_v1.pdf",
+                file_type="pdf",
+                file_size=500,
+                stored_path="/dummy/v1",
+                status="indexed",
+                content_hash=f"hash_scope_v1_{uid}",
+            )
+            v1 = document_registry.register_policy_version(
+                document_id=doc1_id,
+                filename="scope_test_v1.pdf",
+                content_hash=f"hash_scope_v1_{uid}",
+                policy_id=pol_id,
+            )
+            assert v1["is_active"] == 1
+
+            # Register doc and version v2 under same policy
+            document_registry.register_document(
+                document_id=doc2_id,
+                filename="scope_test_v2.pdf",
+                file_type="pdf",
+                file_size=600,
+                stored_path="/dummy/v2",
+                status="indexed",
+                content_hash=f"hash_scope_v2_{uid}",
+            )
+            v2 = document_registry.register_policy_version(
+                document_id=doc2_id,
+                filename="scope_test_v2.pdf",
+                content_hash=f"hash_scope_v2_{uid}",
+                policy_id=pol_id,
+            )
+            assert v2["is_active"] == 1
+            assert document_registry.get_policy_version(v1["version_id"])["is_active"] == 0
+
+            # Review specifically requesting v1
+            resp_v1 = self.client.post(
+                "/api/review",
+                json={
+                    "content": "Our return window is 30 days.",
+                    "policy_version_ids": [v1["version_id"]],
+                },
+            )
+            assert resp_v1.status_code == 200
+            data_v1 = resp_v1.json()
+            assert data_v1["document_ids_searched"] == [doc1_id]
+            assert v1["version_id"] in data_v1["policy_versions_used"]
+
+            # Review requesting v2
+            resp_v2 = self.client.post(
+                "/api/review",
+                json={
+                    "content": "Our return window is 60 days.",
+                    "policy_version_ids": [v2["version_id"]],
+                },
+            )
+            assert resp_v2.status_code == 200
+            data_v2 = resp_v2.json()
+            assert data_v2["document_ids_searched"] == [doc2_id]
+            assert v2["version_id"] in data_v2["policy_versions_used"]
+
+            # Requesting invalid version returns 404
+            resp_invalid = self.client.post(
+                "/api/review",
+                json={
+                    "content": "Claim test",
+                    "policy_version_ids": ["ver-non-existent-999"],
+                },
+            )
+            assert resp_invalid.status_code == 404
+        finally:
+            document_registry.delete_document(doc1_id)
+            document_registry.delete_document(doc2_id)
+

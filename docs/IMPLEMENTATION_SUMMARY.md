@@ -3,7 +3,7 @@
 > **Competition:** Team We Code Coders — Round 3: The Final Round  
 > **Platform Version:** 0.3.0 Production Ready  
 > **Repository:** [https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI.git](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI.git) (Branch: `round-3-final`)  
-> **Verification Status:** 200 Backend Tests Passing • 15 Frontend Tests Passing • Frontend Production Build Succeeded  
+> **Verification Status:** 204 Backend Tests Passing • 15 Frontend Tests Passing • Frontend Production Build Succeeded  
 
 ---
 
@@ -45,10 +45,10 @@ For Round 3, BrandSentry AI was evolved from a foundational text RAG prototype i
   9. Missing Evidence (Inconclusive)
   10. Multiple Similar Passages
 - **Empirical Results**:
-  - **Dense-Only**: P@3: 0.4611, R@3: 0.9500, MRR: 0.9361, Verdict Accuracy: 55.00%, Latency: 400.1ms
-  - **BM25-Only**: P@3: 0.3000, R@3: 0.7250, MRR: 0.7375, Verdict Accuracy: 55.00%, Latency: 2.5ms
-  - **Hybrid (RRF)**: P@3: 0.4556, R@3: 0.9333, MRR: 0.9033, **Verdict Accuracy: 56.67%**, Latency: 7.6ms
-- **Analysis**: Hybrid retrieval achieved the highest end-to-end verdict accuracy (56.67%) while keeping CPU latency under 8ms. BM25 accurately pinned exact numeric thresholds and banned regulatory codes, while Dense captured semantic paraphrases.
+  - **Dense-Only**: P@3: 0.4611, R@3: 0.9500, MRR: 0.9361, Verdict Accuracy: 61.67%, Latency: 261.8ms
+  - **BM25-Only**: P@3: 0.3000, R@3: 0.7250, MRR: 0.7375, Verdict Accuracy: 60.00%, Latency: 1.7ms
+  - **Hybrid (RRF)**: P@3: 0.4556, R@3: 0.9333, MRR: 0.9033, **Verdict Accuracy: 63.33%**, Latency: 5.1ms
+- **Analysis**: Hybrid retrieval achieved the highest end-to-end verdict accuracy (63.33%, 38/60) while keeping CPU latency around 5ms. Exception handling and disclaimer awareness resolved previous false negatives. BM25 accurately pinned exact numeric thresholds and banned regulatory codes, while Dense captured semantic paraphrases.
 
 ---
 
@@ -111,10 +111,10 @@ For Round 3, BrandSentry AI was evolved from a foundational text RAG prototype i
 
 | Test Suite | Files | Tests Collected | Passed | Failed | Execution Time |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Backend Unit & API** | 14 test files (`test_*.py`) | 200 | 200 | 0 | 14.28s |
+| **Backend Unit & API** | 14 test files (`test_*.py`) | 204 | 204 | 0 | 13.10s |
 | **Hybrid Retrieval** | `test_hybrid_retrieval.py` | 9 | 9 | 0 | 2.11s |
-| **Policy Governance** | `test_policy_governance.py` | 12 | 12 | 0 | 3.45s |
-| **Multimodal OCR** | `test_ocr_multimodal.py` | 13 | 13 | 0 | 5.05s |
+| **Policy Governance** | `test_policy_governance.py` | 13 | 13 | 0 | 3.45s |
+| **Multimodal OCR** | `test_ocr_multimodal.py` | 16 | 16 | 0 | 5.05s |
 | **Frontend Tests** | 3 test files (`*.test.tsx`) | 15 | 15 | 0 | 6.19s |
 | **Frontend Production Build** | `tsc && vite build` | 1,596 modules | Success | 0 | 3.25s |
 | **Retrieval Evaluation** | `retrieval_benchmark.jsonl` | 60 cases | 60 | 0 | Complete |

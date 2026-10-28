@@ -252,13 +252,22 @@ export async function fetchGuidelines(forceRefresh: boolean = false): Promise<Do
 export async function reviewMarketingContent(
   content: string,
   documentIds?: string[],
-  retrievalMode?: 'hybrid' | 'dense' | 'bm25'
+  retrievalMode?: 'hybrid' | 'dense' | 'bm25',
+  policyVersionIds?: string[]
 ): Promise<ReviewResponse> {
-  const payload: { content: string; document_ids?: string[]; retrieval_mode?: string } = {
+  const payload: {
+    content: string;
+    document_ids?: string[];
+    policy_version_ids?: string[];
+    retrieval_mode?: string;
+  } = {
     content,
   };
   if (documentIds && documentIds.length > 0) {
     payload.document_ids = documentIds;
+  }
+  if (policyVersionIds && policyVersionIds.length > 0) {
+    payload.policy_version_ids = policyVersionIds;
   }
   if (retrievalMode) {
     payload.retrieval_mode = retrievalMode;

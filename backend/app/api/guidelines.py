@@ -355,31 +355,6 @@ async def list_guidelines():
 
 
 @router.get(
-    "/{document_id}",
-    response_model=DocumentSummary,
-    summary="Get status and details of a specific guideline document",
-)
-async def get_guideline(document_id: str):
-    """Returns details and current status for a given document UUID."""
-    doc = document_registry.get_document(document_id)
-    if not doc:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Document '{document_id}' not found.",
-        )
-    return DocumentSummary(
-        document_id=doc["document_id"],
-        filename=doc["filename"],
-        status=doc["status"],
-        page_count=doc["page_count"],
-        character_count=doc["character_count"],
-        chunk_count=doc["chunk_count"],
-        created_at=doc["created_at"],
-        error_message=doc.get("error_message"),
-    )
-
-
-@router.get(
     "/versions/list",
     summary="List all immutable policy versions and their active/archived status",
 )
@@ -417,3 +392,28 @@ async def activate_policy_version(version_id: str):
             detail=f"Policy version '{version_id}' not found.",
         )
     return {"status": "ok", "message": f"Policy version '{version_id}' is now active."}
+
+
+@router.get(
+    "/{document_id}",
+    response_model=DocumentSummary,
+    summary="Get status and details of a specific guideline document",
+)
+async def get_guideline(document_id: str):
+    """Returns details and current status for a given document UUID."""
+    doc = document_registry.get_document(document_id)
+    if not doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Document '{document_id}' not found.",
+        )
+    return DocumentSummary(
+        document_id=doc["document_id"],
+        filename=doc["filename"],
+        status=doc["status"],
+        page_count=doc["page_count"],
+        character_count=doc["character_count"],
+        chunk_count=doc["chunk_count"],
+        created_at=doc["created_at"],
+        error_message=doc.get("error_message"),
+    )

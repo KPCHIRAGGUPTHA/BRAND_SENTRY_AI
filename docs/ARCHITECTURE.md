@@ -2,7 +2,7 @@
 
 > **Submission:** Round 3: The Final Round (Team We Code Coders)  
 > **Platform Version:** 0.3.0 Production Ready  
-> **Test Status:** 200 Backend Tests Passing • 15 Frontend Tests Passing • Production Build Verified  
+> **Test Status:** 204 Backend Tests Passing • 15 Frontend Tests Passing • Production Build Verified  
 > **Evaluation Benchmark:** 60 Labelled Ground-Truth Cases Across 10 Failure Categories  
 
 ---
@@ -101,10 +101,10 @@ flowchart TD
 - **Dataset**: 60 meticulously labelled ground-truth compliance scenarios in `backend/evaluation/datasets/retrieval_benchmark.jsonl`.
 - **10 Evaluation Categories**: Exact Phrase, Semantic Paraphrase, Numerical Thresholds, Prohibited Phrases, Exceptions, Negation, Temporal Claims, Scope Restrictions, Missing Evidence, and Multiple Similar Passages.
 - **Measured Metrics**:
-  - **Dense-Only**: P@3: 0.4611, R@3: 0.9500, MRR: 0.9361, Verdict Accuracy: 55.00%, Latency: 400.1ms
-  - **BM25-Only**: P@3: 0.3000, R@3: 0.7250, MRR: 0.7375, Verdict Accuracy: 55.00%, Latency: 2.5ms
-  - **Hybrid (RRF)**: P@3: 0.4556, R@3: 0.9333, MRR: 0.9033, **Verdict Accuracy: 56.67%**, Latency: 7.6ms
-- **Key Insight**: Hybrid retrieval yields the highest overall compliance verdict accuracy (56.67%), combining sub-10ms CPU latency with resilience against both semantic drift and exact keyword mismatches.
+  - **Dense-Only**: P@3: 0.4611, R@3: 0.9500, MRR: 0.9361, Verdict Accuracy: 61.67%, Latency: 261.8ms
+  - **BM25-Only**: P@3: 0.3000, R@3: 0.7250, MRR: 0.7375, Verdict Accuracy: 60.00%, Latency: 1.7ms
+  - **Hybrid (RRF)**: P@3: 0.4556, R@3: 0.9333, MRR: 0.9033, **Verdict Accuracy: 63.33%**, Latency: 5.1ms
+- **Key Insight**: Hybrid retrieval yields the highest overall compliance verdict accuracy (63.33%, 38/60), combining ~5ms CPU latency with resilience against both semantic drift and exact keyword mismatches.
 
 ---
 
@@ -118,6 +118,11 @@ flowchart TD
   - `content_hash`: Cryptographic SHA-256 digest of original raw document bytes.
   - `is_active`: Boolean flag indicating whether the version is currently enforced.
 - **Immutability Guarantee**: Re-uploading modified guidelines creates a new immutable version row rather than silently overwriting history. Multiple versions coexist safely.
+- **End-to-End Policy Version Isolation & Enforcement**:
+  - The review request schema accepts `policy_version_ids: List[str] | None`.
+  - The API pipeline (`backend/app/api/review.py::_resolve_scope_and_versions`) maps version UUIDs to underlying indexed `document_id`s via `document_registry.resolve_version_to_document_id()`.
+  - **Archived Version Isolation**: When a review is submitted without explicit scoping, the system queries `document_registry.get_active_document_ids()`. Only active guideline versions are included in retrieval; archived editions are mathematically excluded from un-scoped searches.
+  - The exact policy version UUIDs applied are embedded into the audit record and returned in `policy_versions_used` for full audit traceability.
 
 ### 4.2 Persistent Review Auditing (`backend/app/services/audit_service.py`)
 - Dedicated SQLite database at `backend/data/reviews.db`:
@@ -154,5 +159,18 @@ flowchart TD
 
 1. **Input & Upload Safeguards**: MIME validation, magic-byte inspection, file size guards, dimension caps, and strict character limits prevent DoS or arbitrary file execution.
 2. **Path Traversal & Injection Prevention**: Uploaded files use random UUID filenames in isolated directories. SQLite operations exclusively use parameterized queries (`?`).
-3. **No Fabricated Evidence**: Strict quote verification ensures all citations exist verbatim in source guidelines.
-4. **Render Free-Tier Storage Realities**: SQLite databases and ChromaDB reside in the container filesystem. On ephemeral cloud deployments (Render free tier), data does not survive cold restarts; documentation explicitly details persistent volume configuration (`/var/data/`) for enterprise deployments.
+4. **Render Free-Tier Storage Realities**: SQLite databases (`documents.db`, `reviews.db`), ChromaDB vectors (`data/chroma/`), and BM25 serialized chunks (`data/bm25/`) reside in the local directory `backend/data/`. On ephemeral cloud deployments (Render free tier), the container root filesystem resets upon inactivity spin-down or restart.
+5. **Persistent Disk Mount Specification (Production Deployment)**:
+   - Mount Path: `/app/backend/data/` (or configured via environment variable `DATA_DIR`)
+   - Recommended Disk Size: 1 GB minimum (holds ~50,000 guideline chunks and ~20,000 audit records)
+   - Configuration in `render.yaml`:
+     ```yaml
+     services:
+       - type: web
+         name: brandsentry-api
+         disk:
+           name: brandsentry-data
+           mountPath: /app/backend/data
+           sizeGB: 1
+     ```
+   - With this disk mounted, all guideline registries, version histories, audit trails, dense embeddings, and BM25 indexes achieve 100% durability across service restarts.

@@ -19,11 +19,13 @@ import {
   uploadReviewImage,
   submitImageReview,
   fetchGuidelines,
+  fetchPolicyVersions,
   getExportUrl,
 } from '../services/api';
 import {
   ReviewResponse,
   DocumentSummary,
+  PolicyVersion,
   ClaimVerdict,
   ImageOCRResponse,
 } from '../types/api';
@@ -45,6 +47,7 @@ export const ClaimReview: React.FC = () => {
 
   // Shared options
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
+  const [policyVersions, setPolicyVersions] = useState<PolicyVersion[]>([]);
   const [selectedDocId, setSelectedDocId] = useState<string>('all');
   const [retrievalMode, setRetrievalMode] = useState<'hybrid' | 'dense' | 'bm25'>('hybrid');
 
@@ -57,8 +60,12 @@ export const ClaimReview: React.FC = () => {
 
   const loadDocuments = async () => {
     try {
-      const res = await fetchGuidelines();
-      setDocuments(res.documents);
+      const [res, vers] = await Promise.all([
+        fetchGuidelines().catch(() => ({ total: 0, documents: [] })),
+        fetchPolicyVersions().catch(() => []),
+      ]);
+      setDocuments(res.documents || []);
+      setPolicyVersions(vers || []);
     } catch {
       // Backend may be offline during initial render
     }
@@ -96,8 +103,16 @@ export const ClaimReview: React.FC = () => {
 
     setLoading(true);
     try {
-      const docIds = selectedDocId !== 'all' ? [selectedDocId] : undefined;
-      const res = await reviewMarketingContent(trimmed, docIds, retrievalMode);
+      let docIds: string[] | undefined = undefined;
+      let verIds: string[] | undefined = undefined;
+      if (selectedDocId !== 'all') {
+        if (selectedDocId.startsWith('ver-')) {
+          verIds = [selectedDocId];
+        } else {
+          docIds = [selectedDocId];
+        }
+      }
+      const res = await reviewMarketingContent(trimmed, docIds, retrievalMode, verIds);
       setReviewResult(res);
       setError(null);
     } catch (err: unknown) {
@@ -165,11 +180,20 @@ export const ClaimReview: React.FC = () => {
 
     setLoading(true);
     try {
-      const docIds = selectedDocId !== 'all' ? [selectedDocId] : undefined;
+      let docIds: string[] | undefined = undefined;
+      let verIds: string[] | undefined = undefined;
+      if (selectedDocId !== 'all') {
+        if (selectedDocId.startsWith('ver-')) {
+          verIds = [selectedDocId];
+        } else {
+          docIds = [selectedDocId];
+        }
+      }
       const res = await submitImageReview({
         corrected_text: trimmed,
         raw_ocr_text: ocrResult?.extracted_text || trimmed,
         document_ids: docIds,
+        policy_version_ids: verIds,
         retrieval_mode: retrievalMode,
       });
       setReviewResult(res);
@@ -322,12 +346,22 @@ export const ClaimReview: React.FC = () => {
                     fontSize: '0.84rem',
                   }}
                 >
-                  <option value="all">All Guidelines ({documents.length})</option>
-                  {documents.map((doc) => (
-                    <option key={doc.document_id} value={doc.document_id}>
-                      {doc.filename} ({doc.chunk_count} chunks)
-                    </option>
-                  ))}
+                  <option value="all">
+                    All Active Guidelines ({policyVersions.length > 0 ? policyVersions.filter(v => v.is_active).length : documents.length})
+                  </option>
+                  {policyVersions.length > 0 ? (
+                    policyVersions.map((v) => (
+                      <option key={v.version_id} value={v.version_id}>
+                        {v.is_active ? '● [Active]' : '○ [Archived]'} {v.version_label} — {v.filename}
+                      </option>
+                    ))
+                  ) : (
+                    documents.map((doc) => (
+                      <option key={doc.document_id} value={doc.document_id}>
+                        {doc.filename} ({doc.chunk_count} chunks)
+                      </option>
+                    ))
+                  )}
                 </select>
               </div>
 
@@ -492,12 +526,22 @@ export const ClaimReview: React.FC = () => {
                       onChange={(e) => setSelectedDocId(e.target.value)}
                       style={{ padding: '4px 8px', fontSize: '0.82rem', borderRadius: '4px', border: '1px solid var(--color-border)' }}
                     >
-                      <option value="all">All Guidelines ({documents.length})</option>
-                      {documents.map((doc) => (
-                        <option key={doc.document_id} value={doc.document_id}>
-                          {doc.filename}
-                        </option>
-                      ))}
+                      <option value="all">
+                        All Active Guidelines ({policyVersions.length > 0 ? policyVersions.filter(v => v.is_active).length : documents.length})
+                      </option>
+                      {policyVersions.length > 0 ? (
+                        policyVersions.map((v) => (
+                          <option key={v.version_id} value={v.version_id}>
+                            {v.is_active ? '● [Active]' : '○ [Archived]'} {v.version_label} — {v.filename}
+                          </option>
+                        ))
+                      ) : (
+                        documents.map((doc) => (
+                          <option key={doc.document_id} value={doc.document_id}>
+                            {doc.filename}
+                          </option>
+                        ))
+                      )}
                     </select>
                   </div>
 
@@ -577,9 +621,15 @@ export const ClaimReview: React.FC = () => {
                 </div>
                 <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginTop: '2px' }}>
                   Review ID: <code style={{ fontFamily: 'var(--font-mono)' }}>{reviewResult.review_id}</code> •{' '}
-                  {reviewResult.document_ids_searched.length > 0
-                    ? `Scoped to ${reviewResult.document_ids_searched.length} guideline(s)`
-                    : 'Searched all indexed guidelines'}
+                  {reviewResult.policy_versions_used && reviewResult.policy_versions_used.length > 0 ? (
+                    <span>
+                      Enforced Policy: <strong style={{ color: 'var(--color-deep-aubergine)' }}>{reviewResult.policy_versions_used.join(', ')}</strong>
+                    </span>
+                  ) : reviewResult.document_ids_searched.length > 0 ? (
+                    `Scoped to ${reviewResult.document_ids_searched.length} guideline(s)`
+                  ) : (
+                    'Searched all active guidelines'
+                  )}
                 </p>
               </div>
 

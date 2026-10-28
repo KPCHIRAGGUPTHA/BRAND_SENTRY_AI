@@ -82,6 +82,7 @@ class AuditService:
         warning: Optional[str] = None,
         ocr_raw_text: Optional[str] = None,
         ocr_corrected_text: Optional[str] = None,
+        policy_versions: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """
         Atomically saves a completed compliance review audit record.
@@ -92,7 +93,9 @@ class AuditService:
 
         # Resolve policy versions used
         policy_version_records = []
-        if document_ids:
+        if policy_versions:
+            policy_version_records = list(policy_versions)
+        elif document_ids:
             for doc_id in document_ids:
                 versions = document_registry.list_policy_versions()
                 matched = [v for v in versions if v.get("document_id") == doc_id and v.get("is_active") == 1]

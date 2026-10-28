@@ -3,7 +3,7 @@
 > **Submission:** Round 3: The Final Round  
 > **Repository:** [BRAND_SENTRY_AI](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI) (Branch: `round-3-final`)  
 > **Date:** October 2026  
-> **Status:** 200/200 Backend Tests Passing • 15/15 Frontend Tests Passing • 0 Failures  
+> **Status:** 204/204 Backend Tests Passing • 15/15 Frontend Tests Passing • 0 Failures  
 
 ---
 
@@ -11,10 +11,10 @@
 
 | Test Domain | Runner / Framework | Target Files | Collected | Passed | Failed | Status |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Backend Total** | `pytest 9.1.1` (Python 3.14.5) | `backend/tests/test_*.py` | **200** | **200** | **0** | **PASS** |
+| **Backend Total** | `pytest 9.1.1` (Python 3.14.5) | `backend/tests/test_*.py` | **204** | **204** | **0** | **PASS** |
 | **- Hybrid Retrieval** | Pytest | `test_hybrid_retrieval.py` | 9 | 9 | 0 | PASS |
-| **- Policy Governance** | Pytest | `test_policy_governance.py` | 12 | 12 | 0 | PASS |
-| **- Multimodal OCR** | Pytest | `test_ocr_multimodal.py` | 13 | 13 | 0 | PASS |
+| **- Policy Governance** | Pytest | `test_policy_governance.py` | 13 | 13 | 0 | PASS |
+| **- Multimodal OCR** | Pytest | `test_ocr_multimodal.py` | 16 | 16 | 0 | PASS |
 | **- Review Pipeline & API**| Pytest | `test_review_api.py` | 21 | 21 | 0 | PASS |
 | **- Verdict Engine** | Pytest | `test_verdict_engine.py` | 52 | 52 | 0 | PASS |
 | **- Semantic Drift** | Pytest | `test_semantic_drift.py` | 15 | 15 | 0 | PASS |

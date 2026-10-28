@@ -19,6 +19,13 @@ class ReviewRequest(BaseModel):
             "If omitted or empty, all indexed guidelines are searched."
         ),
     )
+    policy_version_ids: Optional[List[str]] = Field(
+        default=None,
+        description=(
+            "Optional list of policy version identifiers (e.g. 'ver-xxxx') to scope the evidence search. "
+            "If specified, only guidelines corresponding to these exact versions are searched."
+        ),
+    )
     retrieval_mode: Optional[str] = Field(
         default=None,
         description="Optional retrieval mode override ('hybrid', 'dense', or 'bm25'). Defaults to server configuration.",
@@ -171,6 +178,10 @@ class ReviewResponse(BaseModel):
         default=None,
         description="User-corrected text before compliance review",
     )
+    policy_versions_used: List[str] = Field(
+        default_factory=list,
+        description="Policy version identifiers enforced in this review.",
+    )
 
 
 class OCRTextBlock(BaseModel):
@@ -204,6 +215,10 @@ class ImageReviewSubmitRequest(BaseModel):
     document_ids: Optional[List[str]] = Field(
         default=None,
         description="Optional list of guideline document UUIDs to scope evidence retrieval",
+    )
+    policy_version_ids: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of policy version identifiers to scope evidence retrieval",
     )
     retrieval_mode: Optional[str] = Field(
         default=None,

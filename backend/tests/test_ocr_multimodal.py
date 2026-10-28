@@ -157,3 +157,35 @@ def test_api_image_review_submit_empty(client):
     }
     response = client.post("/api/review/image/submit", json=payload)
     assert response.status_code in (400, 422)
+
+
+def test_ocr_validate_valid_webp():
+    img_bytes = _create_synthetic_image("WEBP", size=(200, 100))
+    img = ocr_service.validate_and_load_image(img_bytes)
+    assert img.size == (200, 100)
+    assert img.format == "WEBP"
+
+
+def test_api_upload_disguised_invalid_file(client):
+    # Plain text file disguised with a .png extension
+    fake_png_bytes = b"This is a plain text file, not a real PNG image."
+    response = client.post(
+        "/api/review/image",
+        files={"file": ("malicious.png", fake_png_bytes, "image/png")},
+    )
+    assert response.status_code in (400, 415)
+    assert "Unsupported" in response.json()["detail"] or "Corrupted" in response.json()["detail"]
+
+
+def test_api_upload_oversized_file(client, monkeypatch):
+    from backend.app.core.config import settings
+    # Temporarily set max size to 0.001 MB (1 KB) to test HTTP 413
+    monkeypatch.setattr(settings, "MAX_IMAGE_SIZE_MB", 0.001)
+    big_bytes = b"X" * 2048
+    response = client.post(
+        "/api/review/image",
+        files={"file": ("too_big.png", big_bytes, "image/png")},
+    )
+    assert response.status_code == 413
+    assert "exceeds maximum allowed size" in response.json()["detail"]
+
