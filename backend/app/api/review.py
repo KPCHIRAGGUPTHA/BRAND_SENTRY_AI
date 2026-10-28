@@ -13,7 +13,10 @@ from datetime import datetime, timezone
 from typing import Optional, List
 
 import anyio
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, UploadFile, File, Form
+import pytesseract
+from PIL import Image
+import io
 
 from backend.app.core.config import settings
 from backend.app.schemas.review import (
@@ -327,3 +330,80 @@ def _retrieve_evidence(
             break
 
     return deduped
+
+
+@router.post(
+    "/image",
+    response_model=ReviewResponse,
+    status_code=status.HTTP_200_OK,
+    summary="Submit marketing image for compliance review",
+)
+async def review_image_content(
+    file: UploadFile = File(...),
+    document_ids: Optional[List[str]] = Form(None)
+):
+    try:
+        image_data = await file.read()
+        image = Image.open(io.BytesIO(image_data))
+        text_content = pytesseract.image_to_string(image).strip()
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Failed to process image: {str(e)}"
+        )
+
+    if not text_content:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No text could be extracted from the uploaded image."
+        )
+
+    if len(text_content) > settings.MAX_REVIEW_CONTENT_LENGTH:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=(
+                f"Extracted content exceeds maximum length of {settings.MAX_REVIEW_CONTENT_LENGTH} characters. "
+                f"Extracted: {len(text_content)} characters."
+            ),
+        )
+
+    validated_doc_ids: List[str] = []
+    if document_ids:
+        # In case the frontend sends a single comma-separated string instead of multiple parts
+        if len(document_ids) == 1 and "," in document_ids[0]:
+            document_ids = document_ids[0].split(",")
+
+        for doc_id in document_ids:
+            doc_id = doc_id.strip()
+            if not doc_id:
+                continue
+            doc = document_registry.get_document(doc_id)
+            if not doc:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=f"Guideline document '{doc_id}' not found in registry.",
+                )
+            if doc["status"] != "indexed":
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=(
+                        f"Guideline document '{doc_id}' has status '{doc['status']}' "
+                        "and is not ready for evidence retrieval."
+                    ),
+                )
+            validated_doc_ids.append(doc_id)
+
+    review_id = str(uuid.uuid4())
+    created_at = datetime.now(timezone.utc).isoformat()
+    logger.info(
+        "Review %s initiated from image: %d chars extracted, %d document_ids.",
+        review_id, len(text_content), len(validated_doc_ids),
+    )
+
+    return await anyio.to_thread.run_sync(
+        _execute_review_pipeline,
+        text_content,
+        validated_doc_ids,
+        review_id,
+        created_at,
+    )

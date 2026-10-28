@@ -10,6 +10,7 @@ ENV PYTHONUNBUFFERED=1 \
 # Install minimal OS dependencies for health check
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    tesseract-ocr \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

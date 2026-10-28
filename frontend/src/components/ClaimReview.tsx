@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   ShieldAlert,
   ShieldCheck,
@@ -10,8 +10,8 @@ import {
   Sparkles,
   Info,
   GitCompare
-} from 'lucide-react';
-import { reviewMarketingContent, fetchGuidelines } from '../services/api';
+, Image as ImageIcon } from 'lucide-react';
+import { reviewMarketingContent, reviewImageContent, fetchGuidelines } from '../services/api';
 import { ReviewResponse, DocumentSummary, ClaimVerdict } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
 
@@ -22,6 +22,7 @@ export const ClaimReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { status, checkHealth, isChecking } = useBackendConnection();
 
@@ -94,6 +95,37 @@ export const ClaimReview: React.FC = () => {
     }
   };
 
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (loading) return;
+
+    setError(null);
+    setLoading(true);
+
+    try {
+      const docIds = selectedDocId !== 'all' ? [selectedDocId] : undefined;
+      const res = await reviewImageContent(file, docIds);
+      setReviewResult(res);
+      setContent(res.content_preview + " [Extracted from Image]");
+      setError(null);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred while processing the image.');
+      }
+      checkHealth();
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
   const fillSampleCopy = () => {
     setContent(
       'Our product is 100% guaranteed to deliver results. Our product is 100% safe. Our solution increases employee productivity by 85%.'
@@ -152,6 +184,24 @@ export const ClaimReview: React.FC = () => {
               Marketing Copy to Analyze:
             </label>
             <div style={{ display: 'flex', gap: '8px' }}>
+
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleImageUpload}
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="btn btn-secondary"
+                style={{ fontSize: '0.75rem', padding: '3px 10px', height: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Upload image containing marketing claims"
+              >
+                <ImageIcon size={14} /> Analyze Image
+              </button>
+
               <button
                 type="button"
                 onClick={fillSampleCopy}

@@ -292,3 +292,44 @@ export async function reviewMarketingContent(
 
   return await safeParseJson<ReviewResponse>(response, 'Claim review');
 }
+
+
+export async function reviewImageContent(
+  file: File,
+  documentIds?: string[]
+): Promise<ReviewResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  if (documentIds && documentIds.length > 0) {
+    documentIds.forEach(id => formData.append('document_ids', id));
+  }
+
+  const url = `${API_BASE_URL}/api/review/image`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Image review request failed with HTTP ${response.status}`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) {
+        if (Array.isArray(parsed.detail)) {
+          errorDetail = parsed.detail.map((d: any) => d.msg || JSON.stringify(d)).join(', ');
+        } else {
+          errorDetail = typeof parsed.detail === 'string' ? parsed.detail : JSON.stringify(parsed.detail);
+        }
+      }
+    } catch {
+      if (errorText.trim()) {
+        errorDetail = `Image review request failed: ${errorText.trim().slice(0, 120)}`;
+      }
+    }
+    throw new Error(errorDetail);
+  }
+
+  return await safeParseJson<ReviewResponse>(response, 'Image review');
+}
