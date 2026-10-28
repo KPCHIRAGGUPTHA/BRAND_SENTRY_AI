@@ -251,13 +251,17 @@ export async function fetchGuidelines(forceRefresh: boolean = false): Promise<Do
 
 export async function reviewMarketingContent(
   content: string,
-  documentIds?: string[]
+  documentIds?: string[],
+  retrievalMode?: 'hybrid' | 'dense' | 'bm25'
 ): Promise<ReviewResponse> {
-  const payload: { content: string; document_ids?: string[] } = {
+  const payload: { content: string; document_ids?: string[]; retrieval_mode?: string } = {
     content,
   };
   if (documentIds && documentIds.length > 0) {
     payload.document_ids = documentIds;
+  }
+  if (retrievalMode) {
+    payload.retrieval_mode = retrievalMode;
   }
 
   const url = `${API_BASE_URL}/api/review`;
@@ -292,3 +296,146 @@ export async function reviewMarketingContent(
 
   return await safeParseJson<ReviewResponse>(response, 'Claim review');
 }
+
+import {
+  PolicyVersion,
+  ImageOCRResponse,
+  ImageReviewSubmitRequest,
+  AuditReviewListResponse,
+  DashboardStats,
+} from '../types/api';
+
+export async function fetchPolicyVersions(): Promise<PolicyVersion[]> {
+  const url = `${API_BASE_URL}/api/guidelines/versions/list`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch policy versions (HTTP ${response.status})`);
+  }
+
+  return await safeParseJson<PolicyVersion[]>(response, 'Policy versions');
+}
+
+export async function activatePolicyVersion(versionId: string): Promise<{ status: string; activated_version_id: string }> {
+  const url = `${API_BASE_URL}/api/guidelines/versions/${encodeURIComponent(versionId)}/activate`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to activate policy version (HTTP ${response.status})`);
+  }
+
+  invalidateDocumentsCache();
+  return await safeParseJson(response, 'Activate policy version');
+}
+
+export async function uploadReviewImage(file: File): Promise<ImageOCRResponse> {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const url = `${API_BASE_URL}/api/review/image`;
+  const response = await fetch(url, {
+    method: 'POST',
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Image OCR failed (HTTP ${response.status})`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) errorDetail = parsed.detail;
+    } catch {
+      if (errorText.trim()) errorDetail = errorText.trim().slice(0, 120);
+    }
+    throw new Error(errorDetail);
+  }
+
+  return await safeParseJson<ImageOCRResponse>(response, 'Image OCR extraction');
+}
+
+export async function submitImageReview(request: ImageReviewSubmitRequest): Promise<ReviewResponse> {
+  const url = `${API_BASE_URL}/api/review/image/submit`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(request),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    let errorDetail = `Image review submission failed (HTTP ${response.status})`;
+    try {
+      const parsed = JSON.parse(errorText);
+      if (parsed.detail) errorDetail = parsed.detail;
+    } catch {
+      if (errorText.trim()) errorDetail = errorText.trim().slice(0, 120);
+    }
+    throw new Error(errorDetail);
+  }
+
+  return await safeParseJson<ReviewResponse>(response, 'Image review submit');
+}
+
+export async function fetchReviewHistory(
+  limit: number = 20,
+  offset: number = 0,
+  source?: string
+): Promise<AuditReviewListResponse> {
+  let url = `${API_BASE_URL}/api/reviews?limit=${limit}&offset=${offset}`;
+  if (source) {
+    url += `&source=${encodeURIComponent(source)}`;
+  }
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to load review history (HTTP ${response.status})`);
+  }
+
+  return await safeParseJson<AuditReviewListResponse>(response, 'Review history');
+}
+
+export async function fetchReviewById(reviewId: string): Promise<any> {
+  const url = `${API_BASE_URL}/api/reviews/${encodeURIComponent(reviewId)}`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Review record '${reviewId}' not found (HTTP ${response.status})`);
+  }
+
+  return await safeParseJson(response, 'Review details');
+}
+
+export async function fetchDashboardStats(): Promise<DashboardStats> {
+  const url = `${API_BASE_URL}/api/reviews/stats/summary`;
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: { Accept: 'application/json' },
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch dashboard statistics (HTTP ${response.status})`);
+  }
+
+  return await safeParseJson<DashboardStats>(response, 'Dashboard statistics');
+}
+
+export function getExportUrl(reviewId: string, format: 'json' | 'csv' | 'pdf'): string {
+  return `${API_BASE_URL}/api/reviews/${encodeURIComponent(reviewId)}/export?format=${format}`;
+}
+

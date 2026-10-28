@@ -14,8 +14,14 @@ import {
   FileCode,
   SlidersHorizontal
 } from 'lucide-react';
-import { uploadGuideline, searchGuidelines, fetchGuidelines } from '../services/api';
-import { GuidelineChunkMatch, DocumentSummary } from '../types/api';
+import {
+  uploadGuideline,
+  searchGuidelines,
+  fetchGuidelines,
+  fetchPolicyVersions,
+  activatePolicyVersion,
+} from '../services/api';
+import { GuidelineChunkMatch, DocumentSummary, PolicyVersion } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
 
 export const GuidelineExplorer: React.FC = () => {
@@ -32,6 +38,7 @@ export const GuidelineExplorer: React.FC = () => {
   const [hasSearched, setHasSearched] = useState<boolean>(false);
 
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
+  const [versions, setVersions] = useState<PolicyVersion[]>([]);
   const [loadingDocs, setLoadingDocs] = useState<boolean>(false);
   const [selectedDocId, setSelectedDocId] = useState<string>('');
 
@@ -42,8 +49,12 @@ export const GuidelineExplorer: React.FC = () => {
   const loadDocuments = async () => {
     setLoadingDocs(true);
     try {
-      const res = await fetchGuidelines();
+      const [res, vers] = await Promise.all([
+        fetchGuidelines(),
+        fetchPolicyVersions().catch(() => []),
+      ]);
       setDocuments(res.documents);
+      setVersions(vers);
       if (res.documents.length > 0 && !selectedDocId) {
         setSelectedDocId(res.documents[0].document_id);
       }
@@ -53,6 +64,16 @@ export const GuidelineExplorer: React.FC = () => {
       setLoadingDocs(false);
     }
   };
+
+  const handleActivateVersion = async (versionId: string) => {
+    try {
+      await activatePolicyVersion(versionId);
+      await loadDocuments();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'Failed to activate policy version');
+    }
+  };
+
 
   useEffect(() => {
     loadDocuments();
@@ -399,7 +420,89 @@ export const GuidelineExplorer: React.FC = () => {
             </table>
           </div>
         )}
+
+        {/* Policy Versions Governance Table (Round 3 Improvement 2) */}
+        {versions.length > 0 && (
+          <div style={{ marginTop: '24px', borderTop: '1px solid var(--color-border)', paddingTop: '18px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div>
+                <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: 'var(--color-deep-aubergine)' }}>
+                  Policy Version History &amp; Governance
+                </h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
+                  Immutable version tracking with SHA-256 integrity verification. Active version is enforced during reviews.
+                </p>
+              </div>
+              <span className="badge badge-success" style={{ fontSize: '0.72rem' }}>
+                {versions.length} {versions.length === 1 ? 'Version' : 'Versions'} Tracked
+              </span>
+            </div>
+
+            <div className="table-container">
+              <table className="document-table" aria-label="Policy versions governance table">
+                <thead>
+                  <tr>
+                    <th>Version</th>
+                    <th>Filename</th>
+                    <th>Policy Identifier</th>
+                    <th>Status</th>
+                    <th>Chunks</th>
+                    <th>Created</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {versions.map((ver) => (
+                    <tr key={ver.version_id}>
+                      <td>
+                        <span className="badge badge-primary" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem' }}>
+                          {ver.version_label}
+                        </span>
+                      </td>
+                      <td style={{ fontWeight: 500, fontSize: '0.82rem' }}>{ver.filename}</td>
+                      <td>
+                        <code style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+                          {ver.policy_id.slice(0, 12)}...
+                        </code>
+                      </td>
+                      <td>
+                        {ver.is_active ? (
+                          <span className="badge badge-success" style={{ fontSize: '0.7rem' }}>
+                            <CheckCircle2 size={11} /> Active
+                          </span>
+                        ) : (
+                          <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
+                            Archived
+                          </span>
+                        )}
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem' }}>{ver.chunk_count}</td>
+                      <td style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>
+                        {new Date(ver.created_at).toLocaleDateString()}
+                      </td>
+                      <td>
+                        {!ver.is_active ? (
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={() => handleActivateVersion(ver.version_id)}
+                            style={{ fontSize: '0.7rem', padding: '2px 8px', height: 'auto' }}
+                          >
+                            Activate
+                          </button>
+                        ) : (
+                          <span style={{ fontSize: '0.72rem', color: 'var(--color-text-secondary)' }}>Enforced</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </section>
+
 
       {/* 3. Semantic Search Interface */}
       <section className="card" id="search">
