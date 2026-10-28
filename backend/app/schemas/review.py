@@ -19,6 +19,10 @@ class ReviewRequest(BaseModel):
             "If omitted or empty, all indexed guidelines are searched."
         ),
     )
+    retrieval_mode: Optional[str] = Field(
+        default=None,
+        description="Optional retrieval mode override ('hybrid', 'dense', or 'bm25'). Defaults to server configuration.",
+    )
 
     @field_validator("content")
     @classmethod
@@ -51,6 +55,14 @@ class EvidenceItemSchema(BaseModel):
     )
     distance: float = Field(
         description="ChromaDB cosine distance (1 - similarity_score). Range [0.0, 1.0]."
+    )
+    bm25_score: Optional[float] = Field(
+        default=None,
+        description="BM25 score if retrieved via lexical search",
+    )
+    rrf_score: Optional[float] = Field(
+        default=None,
+        description="Reciprocal Rank Fusion score if retrieved via hybrid search",
     )
 
 
@@ -147,3 +159,60 @@ class ReviewResponse(BaseModel):
         default=None,
         description="Non-fatal warning, e.g. 'No guidelines indexed — evidence not available.'",
     )
+    review_source: str = Field(
+        default="text",
+        description="Origin of reviewed content: 'text' or 'image'",
+    )
+    ocr_raw_text: Optional[str] = Field(
+        default=None,
+        description="Raw text extracted by OCR if source was image",
+    )
+    ocr_user_text: Optional[str] = Field(
+        default=None,
+        description="User-corrected text before compliance review",
+    )
+
+
+class OCRTextBlock(BaseModel):
+    text: str
+    confidence: float
+    bbox: Optional[List[int]] = Field(default=None, description="[x, y, width, height]")
+
+
+class ImageOCRResponse(BaseModel):
+    """Response returned upon uploading promotional image for OCR extraction."""
+    status: str = Field(description="'success', 'empty_text', or 'error'")
+    extracted_text: str = Field(description="Full concatenated text extracted from image")
+    confidence: float = Field(description="Mean OCR confidence percentage [0.0 - 100.0]")
+    width: int
+    height: int
+    blocks: List[OCRTextBlock] = Field(default_factory=list)
+    warning: Optional[str] = None
+
+
+class ImageReviewSubmitRequest(BaseModel):
+    """Request to review user-verified OCR text through compliance engine."""
+    corrected_text: str = Field(
+        ...,
+        min_length=1,
+        description="User-reviewed marketing text extracted from the promotional image",
+    )
+    raw_ocr_text: Optional[str] = Field(
+        default=None,
+        description="Original uncorrected OCR text for audit traceability",
+    )
+    document_ids: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of guideline document UUIDs to scope evidence retrieval",
+    )
+    retrieval_mode: Optional[str] = Field(
+        default=None,
+        description="Optional retrieval mode override ('hybrid', 'dense', or 'bm25')",
+    )
+
+    @field_validator("corrected_text")
+    @classmethod
+    def text_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Corrected promotional text cannot be empty or whitespace.")
+        return v

@@ -1,0 +1,227 @@
+{
+  "dense": {
+    "mode": "dense",
+    "queries_evaluated": 60,
+    "runtime_seconds": 24.01,
+    "mean_latency_ms": 400.14,
+    "precision_at_3": 0.4611,
+    "recall_at_3": 0.95,
+    "precision_at_5": 0.3433,
+    "recall_at_5": 0.9667,
+    "mean_reciprocal_rank": 0.9361,
+    "verdict_accuracy": 0.55,
+    "verdict_correct_count": 33,
+    "category_breakdown": {
+      "exact_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3889,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.6667
+      },
+      "semantic_paraphrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.1667
+      },
+      "numerical_threshold": {
+        "count": 6,
+        "precision_at_3": 0.3889,
+        "recall_at_3": 0.9167,
+        "verdict_accuracy": 0.5
+      },
+      "prohibited_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 1.0
+      },
+      "exception": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.5
+      },
+      "negation": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.1667
+      },
+      "temporal": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.5
+      },
+      "scope_restriction": {
+        "count": 6,
+        "precision_at_3": 0.6111,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 0.6667
+      },
+      "missing_evidence": {
+        "count": 6,
+        "precision_at_3": 1.0,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 1.0
+      },
+      "similar_passages": {
+        "count": 6,
+        "precision_at_3": 0.5556,
+        "recall_at_3": 0.9167,
+        "verdict_accuracy": 0.3333
+      }
+    }
+  },
+  "bm25": {
+    "mode": "bm25",
+    "queries_evaluated": 60,
+    "runtime_seconds": 0.15,
+    "mean_latency_ms": 2.51,
+    "precision_at_3": 0.3,
+    "recall_at_3": 0.725,
+    "precision_at_5": 0.2,
+    "recall_at_5": 0.75,
+    "mean_reciprocal_rank": 0.7375,
+    "verdict_accuracy": 0.55,
+    "verdict_correct_count": 33,
+    "category_breakdown": {
+      "exact_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 0.9167,
+        "verdict_accuracy": 0.6667
+      },
+      "semantic_paraphrase": {
+        "count": 6,
+        "precision_at_3": 0.2222,
+        "recall_at_3": 0.6667,
+        "verdict_accuracy": 0.1667
+      },
+      "numerical_threshold": {
+        "count": 6,
+        "precision_at_3": 0.2778,
+        "recall_at_3": 0.5833,
+        "verdict_accuracy": 0.6667
+      },
+      "prohibited_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 1.0
+      },
+      "exception": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.5
+      },
+      "negation": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.1667
+      },
+      "temporal": {
+        "count": 6,
+        "precision_at_3": 0.2778,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 0.5
+      },
+      "scope_restriction": {
+        "count": 6,
+        "precision_at_3": 0.2778,
+        "recall_at_3": 0.5,
+        "verdict_accuracy": 0.5
+      },
+      "missing_evidence": {
+        "count": 6,
+        "precision_at_3": 0.1667,
+        "recall_at_3": 0.1667,
+        "verdict_accuracy": 0.8333
+      },
+      "similar_passages": {
+        "count": 6,
+        "precision_at_3": 0.4444,
+        "recall_at_3": 0.75,
+        "verdict_accuracy": 0.5
+      }
+    }
+  },
+  "hybrid": {
+    "mode": "hybrid",
+    "queries_evaluated": 60,
+    "runtime_seconds": 0.45,
+    "mean_latency_ms": 7.57,
+    "precision_at_3": 0.4556,
+    "recall_at_3": 0.9333,
+    "precision_at_5": 0.3433,
+    "recall_at_5": 0.9667,
+    "mean_reciprocal_rank": 0.9033,
+    "verdict_accuracy": 0.5667,
+    "verdict_correct_count": 34,
+    "category_breakdown": {
+      "exact_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3889,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.6667
+      },
+      "semantic_paraphrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.1667
+      },
+      "numerical_threshold": {
+        "count": 6,
+        "precision_at_3": 0.4444,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.5
+      },
+      "prohibited_phrase": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 1.0
+      },
+      "exception": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.5
+      },
+      "negation": {
+        "count": 6,
+        "precision_at_3": 0.3333,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 0.1667
+      },
+      "temporal": {
+        "count": 6,
+        "precision_at_3": 0.2778,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 0.5
+      },
+      "scope_restriction": {
+        "count": 6,
+        "precision_at_3": 0.6111,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 0.6667
+      },
+      "missing_evidence": {
+        "count": 6,
+        "precision_at_3": 1.0,
+        "recall_at_3": 1.0,
+        "verdict_accuracy": 1.0
+      },
+      "similar_passages": {
+        "count": 6,
+        "precision_at_3": 0.5,
+        "recall_at_3": 0.8333,
+        "verdict_accuracy": 0.5
+      }
+    }
+  }
+}

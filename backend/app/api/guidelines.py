@@ -32,6 +32,8 @@ from backend.app.services.extraction import (
 from backend.app.services.chunking import document_chunker
 from backend.app.retrieval.embeddings import embedding_service
 from backend.app.retrieval.vector_store import vector_store_service
+from backend.app.retrieval.bm25_retriever import bm25_retriever
+from backend.app.retrieval.hybrid_retriever import hybrid_retriever
 
 logger = logging.getLogger(__name__)
 
@@ -119,9 +121,10 @@ def _process_upload_sync(
         embeddings = embedding_service.generate_embeddings(chunk_texts)
         t_emb_ms = (time.perf_counter() - t_emb_start) * 1000
 
-        # 6. Index into ChromaDB vector store
+        # 6. Index into ChromaDB vector store and BM25 lexical index
         t_idx_start = time.perf_counter()
         vector_store_service.add_chunks(chunks, embeddings)
+        bm25_retriever.add_chunks(chunks)
         t_idx_ms = (time.perf_counter() - t_idx_start) * 1000
 
         # 7. Update status to indexed
@@ -131,6 +134,13 @@ def _process_upload_sync(
             page_count=extracted_doc.page_count,
             character_count=extracted_doc.total_characters,
             chunk_count=len(chunks),
+        )
+
+        # 8. Register immutable policy version record
+        document_registry.register_policy_version(
+            document_id=document_id,
+            filename=sanitized_name,
+            content_hash=content_hash,
         )
 
         t_total_ms = (time.perf_counter() - t_start) * 1000
@@ -217,6 +227,12 @@ async def upload_guideline(file: UploadFile = File(...)):
             existing_doc["document_id"],
             existing_doc["filename"],
         )
+        # Ensure policy version is present
+        document_registry.register_policy_version(
+            document_id=existing_doc["document_id"],
+            filename=sanitized_name,
+            content_hash=content_hash,
+        )
         return GuidelineUploadResponse(
             document_id=existing_doc["document_id"],
             filename=sanitized_name,
@@ -277,10 +293,11 @@ async def search_guidelines(request: GuidelineSearchRequest):
 
     try:
         query_embedding = embedding_service.generate_query_embedding(query)
-        matches = vector_store_service.search(
-            query_embedding=query_embedding,
+        matches = hybrid_retriever.search(
+            query=query,
             document_id=request.document_id,
             top_k=top_k,
+            query_embedding=query_embedding,
         )
 
         results = [
@@ -291,8 +308,10 @@ async def search_guidelines(request: GuidelineSearchRequest):
                 page_number=m["page_number"],
                 chunk_index=m["chunk_index"],
                 text=m["text"],
-                distance=m["distance"],
-                similarity_score=m["similarity_score"],
+                distance=m.get("distance", 0.0),
+                similarity_score=m.get("similarity_score", 0.0),
+                bm25_score=m.get("bm25_score"),
+                rrf_score=m.get("rrf_score"),
             )
             for m in matches
         ]
@@ -358,3 +377,43 @@ async def get_guideline(document_id: str):
         created_at=doc["created_at"],
         error_message=doc.get("error_message"),
     )
+
+
+@router.get(
+    "/versions/list",
+    summary="List all immutable policy versions and their active/archived status",
+)
+async def list_policy_versions(
+    policy_id: Optional[str] = None,
+    active_only: bool = False,
+):
+    """Returns policy versions for governance auditability and scoping."""
+    return document_registry.list_policy_versions(policy_id=policy_id, active_only=active_only)
+
+
+@router.get(
+    "/versions/{version_id}",
+    summary="Get details of a specific immutable policy version",
+)
+async def get_policy_version(version_id: str):
+    ver = document_registry.get_policy_version(version_id)
+    if not ver:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Policy version '{version_id}' not found.",
+        )
+    return ver
+
+
+@router.post(
+    "/versions/{version_id}/activate",
+    summary="Activate a specific policy version for compliance review scoping",
+)
+async def activate_policy_version(version_id: str):
+    success = document_registry.activate_policy_version(version_id)
+    if not success:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Policy version '{version_id}' not found.",
+        )
+    return {"status": "ok", "message": f"Policy version '{version_id}' is now active."}

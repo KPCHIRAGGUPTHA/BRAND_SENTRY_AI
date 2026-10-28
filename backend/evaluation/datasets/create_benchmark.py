@@ -1,0 +1,582 @@
+"""
+Script to create the labelled retrieval evaluation dataset.
+Generates 60 diverse, carefully labelled evaluation queries covering 10 distinct failure modes
+and linguistic categories, mapped to guideline passages and expected verdicts.
+"""
+import os
+import json
+
+DATASET_DIR = os.path.dirname(__file__)
+BENCHMARK_PATH = os.path.join(DATASET_DIR, "retrieval_benchmark.jsonl")
+
+# Benchmark items
+BENCHMARK_ITEMS = [
+    # 1. Exact Phrase Matches (1-6)
+    {
+        "id": "eval-exact-01",
+        "query": "100% guaranteed",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct keyword match against prohibited guarantees policy."
+    },
+    {
+        "id": "eval-exact-02",
+        "query": "100% safe",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Exact match for prohibited safety claim."
+    },
+    {
+        "id": "eval-exact-03",
+        "query": "lowest price ever",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Exact match on restricted pricing superlative."
+    },
+    {
+        "id": "eval-exact-04",
+        "query": "impossible to hack",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Exact prohibited cybersecurity phrasing."
+    },
+    {
+        "id": "eval-exact-05",
+        "query": "zero risk",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-guarantees", "chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Exact prohibited absolute risk phrase."
+    },
+    {
+        "id": "eval-exact-06",
+        "query": "carbon neutral",
+        "category": "exact_phrase",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Requires verified documented basis before publishing."
+    },
+
+    # 2. Semantic Paraphrases (7-12)
+    {
+        "id": "eval-para-07",
+        "query": "Our platform ensures flawless zero vulnerability protection against all threats.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Paraphrase of 'completely secure / impossible to hack'."
+    },
+    {
+        "id": "eval-para-08",
+        "query": "This organic formula eradicates chronic diabetes permanently.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Paraphrase of 'cures or prevents a disease'."
+    },
+    {
+        "id": "eval-para-09",
+        "query": "Customers will never experience any downtime under any circumstances.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Paraphrase of absolute 'never / guaranteed outcomes'."
+    },
+    {
+        "id": "eval-para-10",
+        "query": "Our green initiative leaves absolutely zero footprint on the environment.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Paraphrase of 'zero impact' environmental claim."
+    },
+    {
+        "id": "eval-para-11",
+        "query": "We provide verified reproducible performance benchmarks against legacy systems.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative compliance with reproducible performance benchmarks policy."
+    },
+    {
+        "id": "eval-para-12",
+        "query": "Reviewers must supply the direct source citation and page number for every finding.",
+        "category": "semantic_paraphrase",
+        "expected_chunk_ids": ["chunk-brand-review-outcomes"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Paraphrase of requirement to cite actual source passage and page."
+    },
+
+    # 3. Numerical Thresholds (13-18)
+    {
+        "id": "eval-num-13",
+        "query": "Boost your company productivity by exactly 45% within three weeks.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Specific percentage improvement requires documented methodology."
+    },
+    {
+        "id": "eval-num-14",
+        "query": "Instant 70% off markdown across our entire inventory.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Discount claims must be accurate and state limitations."
+    },
+    {
+        "id": "eval-num-15",
+        "query": "Maintain a 20px clear buffer zone surrounding the corporate emblem.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-brand-visual"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Specific numerical margin rule for logo placement."
+    },
+    {
+        "id": "eval-num-16",
+        "query": "Achieved a 99.999% uptime benchmark with audited third-party proof.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-brand-performance", "chunk-brand-evidence"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Performance benchmark supported by reproducible evidence."
+    },
+    {
+        "id": "eval-num-17",
+        "query": "Claiming 100% customer satisfaction across all retail branches.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-brand-guarantees", "chunk-brand-testimonials"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "100% absolute satisfaction claim prohibited."
+    },
+    {
+        "id": "eval-num-18",
+        "query": "Regulatory registration under code 9845-A.",
+        "category": "numerical_threshold",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-health",
+        "notes": "Exact alphanumeric registration threshold."
+    },
+
+    # 4. Prohibited Phrases (19-24)
+    {
+        "id": "eval-proh-19",
+        "query": "We are officially voted number 1 in the world for customer care.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Unsubstantiated global number 1 claim."
+    },
+    {
+        "id": "eval-proh-20",
+        "query": "Clinically proven to cure insomnia without prescription.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Prohibited disease cure and unverified clinically proven claim."
+    },
+    {
+        "id": "eval-proh-21",
+        "query": "Our investment algorithm is 100% pure profit with no downsides.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Absolute percentage expectation."
+    },
+    {
+        "id": "eval-proh-22",
+        "query": "Guaranteed to eliminate all computer viruses forever.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-guarantees", "chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guaranteed outcome on variable customer environment."
+    },
+    {
+        "id": "eval-proh-23",
+        "query": "This supplement cures cancer in 30 days.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Prohibited cure claim violating statutory compliance."
+    },
+    {
+        "id": "eval-proh-24",
+        "query": "Completely secure biometric vault cannot be compromised.",
+        "category": "prohibited_phrase",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Violates prohibition against 'completely secure'."
+    },
+
+    # 5. Exceptions & Authorizations (25-30)
+    {
+        "id": "eval-exc-25",
+        "query": "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: written legal approval permits guarantee phrase."
+    },
+    {
+        "id": "eval-exc-26",
+        "query": "Historical pricing records verify this is the lowest price ever offered.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: historical pricing records substantiate lowest price."
+    },
+    {
+        "id": "eval-exc-27",
+        "query": "Carbon neutral status has been documented, certified, and approved by the sustainability board.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: approved carbon neutral documentation."
+    },
+    {
+        "id": "eval-exc-28",
+        "query": "Clinical trial results have been formally reviewed through the medical regulatory process.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: formal medical regulatory review."
+    },
+    {
+        "id": "eval-exc-29",
+        "query": "Competitor speed comparisons are based on verifiable, current benchmark data.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: fair verifiable competitor comparison."
+    },
+    {
+        "id": "eval-exc-30",
+        "query": "Customer testimonial included mandatory disclosure regarding sponsored incentives.",
+        "category": "exception",
+        "expected_chunk_ids": ["chunk-brand-testimonials"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Exception clause: proper incentive disclosure."
+    },
+
+    # 6. Negation & Disclaimers (31-36)
+    {
+        "id": "eval-neg-31",
+        "query": "This wellness app does not replace professional medical diagnosis or treatment.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Explicit medical disclaimer complying with policy."
+    },
+    {
+        "id": "eval-neg-32",
+        "query": "We make no promise of guaranteed financial returns.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Explicit disclaimer avoiding guaranteed outcome promise."
+    },
+    {
+        "id": "eval-neg-33",
+        "query": "Product does not claim zero environmental impact.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Avoids prohibited broad environmental superlatives."
+    },
+    {
+        "id": "eval-neg-34",
+        "query": "Results shown in customer reviews are not typical for every user.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-testimonials"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Complies with testimonial typicality disclosure."
+    },
+    {
+        "id": "eval-neg-35",
+        "query": "Security controls do not claim to make the system impossible to hack.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Truthful security statement avoiding absolute immunity."
+    },
+    {
+        "id": "eval-neg-36",
+        "query": "Promotional prices do not hide any undisclosed administrative fees.",
+        "category": "negation",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Clear disclosure of material limitations and fees."
+    },
+
+    # 7. Temporal Claims & Recency (37-42)
+    {
+        "id": "eval-time-37",
+        "query": "Performance comparisons rely on benchmark records from five years ago.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Violates requirement for current, up-to-date comparison data."
+    },
+    {
+        "id": "eval-time-38",
+        "query": "All cited marketing evidence is retained and updated annually for review.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-evidence"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirms policy that evidence must be current and retained."
+    },
+    {
+        "id": "eval-time-39",
+        "query": "Lowest price ever based strictly on this morning's competitor flyer.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Fails historical pricing records requirement."
+    },
+    {
+        "id": "eval-time-40",
+        "query": "Historical audit of customer claims conducted in Q4 2026.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-evidence"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Complies with traceability and current evidence mandate."
+    },
+    {
+        "id": "eval-time-41",
+        "query": "Our carbon neutral certification expired in 2021.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Expired environmental documentation is invalid."
+    },
+    {
+        "id": "eval-time-42",
+        "query": "Product safety assessed under current 2026 laboratory protocols.",
+        "category": "temporal",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Complies with assessed and documented safety policy."
+    },
+
+    # 8. Scope Restrictions & Cross-Document Isolation (43-48)
+    {
+        "id": "eval-scope-43",
+        "query": "Medical device CE marking registration number 9845-A.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Healthcare policy chunk exists in doc-health, but scope is doc-brand. Must yield empty/insufficient."
+    },
+    {
+        "id": "eval-scope-44",
+        "query": "Corporate emblem placement requires 20px clear margin.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Brand visual rule scoped to healthcare document must yield empty."
+    },
+    {
+        "id": "eval-scope-45",
+        "query": "Discount claims cannot exceed 50% without compliance officer signoff.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-finance",
+        "notes": "Properly scoped within financial compliance document."
+    },
+    {
+        "id": "eval-scope-46",
+        "query": "Discount claims cannot exceed 50% without compliance officer signoff.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Financial threshold scoped to brand policy returns insufficient."
+    },
+    {
+        "id": "eval-scope-47",
+        "query": "Customer data is encrypted with AES-256 at rest.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": ["chunk-security-encryption"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-security",
+        "notes": "Properly scoped to security guideline."
+    },
+    {
+        "id": "eval-scope-48",
+        "query": "Customer data is encrypted with AES-256 at rest.",
+        "category": "scope_restriction",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Security encryption claim scoped to health policy is out of scope."
+    },
+
+    # 9. Missing Evidence & Unsupported Domains (49-54)
+    {
+        "id": "eval-miss-49",
+        "query": "Our delivery fleet operates 100 autonomous flying drones in Zurich.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Completely unmentioned technology. Must return insufficient evidence."
+    },
+    {
+        "id": "eval-miss-50",
+        "query": "Every software engineer on our team possesses a master's degree in robotics.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "HR qualifications not covered in brand guidelines."
+    },
+    {
+        "id": "eval-miss-51",
+        "query": "Packaging made from recycled Himalayan sea salt.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Fabricated ingredient claim with zero guideline reference."
+    },
+    {
+        "id": "eval-miss-52",
+        "query": "We accept payments in 40 international cryptocurrencies.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Payment methods not defined in brand compliance."
+    },
+    {
+        "id": "eval-miss-53",
+        "query": "Awarded best employer in Scandinavia three years consecutively.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Workplace awards have no indexed policy."
+    },
+    {
+        "id": "eval-miss-54",
+        "query": "Office headquarters are located in downtown Singapore.",
+        "category": "missing_evidence",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Geographic office location not covered."
+    },
+
+    # 10. Multiple Similar Policy Passages (55-60)
+    {
+        "id": "eval-sim-55",
+        "query": "Absolute safety guarantee with zero risk to customer data.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-guarantees", "chunk-brand-safety", "chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Touches guarantees, safety, and security policies simultaneously."
+    },
+    {
+        "id": "eval-sim-56",
+        "query": "Eco-friendly green packaging certified zero impact on waterways.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Multiple environmental policy restrictions match."
+    },
+    {
+        "id": "eval-sim-57",
+        "query": "Medical study proves 100% cure rate for seasonal flu.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-health", "chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Overlaps health cure claims and 100% guarantee prohibitions."
+    },
+    {
+        "id": "eval-sim-58",
+        "query": "Customer reviews demonstrate 50% productivity acceleration.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-testimonials", "chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Touches testimonial typicality and percentage improvement documentation."
+    },
+    {
+        "id": "eval-sim-59",
+        "query": "Unsubstantiated security certification claims.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-security", "chunk-brand-evidence"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Matches security claims and evidence retention rules."
+    },
+    {
+        "id": "eval-sim-60",
+        "query": "High semantic similarity score guarantees legal compliance.",
+        "category": "similar_passages",
+        "expected_chunk_ids": ["chunk-brand-review-outcomes"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Directly contradicted by Section 10: 'similarity score alone is not proof'."
+    },
+]
+
+def main():
+    with open(BENCHMARK_PATH, "w", encoding="utf-8") as f:
+        for item in BENCHMARK_ITEMS:
+            f.write(json.dumps(item, ensure_ascii=False) + "\n")
+    print(f"Created {len(BENCHMARK_ITEMS)} benchmark evaluation records at {BENCHMARK_PATH}")
+
+if __name__ == "__main__":
+    main()

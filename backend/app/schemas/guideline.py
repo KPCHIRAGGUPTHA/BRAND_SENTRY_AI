@@ -58,6 +58,14 @@ class GuidelineChunkMatch(BaseModel):
             "or the probability that a brand claim is true or false."
         )
     )
+    bm25_score: Optional[float] = Field(
+        default=None,
+        description="BM25 lexical relevance score if computed during hybrid or lexical search",
+    )
+    rrf_score: Optional[float] = Field(
+        default=None,
+        description="Reciprocal Rank Fusion score if computed during hybrid search",
+    )
 
 
 class GuidelineSearchResponse(BaseModel):
