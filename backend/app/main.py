@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.config import settings
 from backend.app.api.guidelines import router as guidelines_router
 from backend.app.api.review import router as review_router
+from backend.app.api.reviews import router as reviews_router
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -31,6 +32,7 @@ app.add_middleware(
 # Include API Routers
 app.include_router(guidelines_router, prefix="/api/guidelines", tags=["Guidelines"])
 app.include_router(review_router, prefix="/api/review", tags=["Review"])
+app.include_router(reviews_router, prefix="/api/reviews", tags=["Reviews Audit"])
 
 
 @app.get("/health", tags=["System"])
