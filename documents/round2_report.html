@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>BrandSentry AI – Round 2: The Build | Team Nexora AI | K P Chirag Guptha (24MIS0369)</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@page { size: A4 portrait; margin: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --accent:#2563EB; --accent2:#4F46E5; --accent-dark:#1E3A8A;
+  --ok:#059669; --ok-bg:#ECFDF5; --ok-border:#A7F3D0;
+  --warn:#D97706; --warn-bg:#FFFBEB; --warn-border:#FDE68A;
+  --danger:#DC2626; --danger-bg:#FEF2F2; --danger-border:#FECACA;
+  --dark:#0F172A; --dark2:#1E293B; --mid:#334155;
+  --muted:#64748B; --border:#E2E8F0; --light:#F8FAFC;
+}
+html { font-size: 9pt; }
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: #E2E8F0; color: var(--dark); line-height: 1.5;
+}
+.page {
+  width: 210mm; height: 297mm;
+  margin: 6mm auto; background: #fff;
+  overflow: hidden; position: relative;
+  page-break-after: always; break-after: page;
+  display: flex; flex-direction: column;
+}
+@media print {
+  body { background: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+  .page { margin: 0; box-shadow: none; page-break-after: always; break-after: page; }
+}
+
+/* ─── COVER PAGE ─── */
+.cover {
+  width: 210mm; height: 297mm;
+  background: #0B132B;
+  background-image: linear-gradient(155deg, #0B132B 0%, #1C2541 55%, #141E30 100%);
+  display: flex; flex-direction: column; color: #fff; overflow: hidden; position: relative;
+  padding: 16mm 18mm 14mm;
+}
+.cover-glow1 {
+  position: absolute; width: 340px; height: 340px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+  top: -80px; right: -60px;
+}
+.cover-glow2 {
+  position: absolute; width: 280px; height: 280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,70,229,0.20) 0%, transparent 70%);
+  bottom: 40px; left: -60px;
+}
+.c-badge-top {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(37,99,235,0.18); border: 1px solid rgba(147,197,253,0.35);
+  border-radius: 30px; padding: 5px 16px; font-size: 8pt; font-weight: 700;
+  color: #93C5FD; letter-spacing: 1.5px; text-transform: uppercase;
+  margin-bottom: 8mm; align-self: flex-start; position: relative; z-index: 2;
+}
+.c-badge-top .dot { width: 7px; height: 7px; background: #60A5FA; border-radius: 50%; }
+
+.c-hero {
+  margin-top: 10mm; margin-bottom: auto; position: relative; z-index: 2;
+}
+.c-stage {
+  font-size: 11pt; font-weight: 700; color: #60A5FA; letter-spacing: 3px;
+  text-transform: uppercase; margin-bottom: 3mm;
+}
+.c-title {
+  font-size: 38pt; font-weight: 900; line-height: 1.05; letter-spacing: -1px;
+  color: #FFFFFF; margin-bottom: 4mm;
+}
+.c-tagline {
+  font-size: 12.5pt; font-weight: 400; color: #CBD5E1; margin-bottom: 6mm;
+  line-height: 1.4; max-width: 160mm;
+}
+.c-rule {
+  width: 60px; height: 4px; background: linear-gradient(90deg, #3B82F6, #6366F1);
+  border-radius: 2px; margin-bottom: 6mm;
+}
+.c-abstract {
+  font-size: 9pt; color: #94A3B8; line-height: 1.6; max-width: 155mm;
+  background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px; padding: 5mm 6mm; margin-bottom: 8mm;
+}
+
+.c-participant-card {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 12px; padding: 6mm 8mm; position: relative; z-index: 2;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; margin-bottom: 6mm;
+}
+.c-pitem { display: flex; flex-direction: column; gap: 1.5px; }
+.c-pitem.full { grid-column: 1 / -1; }
+.c-plabel { font-size: 6.8pt; text-transform: uppercase; letter-spacing: 1px; color: #94A3B8; }
+.c-pvalue { font-size: 9pt; font-weight: 700; color: #FFFFFF; }
+.c-pvalue.highlight { color: #93C5FD; font-size: 10.5pt; }
+
+.c-footer {
+  border-top: 1px solid rgba(255,255,255,0.1); padding-top: 4mm;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 7.5pt; color: #64748B; position: relative; z-index: 2;
+}
+
+/* ─── INNER PAGES ─── */
+.pg {
+  padding: 10mm 14mm 9mm; height: 100%; display: flex; flex-direction: column;
+}
+.ph {
+  display: flex; justify-content: space-between; align-items: center;
+  padding-bottom: 2.8mm; margin-bottom: 4.5mm; border-bottom: 1.5px solid var(--border);
+  flex-shrink: 0;
+}
+.ph-title {
+  font-size: 7.5pt; font-weight: 700; color: var(--accent); letter-spacing: 0.5px;
+  text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+}
+.ph-tag {
+  background: #DBEAFE; color: #1E40AF; padding: 1.5px 6px; border-radius: 4px;
+  font-size: 6.8pt; font-weight: 600;
+}
+.ph-page { font-size: 7.2pt; color: var(--muted); font-weight: 500; }
+
+.pf {
+  margin-top: auto; padding-top: 2.8mm; border-top: 1px solid var(--border);
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 6.8pt; color: var(--muted); flex-shrink: 0;
+}
+
+.sec-title {
+  font-size: 13pt; font-weight: 800; color: var(--dark); margin-bottom: 1.2mm;
+  display: flex; align-items: center; gap: 7px; letter-spacing: -0.3px;
+}
+.sec-title .num {
+  width: 22px; height: 22px; background: linear-gradient(135deg, #2563EB, #4F46E5);
+  color: #fff; border-radius: 6px; display: inline-flex; align-items: center;
+  justify-content: center; font-size: 8pt; font-weight: 800; flex-shrink: 0;
+}
+.sec-desc { font-size: 8pt; color: var(--muted); margin-bottom: 4mm; }
+
+/* ─── COMPONENTS ─── */
+.card {
+  background: var(--light); border: 1px solid var(--border); border-radius: 8px;
+  padding: 3.5mm 4mm; margin-bottom: 3mm;
+}
+.card-blue { background: #F0F6FF; border-color: #BFDBFE; }
+.card-green { background: var(--ok-bg); border-color: var(--ok-border); }
+.card-warn { background: var(--warn-bg); border-color: var(--warn-border); }
+.card-danger { background: var(--danger-bg); border-color: var(--danger-border); }
+.card h4 { font-size: 8.5pt; font-weight: 700; margin-bottom: 1.5mm; color: var(--dark); }
+.card p { font-size: 7.8pt; line-height: 1.5; color: var(--mid); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3.5mm; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 3mm; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5mm; }
+
+.stat-box {
+  background: #FFFFFF; border: 1px solid var(--border); border-radius: 8px;
+  padding: 3mm 3.5mm; text-align: center;
+}
+.stat-box .val { font-size: 14pt; font-weight: 800; color: var(--accent); margin-bottom: 0.5mm; }
+.stat-box .lbl { font-size: 6.8pt; color: var(--muted); text-transform: uppercase; font-weight: 600; }
+
+table {
+  width: 100%; border-collapse: collapse; font-size: 7.6pt; margin: 2.5mm 0 3.5mm;
+}
+th {
+  background: #1E293B; color: #FFFFFF; padding: 2.5mm 3mm; text-align: left;
+  font-weight: 600; font-size: 7.2pt; letter-spacing: 0.3px;
+}
+td {
+  padding: 2.2mm 3mm; border-bottom: 1px solid var(--border); vertical-align: top;
+  line-height: 1.45;
+}
+tr:nth-child(even) td { background: #F8FAFC; }
+.col-nowrap { white-space: nowrap; }
+
+.chip {
+  display: inline-block; padding: 1.5px 6px; border-radius: 4px;
+  font-size: 6.8pt; font-weight: 700; letter-spacing: 0.3px;
+}
+.chip-green { background: #D1FAE5; color: #065F46; }
+.chip-blue { background: #DBEAFE; color: #1E40AF; }
+.chip-warn { background: #FEF3C7; color: #92400E; }
+.chip-red { background: #FEE2E2; color: #991B1B; }
+.chip-gray { background: #F1F5F9; color: #475569; }
+
+.code-box {
+  background: #0F172A; border-radius: 6px; padding: 3mm 4mm;
+  font-family: 'JetBrains Mono', monospace; font-size: 7pt; color: #E2E8F0;
+  line-height: 1.5; margin: 2.5mm 0; overflow: hidden;
+}
+
+.flow-step {
+  display: flex; align-items: stretch; margin: 3mm 0; gap: 2mm;
+}
+.step-node {
+  flex: 1; background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 7px;
+  padding: 2.5mm 3mm; text-align: center;
+}
+.step-node.active { border-color: #3B82F6; background: #F0F7FF; }
+.step-node .s-icon { font-size: 11pt; margin-bottom: 1mm; }
+.step-node .s-name { font-size: 7.3pt; font-weight: 700; color: var(--dark); line-height: 1.25; }
+.step-node .s-sub { font-size: 6.4pt; color: var(--muted); margin-top: 1mm; }
+.step-arr { align-self: center; font-size: 10pt; color: var(--muted); }
+
+a { color: var(--accent); text-decoration: none; font-weight: 600; }
+a:hover { text-decoration: underline; }
+.url-text { font-family: 'JetBrains Mono', monospace; font-size: 7pt; color: #2563EB; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 1: COVER PAGE
+══════════════════════════════════════════════════════════ -->
+<div class="page cover">
+  <div class="cover-glow1"></div>
+  <div class="cover-glow2"></div>
+
+  <div class="c-badge-top">
+    <span class="dot"></span> Round 2 &mdash; The Build Submission
+  </div>
+
+  <div class="c-hero">
+    <div class="c-stage">Production Hackathon Submission</div>
+    <div class="c-title">BRANDSENTRY AI</div>
+    <div class="c-tagline">Explainable, evidence-grounded brand governance before marketing copy goes live.</div>
+    <div class="c-rule"></div>
+
+    <div class="c-abstract">
+      A deployed, production-verified RAG compliance review system that evaluates marketing claims against approved brand guidelines and regulatory playbooks. Features deterministic sliding-window PyMuPDF chunking, ONNX MiniLM vector embeddings, ChromaDB semantic retrieval, 3-way verdicts (SUPPORTED, CONTRADICTED, INSUFFICIENT_EVIDENCE), character-exact citation grounding, and an explainable 7-category semantic drift detection engine.
+    </div>
+
+    <div class="c-participant-card">
+      <div class="c-pitem full">
+        <div class="c-plabel">Team Name</div>
+        <div class="c-pvalue highlight">Nexora AI</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Participant Full Name</div>
+        <div class="c-pvalue">K P Chirag Guptha</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Registration Number</div>
+        <div class="c-pvalue">24MIS0369</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Institution</div>
+        <div class="c-pvalue">Vellore Institute of Technology (VIT Vellore)</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Participation Type</div>
+        <div class="c-pvalue">Individual Solo Participant</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Submission Date</div>
+        <div class="c-pvalue">24 October 2026</div>
+      </div>
+      <div class="c-pitem">
+        <div class="c-plabel">Round 2 Deadline</div>
+        <div class="c-pvalue">25 October 2026 &bull; 10:00 AM IST</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-footer">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369)</span>
+    <span>Round 2 Official Project Submission</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 2: EXECUTIVE SUMMARY & LIVE DEPLOYMENT
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 2 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">1</div>Executive Summary</div>
+  <div class="sec-desc">Overview of the operational Round 2 platform, delivered capabilities, and public deployment</div>
+
+  <div class="card card-blue" style="margin-bottom:3.5mm;">
+    <h4>Transforming Policy Documents into Deterministic Pre-Publication Safeguards</h4>
+    <p>
+      BrandSentry AI turns approved brand guidelines into a practical pre-publication review step. A user uploads a guideline document (PDF or TXT), enters marketing copy, and receives deterministic verdicts grounded directly in retrieved source passages. The application explicitly distinguishes a claim supported by verified evidence from one contradicted by policy, and from one for which the available sources are insufficient &mdash; preventing fabricated approvals.
+    </p>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">What Is Working in Production</div>
+  <div class="grid-2" style="margin-bottom:3.5mm;">
+    <div class="card">
+      <h4>&bull; Guideline Ingestion Engine</h4>
+      <p>Multipart upload supporting PDF and TXT with PyMuPDF digital extraction, page boundary preservation, and automatic fallback rejection for scanned non-digital PDFs.</p>
+    </div>
+    <div class="card">
+      <h4>&bull; Evidence-Grounded Review</h4>
+      <p>Dense vector retrieval using local ONNX <code>all-MiniLM-L6-v2</code> embeddings and persistent ChromaDB with character-exact citation substring validation.</p>
+    </div>
+    <div class="card">
+      <h4>&bull; 3-Way Verdict Classification</h4>
+      <p>Conservative, explainable triage: <code>SUPPORTED</code>, <code>CONTRADICTED</code>, and <code>INSUFFICIENT_EVIDENCE</code> to eliminate hallucinated approvals.</p>
+    </div>
+    <div class="card">
+      <h4>&bull; Deterministic Safeguards</h4>
+      <p>High-risk prohibited phrase screening (e.g. absolute guarantees, unverified superlatives) and conservative handling of missing evidence.</p>
+    </div>
+    <div class="card">
+      <h4>&bull; Semantic Drift Detection</h4>
+      <p>Deterministic analysis across 7 linguistic categories with severity rating (LOW/MED/HIGH), evidence phrase diffing, and conservative compliant rewrites.</p>
+    </div>
+    <div class="card">
+      <h4>&bull; Accessible Production Cloud</h4>
+      <p>Dockerized FastAPI backend and React + TypeScript static frontend deployed independently on Render with automated HTTPS and health check monitoring.</p>
+    </div>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">Live Production Endpoints</div>
+  <table>
+    <thead>
+      <tr><th>Service</th><th>Public URL</th><th>Status &amp; Verification</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Web Application UI</strong></td>
+        <td><a href="https://brandsentry-web.onrender.com" target="_blank" class="url-text">https://brandsentry-web.onrender.com</a></td>
+        <td><span class="chip chip-green">LIVE &bull; 200 OK</span> React + TypeScript + Vite CDN</td>
+      </tr>
+      <tr>
+        <td><strong>Backend REST API</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com" target="_blank" class="url-text">https://brandsentry-api.onrender.com</a></td>
+        <td><span class="chip chip-green">LIVE &bull; 200 OK</span> FastAPI on Docker / Uvicorn</td>
+      </tr>
+      <tr>
+        <td><strong>Interactive API Docs</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com/docs" target="_blank" class="url-text">https://brandsentry-api.onrender.com/docs</a></td>
+        <td><span class="chip chip-blue">SWAGGER UI</span> Interactive schema testing</td>
+      </tr>
+      <tr>
+        <td><strong>API Health Check</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com/health" target="_blank" class="url-text">https://brandsentry-api.onrender.com/health</a></td>
+        <td><span class="chip chip-green">HEALTHY</span> Returns uptime, version, and status</td>
+      </tr>
+      <tr>
+        <td><strong>Source Code Repository</strong></td>
+        <td><a href="https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI" target="_blank" class="url-text">https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI</a></td>
+        <td><span class="chip chip-gray">PUBLIC GIT</span> Complete commit &amp; test history</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card card-warn" style="margin-top:auto;">
+    <h4>Important Scope &amp; Responsibility Notice</h4>
+    <p>This application is an AI-assisted decision-support prototype designed to enhance human reviewer accuracy and velocity. It does not constitute legal certification or guaranteed detection of all regulatory violations. Final publication review remains a human responsibility.</p>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 2</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 3: PROBLEM STATEMENT & PRODUCT GOAL
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 3 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">2</div>Problem Statement &amp; Product Goal</div>
+  <div class="sec-desc">Market challenges in pre-publication content governance and the BrandSentry AI design principles</div>
+
+  <div class="card" style="margin-bottom:3.5mm;">
+    <h4>The Real-World Governance Challenge</h4>
+    <p>
+      Marketing copy is generated at unprecedented velocity by decentralized internal teams, external creative agencies, and generative AI tools. However, corporate brand guidelines and legal policies are dense, constantly updated, and trapped inside long PDF manuals. As a result:
+    </p>
+    <ul style="padding-left:4mm;margin-top:1.5mm;font-size:7.8pt;color:var(--mid);line-height:1.55;">
+      <li><strong>Unsubstantiated and Outdated Claims:</strong> Marketing statements exaggerate product capabilities or quote deprecated statistics without citations.</li>
+      <li><strong>Prohibited Guarantees:</strong> Copywriters frequently use banned absolute claims (e.g., "100% risk-free", "guaranteed cure", "fastest on earth") that trigger regulatory action.</li>
+      <li><strong>Semantic Drift:</strong> Qualified internal facts ("may assist in recovery") become absolute promotional promises ("guarantees complete recovery") through subtle paraphrase.</li>
+      <li><strong>Review Bottlenecks:</strong> Human legal and brand review takes days or weeks, creating friction between marketing speed and compliance rigor.</li>
+    </ul>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">Product Principles Retained from Round 1</div>
+  <div class="grid-2" style="margin-bottom:3.5mm;">
+    <div class="card card-blue">
+      <h4>1. Evidence Before Explanation</h4>
+      <p>No claim is marked compliant without direct character-exact substring evidence from an uploaded, authorized brand guideline. Unsubstantiated claims must never receive silent approval.</p>
+    </div>
+    <div class="card card-warn">
+      <h4>2. Missing Evidence &ne; Falsity</h4>
+      <p>The system strictly separates <code>INSUFFICIENT_EVIDENCE</code> from <code>CONTRADICTED</code>. If a claim is not addressed in policy, the engine reports missing evidence rather than guessing.</p>
+    </div>
+    <div class="card card-green">
+      <h4>3. Explain and Correct</h4>
+      <p>Beyond issuing a verdict, the system produces actionable explanations and conservative suggested rewrites that preserve promotional tone while eliminating compliance risk.</p>
+    </div>
+    <div class="card">
+      <h4>4. Human-in-the-Loop Oversight</h4>
+      <p>BrandSentry AI is designed as reviewer-augmentation software. It exposes full audit evidence, confidence scores, and reasoning to empower human sign-off.</p>
+    </div>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">Primary User Journey Implemented in Round 2</div>
+  <div class="flow-step">
+    <div class="step-node active">
+      <div class="s-icon">&#128196;</div>
+      <div class="s-name">1. Upload Guidelines</div>
+      <div class="s-sub">PDF/TXT drag &amp; drop; PyMuPDF text chunking</div>
+    </div>
+    <div class="step-arr">&rarr;</div>
+    <div class="step-node active">
+      <div class="s-icon">&#9997;&#65039;</div>
+      <div class="s-name">2. Input Copy</div>
+      <div class="s-sub">Multi-sentence marketing copy; atomic claim parsing</div>
+    </div>
+    <div class="step-arr">&rarr;</div>
+    <div class="step-node active">
+      <div class="s-icon">&#9878;&#65039;</div>
+      <div class="s-name">3. RAG &amp; Drift Triage</div>
+      <div class="s-sub">MiniLM vector retrieval; 7-drift checks &amp; rules</div>
+    </div>
+    <div class="step-arr">&rarr;</div>
+    <div class="step-node active">
+      <div class="s-icon">&#9989;</div>
+      <div class="s-name">4. Review Findings</div>
+      <div class="s-sub">Verdicts, citations, drawer diffs &amp; rewrites</div>
+    </div>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 3</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 4: PROGRESS FROM ROUND 1 TO ROUND 2
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 4 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">3</div>Progress from Round 1 to Round 2</div>
+  <div class="sec-desc">Transparent comparison between initial proposal promises, delivered build features, and deferred roadmap</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%;">Round 1 Proposal Plan</th>
+        <th style="width:25%;">Round 2 Implementation Status</th>
+        <th style="width:50%;">Technical Evidence &amp; Verification Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Guideline Document Ingestion</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>PyMuPDF digital extraction, page-aware chunking (~400 tokens / 50 overlap), MIME/size validation. Tested in <code>test_extraction.py</code> &amp; <code>test_api_guidelines.py</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Vector-Based Evidence Retrieval</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Pure local ONNX <code>all-MiniLM-L6-v2</code> 384-dim embeddings + ChromaDB vector store. Tested across <code>test_embeddings.py</code> &amp; <code>test_vector_store.py</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Three-Way Claim Verdicts</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Deterministic classification into <code>SUPPORTED</code>, <code>CONTRADICTED</code>, and <code>INSUFFICIENT_EVIDENCE</code>. Covered by 52 unit tests in <code>test_verdict_engine.py</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Citation Grounding &amp; Page Tracking</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Character-exact substring verification against raw source text with page numbers. Hallucinated quotes strictly rejected. Verified in <code>TestCitationValidation</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Prohibited Phrase Pre-Screening</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Regex and keyword engine flagging absolute guarantees, false health claims, and unhedged superlatives. Verified in <code>TestProhibitedPhraseRules</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Semantic Drift Detection</strong></td>
+        <td><span class="chip chip-green">DEPLOYED &amp; TESTED</span></td>
+        <td>Added during Round 2: 7 heuristic drift categories with diffing, severity rating, and suggested fixes. 15 dedicated tests in <code>test_semantic_drift.py</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Review Queue, Comments &amp; Approvals</strong></td>
+        <td><span class="chip chip-warn">DEFERRED</span></td>
+        <td>Deferred to Round 3 to focus engineering resources on building a robust, high-reliability claim verification engine first.</td>
+      </tr>
+      <tr>
+        <td><strong>Multi-Tenant Auth &amp; Enterprise RBAC</strong></td>
+        <td><span class="chip chip-warn">DEFERRED</span></td>
+        <td>Public demo mode enabled for hackathon judging convenience without requiring login credentials or tenant provisioning.</td>
+      </tr>
+      <tr>
+        <td><strong>Multimodal Visual &amp; Logo Compliance</strong></td>
+        <td><span class="chip chip-gray">ROADMAP (R3)</span></td>
+        <td>Text-first PDF/TXT focus delivered. Logo, color, and image disclaimer verification is slated as the primary Round 3 expansion.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="card card-blue" style="margin-top:auto;">
+    <h4>Engineering Rationale: The Focused Vertical Slice</h4>
+    <p>
+      In Round 1, an expansive brand-governance suite was outlined. For Round 2 (The Build), we intentionally prioritized a <strong>bulletproof, demonstrable vertical slice</strong>: taking real PDFs, reliably extracting text, generating local embeddings without API costs, finding citations, evaluating claims with zero hallucinated approvals, and detecting semantic drift. This delivers an honest, operational tool that judges can test immediately.
+    </p>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 4</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 5: SYSTEM ARCHITECTURE & DATA FLOW
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 5 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">4</div>System Architecture &amp; Data Flow</div>
+  <div class="sec-desc">End-to-end component breakdown from presentation layer down to storage and embedding models</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:20%;">Layer</th>
+        <th style="width:28%;">Component &amp; Technology</th>
+        <th style="width:52%;">Architectural Role &amp; Responsibilities</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Presentation Layer</strong></td>
+        <td>React 18 + TypeScript + Vite + Tailwind/CSS</td>
+        <td>Drag-and-drop document uploader, marketing copy review form, interactive verdict breakdown cards, expandable evidence drawers, and semantic drift diff viewer.</td>
+      </tr>
+      <tr>
+        <td><strong>API &amp; Routing</strong></td>
+        <td>FastAPI (Python 3.11/3.14) + Uvicorn</td>
+        <td>RESTful endpoints (<code>/api/guidelines/upload</code>, <code>/api/review</code>, <code>/health</code>), Pydantic v2 request/response validation, CORS header management, and exception handling.</td>
+      </tr>
+      <tr>
+        <td><strong>Extraction Layer</strong></td>
+        <td>PyMuPDF 2.0 (<code>fitz</code>)</td>
+        <td>Extracts digital text while retaining physical page boundaries; detects scanned image-only PDFs and returns clean HTTP 422 diagnostic responses.</td>
+      </tr>
+      <tr>
+        <td><strong>Vector Pipeline</strong></td>
+        <td>ONNX <code>all-MiniLM-L6-v2</code> + ChromaDB</td>
+        <td>Runs local CPU inference to produce 384-dimensional unit L2 normalized dense embeddings. Persists vectors to disk for cosine distance retrieval.</td>
+      </tr>
+      <tr>
+        <td><strong>Verdict Engine</strong></td>
+        <td>Multi-tier Rule Engine + Heuristics</td>
+        <td>Screens prohibited phrases, applies distance thresholds, enforces character-exact substring citation validation, and coordinates optional LLM reasoning.</td>
+      </tr>
+      <tr>
+        <td><strong>Metadata Store</strong></td>
+        <td>SQLite (<code>data/documents.db</code>)</td>
+        <td>Tracks uploaded document UUIDs, filenames, total chunks, character lengths, and processing timestamps.</td>
+      </tr>
+      <tr>
+        <td><strong>Model Agnosticism</strong></td>
+        <td>Pluggable Fallback Architecture</td>
+        <td>Can run completely standalone on pure deterministic CPU heuristics, or connect to server-side Gemini/OpenAI API keys for nuanced rewrite generation.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;margin-top:2mm;">Runtime Request Execution Pipeline</div>
+  <div class="code-box">
+[Marketing Copy] &rarr; FastAPI /api/review &rarr; Claim Extractor (Splits into Atomic Propositions)
+  &boxur;&rarr; Prohibited Phrase Scanner (Regex match &rarr; Direct CONTRADICTED verdict if found)
+  &boxur;&rarr; ONNX MiniLM Embedding (384-dim vector generated via local CPU)
+  &boxur;&rarr; ChromaDB Cosine Query (Retrieves top-k candidate guideline chunks)
+  &boxur;&rarr; Citation Substring Verifier (Rejects quotes not found verbatim in source)
+  &boxur;&rarr; Semantic Drift Engine (Compares claim vs evidence across 7 categories)
+  &boxur;&rarr; Pydantic Response Serializer &rarr; React Review Dashboard
+  </div>
+
+  <div class="card card-blue" style="margin-top:auto;">
+    <h4>Data Privacy &amp; Ephemeral Cloud Notice</h4>
+    <p>
+      The public demo is deployed on Render's free tier. All guideline text and embeddings are stored on ephemeral container disks without tracking personal data. Because free-tier containers restart after idle periods, demo users can re-upload guidelines at any time using the one-click sample guideline button in the web UI.
+    </p>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 5</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 6: SEMANTIC DRIFT DETECTION ENGINE
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 6 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">5</div>Round 2 Advancement: Semantic Drift Detection</div>
+  <div class="sec-desc">Detecting subtle, dangerous shifts in meaning between internal facts and external marketing claims</div>
+
+  <div class="card card-blue" style="margin-bottom:3mm;">
+    <h4>Why Vector Similarity Alone Is Insufficient</h4>
+    <p>
+      Standard dense vector retrieval measures topical proximity, not factual precision. A claim can have <strong>95% vector similarity</strong> to a guideline passage while reversing its truth value or removing critical legal qualifications. BrandSentry AI introduces a deterministic linguistic drift detector that evaluates claim-evidence pairs across 7 distinct categories.
+    </p>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%;">Drift Category</th>
+        <th style="width:38%;">What the Engine Evaluates</th>
+        <th style="width:37%;">Illustrative Linguistic Example</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>CERTAINTY_SHIFT</strong></td>
+        <td>Modality change from possibility or probability to an absolute certainty.</td>
+        <td><em>"may improve efficiency"</em> &rarr; <strong>"always improves efficiency"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>SCOPE_EXPANSION</strong></td>
+        <td>Broadening audience or eligibility from a qualified cohort to everyone.</td>
+        <td><em>"registered enterprise users"</em> &rarr; <strong>"all customers"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>NUMERICAL_EXAGGERATION</strong></td>
+        <td>Claimed numerical value, metric, or percentage exceeds evidence figure.</td>
+        <td><em>"up to 15% faster"</em> &rarr; <strong>"85% faster"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>CONDITION_OMISSION</strong></td>
+        <td>Removing prerequisites, dependencies, or required caveats.</td>
+        <td><em>"if unused within 30 days"</em> &rarr; <strong>"within 30 days"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>TEMPORAL_SHIFT</strong></td>
+        <td>Altering timing, duration, latency, or frequency parameters.</td>
+        <td><em>"usually ships within 48h"</em> &rarr; <strong>"instant dispatch"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>CAUSALITY_SHIFT</strong></td>
+        <td>Upgrading an observed correlation into an unproven direct cause.</td>
+        <td><em>"is associated with lower churn"</em> &rarr; <strong>"eliminates customer churn"</strong></td>
+      </tr>
+      <tr>
+        <td><strong>COMPARISON_SHIFT</strong></td>
+        <td>Transforming a qualified comparative into an unsubstantiated superlative.</td>
+        <td><em>"competitive performance"</em> &rarr; <strong>"fastest solution in the world"</strong></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-2" style="margin-top:auto;">
+    <div class="card card-green">
+      <h4>What the UI Presents to Reviewers</h4>
+      <ul style="padding-left:4mm;font-size:7.5pt;color:var(--mid);line-height:1.5;">
+        <li><strong>Severity Rating:</strong> <code>LOW</code>, <code>MEDIUM</code>, or <code>HIGH</code>.</li>
+        <li><strong>Phrase-Level Comparison:</strong> Specific claim phrase vs source phrase.</li>
+        <li><strong>Conservative Suggested Rewrite:</strong> Restores compliant phrasing while maintaining promotional punch.</li>
+      </ul>
+    </div>
+    <div class="card card-warn">
+      <h4>Deterministic Guardrails</h4>
+      <ul style="padding-left:4mm;font-size:7.5pt;color:var(--mid);line-height:1.5;">
+        <li><strong>Zero Fabrication:</strong> Drift engine never invents evidence citations.</li>
+        <li><strong>Topical Overlap Filter:</strong> Rejects false flags when sentences discuss unrelated subjects.</li>
+        <li><strong>Preserves Verdict Semantics:</strong> A drift flag supplements, but never blindly overturns, verified evidence.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 6</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 7: DEMONSTRATION SCENARIOS & EXPECTED BEHAVIOUR
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 7 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">6</div>Demonstration Scenarios &amp; Expected Behaviour</div>
+  <div class="sec-desc">Test scenarios for judges to verify deterministic safeguards and semantic drift on the live web deployment</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:18%;">Test Scenario</th>
+        <th style="width:30%;">Uploaded Guideline Passage</th>
+        <th style="width:28%;">Submitted Marketing Claim</th>
+        <th style="width:24%;">Expected Engine Behaviour</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Evidence-Supported Claim</strong></td>
+        <td><em>"Marketing materials must include traceable evidence sources for every material factual claim."</em></td>
+        <td>"Our marketing materials must include traceable evidence sources for every material factual claim."</td>
+        <td><span class="chip chip-green">SUPPORTED</span><br/>Returns character-exact guideline quote, page number, and high confidence.</td>
+      </tr>
+      <tr>
+        <td><strong>2. Unsupported Guarantee</strong></td>
+        <td><em>"Approved guidelines strictly prohibit absolute safety and performance guarantees without certified testing."</em></td>
+        <td>"Our product is 100% guaranteed to deliver perfect results."</td>
+        <td><span class="chip chip-red">CONTRADICTED</span><br/>Flags prohibited term ("100% guaranteed"), returns policy citation, and suggests compliant rewrite.</td>
+      </tr>
+      <tr>
+        <td><strong>3. Missing Evidence (No Hallucination)</strong></td>
+        <td><em>(No guideline passage mentioning customer productivity metrics or percentages exists in index).</em></td>
+        <td>"Our enterprise platform increases customer productivity by 85%."</td>
+        <td><span class="chip chip-warn">INSUFFICIENT_EVIDENCE</span><br/>Correctly reports lack of evidence; strictly avoids hallucinating an approval.</td>
+      </tr>
+      <tr>
+        <td><strong>4. Certainty Drift Detection</strong></td>
+        <td><em>"Our platform may improve operational productivity under suitable conditions."</em></td>
+        <td>"Our platform always improves operational productivity."</td>
+        <td><span class="chip chip-blue">DRIFT DETECTED</span><br/>Flags <code>CERTAINTY_SHIFT</code> with <code>HIGH</code> severity; highlights "may" vs "always" diff.</td>
+      </tr>
+      <tr>
+        <td><strong>5. Condition Omission</strong></td>
+        <td><em>"Full refunds are available within 30 days when the product is unused and undamaged."</em></td>
+        <td>"Full refunds are available within 30 days."</td>
+        <td><span class="chip chip-blue">DRIFT DETECTED</span><br/>Flags <code>CONDITION_OMISSION</code>; alerts reviewer that required condition was dropped.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;margin-top:2mm;">Recommended Judge Demonstration Walkthrough (3 Minutes)</div>
+  <div class="card card-blue">
+    <ol style="padding-left:4mm;font-size:7.5pt;color:var(--mid);line-height:1.6;">
+      <li><strong>Open the Web Dashboard:</strong> Navigate to <a href="https://brandsentry-web.onrender.com" target="_blank">https://brandsentry-web.onrender.com</a>.</li>
+      <li><strong>Load Sample Guideline:</strong> Click <em>"Load Sample Marketing Compliance Guidelines"</em> (or upload <code>BrandSentry_Sample_Marketing_Compliance_Guidelines.txt</code>). Confirm the document status card displays chunk counts.</li>
+      <li><strong>Run a Supported Claim:</strong> Paste Scenario 1. Observe the green <code>SUPPORTED</code> card and expandable citation drawer showing page boundaries.</li>
+      <li><strong>Run an Absolute Guarantee:</strong> Paste Scenario 2. Observe the red <code>CONTRADICTED</code> card, prohibited phrase flag, and suggested correction.</li>
+      <li><strong>Verify Zero Hallucination:</strong> Paste Scenario 3. Observe the amber <code>INSUFFICIENT_EVIDENCE</code> tag and absence of fabricated quotes.</li>
+      <li><strong>Inspect Semantic Drift:</strong> Paste Scenario 4. Observe the Semantic Drift Analysis section showing <code>CERTAINTY_SHIFT</code>.</li>
+    </ol>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 7</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 8: COMPLETED FEATURES & CURRENT BOUNDARIES
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 8 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">7</div>Completed Features &amp; Current Boundaries</div>
+  <div class="sec-desc">Comprehensive audit of delivered features, automated test coverage, and deferred capabilities</div>
+
+  <div class="grid-4" style="margin-bottom:3.5mm;">
+    <div class="stat-box">
+      <div class="val" style="color:#059669;">166</div>
+      <div class="lbl">Backend Tests Passing</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" style="color:#2563EB;">0</div>
+      <div class="lbl">Failed Tests (100% Pass)</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" style="color:#4F46E5;">0</div>
+      <div class="lbl">TypeScript Errors</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" style="color:#D97706;">16</div>
+      <div class="lbl">Deployed Features</div>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%;">Feature Module</th>
+        <th style="width:18%;">Verified Status</th>
+        <th style="width:57%;">Current Implementation &amp; Verification Evidence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Web UI &amp; REST API</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>FastAPI container &amp; Vite static app running live on Render with automated HTTPS and CORS.</td>
+      </tr>
+      <tr>
+        <td><strong>PDF &amp; TXT Ingestion</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>PyMuPDF digital extraction, page-aware chunking, and scanned image-only PDF rejection (HTTP 422).</td>
+      </tr>
+      <tr>
+        <td><strong>Dense Vector Retrieval</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Local ONNX MiniLM 384-dimensional embeddings + persistent ChromaDB with cosine distance scoring.</td>
+      </tr>
+      <tr>
+        <td><strong>Three-Way Verdicts</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Deterministic classification into <code>SUPPORTED</code>, <code>CONTRADICTED</code>, and <code>INSUFFICIENT_EVIDENCE</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Prohibited Phrase Screening</strong></td>
+        <td><span class="chip chip-green">DEPLOYED</span></td>
+        <td>Pre-screening engine blocking absolute guarantees, medical cure claims, and unhedged superlatives.</td>
+      </tr>
+      <tr>
+        <td><strong>Semantic Drift Engine</strong></td>
+        <td><span class="chip chip-green">DEPLOYED &amp; TESTED</span></td>
+        <td>7 heuristic categories, phrase-level comparison diffs, severity tags, and conservative rewrite suggestions.</td>
+      </tr>
+      <tr>
+        <td><strong>Automated Regression Suite</strong></td>
+        <td><span class="chip chip-green">166 PASSING</span></td>
+        <td>Full suite of 166 pytest tests covering health, extraction, chunking, embeddings, verdicts, and drift.</td>
+      </tr>
+      <tr>
+        <td><strong>Frontend Production Build</strong></td>
+        <td><span class="chip chip-green">0 TS ERRORS</span></td>
+        <td><code>tsc &amp;&amp; vite build</code> compiles 1,593 modules cleanly into production assets without warnings.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:1.5mm;margin-top:2mm;">Explicit Boundaries &amp; Deferred Scope</div>
+  <div class="card card-warn" style="margin-top:auto;">
+    <p style="font-size:7.5pt;line-height:1.55;color:var(--mid);">
+      To maintain absolute engineering integrity, the following capabilities are <strong>not claimed as completed</strong> in Round 2:
+      <br/>
+      &bull; <strong>Enterprise Multi-Tenancy &amp; RBAC:</strong> JWT user auth and isolated multi-client databases are deferred.
+      <br/>
+      &bull; <strong>Approval Workflows &amp; Audit Logs:</strong> Multi-user comment threads, reviewer sign-offs, and version diffing remain Round 3 goals.
+      <br/>
+      &bull; <strong>Sparse BM25 + Dense Hybrid Retrieval:</strong> Retrieval is currently purely dense vector search; hybrid rank fusion is deferred.
+      <br/>
+      &bull; <strong>Multimodal Creative Verification:</strong> Image-based logo placement, typography rules, and video audits remain roadmap items.
+    </p>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 8</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 9: TECHNOLOGY STACK & VERIFICATION AUDIT
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 9 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">8</div>Technology Stack &amp; Verification Audit</div>
+  <div class="sec-desc">Comprehensive technology choices, architecture justification, and empirical verification results</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:20%;">Layer / Area</th>
+        <th style="width:25%;">Technology Selected</th>
+        <th style="width:55%;">Engineering Justification &amp; Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Frontend Framework</strong></td>
+        <td>React 18, TypeScript, Vite</td>
+        <td>Component modularity, type-safe API client, sub-second HMR development, and compact production bundle.</td>
+      </tr>
+      <tr>
+        <td><strong>Backend Framework</strong></td>
+        <td>Python, FastAPI, Uvicorn</td>
+        <td>High-performance asynchronous REST endpoints, automatic OpenAPI / Swagger generation, Pydantic v2 schemas.</td>
+      </tr>
+      <tr>
+        <td><strong>PDF Processing</strong></td>
+        <td>PyMuPDF 2.0 (<code>pymupdf</code>)</td>
+        <td>Industry-standard C-speed text extraction that strictly tracks physical page numbers for audit citations.</td>
+      </tr>
+      <tr>
+        <td><strong>Embedding Inference</strong></td>
+        <td>ONNX <code>all-MiniLM-L6-v2</code></td>
+        <td>Self-contained CPU inference generating 384-dim normalized vectors without external API calls or latency costs.</td>
+      </tr>
+      <tr>
+        <td><strong>Vector Database</strong></td>
+        <td>ChromaDB (Local persistent)</td>
+        <td>Fast cosine distance index with document-level metadata filtering and idempotent upsert support.</td>
+      </tr>
+      <tr>
+        <td><strong>Document Registry</strong></td>
+        <td>SQLite (<code>documents.db</code>)</td>
+        <td>Embedded SQL metadata database recording uploaded guideline UUIDs, chunk counts, and file sizes.</td>
+      </tr>
+      <tr>
+        <td><strong>Cloud Infrastructure</strong></td>
+        <td>Render Container &amp; Static CDN</td>
+        <td>Fully automated CI/CD deployment triggered directly on pushes to GitHub <code>main</code> branch.</td>
+      </tr>
+      <tr>
+        <td><strong>Testing Frameworks</strong></td>
+        <td>Pytest, TypeScript Compiler</td>
+        <td>Automated unit, integration, and regression testing covering all API endpoints and verification rules.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;margin-top:2mm;">Empirical Verification Results (Audited 24 October 2026)</div>
+  <div class="card card-green">
+    <h4 style="color:#065F46;">&bull; Backend Automated Suite: 166 Passed &bull; 0 Failed &bull; 4 Warnings</h4>
+    <p style="font-size:7.5pt;line-height:1.5;">
+      Executed locally via <code>pytest -v</code> in 13.72 seconds. Tests verify health endpoints (5), PyMuPDF extraction (8), sliding-window chunking (7), ONNX embeddings (11), vector distance semantics (16), ChromaDB store (4), guideline APIs (15), claim extraction (16), review schemas (17), 3-way verdict engine (52), and semantic drift engine (15).
+    </p>
+  </div>
+
+  <div class="card card-blue" style="margin-top:2mm;">
+    <h4 style="color:#1E40AF;">&bull; Frontend Typecheck &amp; Production Build: 0 Errors</h4>
+    <p style="font-size:7.5pt;line-height:1.5;">
+      Executed via <code>npm run build</code> (invoking <code>tsc &amp;&amp; vite build</code>). Successfully transformed 1,593 modules into production assets with zero TypeScript compilation warnings or errors.
+    </p>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 9</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 10: CHANGES FROM PLAN & KNOWN LIMITATIONS
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 10 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">9</div>Changes from Plan &amp; Known Limitations</div>
+  <div class="sec-desc">Intentional architectural scope adaptations and transparent mitigation strategies</div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">Architectural Scope Adaptations Made During Round 2</div>
+  <div class="grid-2" style="margin-bottom:3.5mm;">
+    <div class="card card-blue">
+      <h4>Vertical Slice Prioritization</h4>
+      <p>Narrowed the MVP scope to claim-level verification against uploaded guidelines rather than building an incomplete multi-role project management suite.</p>
+    </div>
+    <div class="card card-green">
+      <h4>Added Semantic Drift Detection</h4>
+      <p>Recognizing that vector similarity alone misses subtle qualification drops, we designed and shipped a deterministic 7-category drift engine in Round 2.</p>
+    </div>
+    <div class="card card-warn">
+      <h4>Simplified Workflow Lifecycle</h4>
+      <p>Replaced multi-stage human approval state machines with an immediate, interactive reviewer dashboard featuring expandable evidence cards and instant diffs.</p>
+    </div>
+    <div class="card">
+      <h4>Pragmatic Cloud Constraints</h4>
+      <p>Used embedded SQLite and local ChromaDB instead of external managed PostgreSQL and Redis clusters, ensuring complete zero-cost portability on Render free tier.</p>
+    </div>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;">Known System Limitations &amp; Mitigations</div>
+  <table>
+    <thead>
+      <tr>
+        <th style="width:25%;">Limitation</th>
+        <th style="width:35%;">Potential Failure Mode</th>
+        <th style="width:40%;">Implemented Safeguard / Mitigation</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Heuristic Drift Rules</strong></td>
+        <td>May miss highly nuanced domain idioms or novel indirect paraphrases.</td>
+        <td>UI presents verbatim source passage; flags uncertainty and keeps human reviewer in control.</td>
+      </tr>
+      <tr>
+        <td><strong>Vector Retrieval Misses</strong></td>
+        <td>Guideline passage may not appear in top-k if vocabulary differs drastically.</td>
+        <td>Never claims a missing passage means the claim is false; safely returns <code>INSUFFICIENT_EVIDENCE</code>.</td>
+      </tr>
+      <tr>
+        <td><strong>Ephemeral Free Hosting</strong></td>
+        <td>Render free containers restart on idle, clearing local uploaded documents.</td>
+        <td>One-click sample guideline loader in UI enables instant re-hydration for demo sessions.</td>
+      </tr>
+      <tr>
+        <td><strong>Scanned Document PDFs</strong></td>
+        <td>PyMuPDF cannot read text from rasterized image scans without OCR.</td>
+        <td>HTTP 422 diagnostic rejection informs user document contains no extractable digital text.</td>
+      </tr>
+      <tr>
+        <td><strong>No Legal Certification</strong></td>
+        <td>AI outputs cannot replace licensed legal or regulatory compliance review.</td>
+        <td>Explicit disclaimers in UI; verdicts formatted strictly as decision-support suggestions.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 10</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 11: THREE MAJOR IMPROVEMENTS PLANNED FOR ROUND 3
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 11 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">10</div>Three Major Improvements Planned for Round 3</div>
+  <div class="sec-desc">Substantial architectural upgrades targeting evidence quality, policy governance, and creative coverage</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:22%;">Improvement Area</th>
+        <th style="width:40%;">What Will Be Engineered</th>
+        <th style="width:38%;">Impact, Rationale &amp; Validation Plan</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>1. Hybrid Evidence Retrieval &amp; Evaluation Benchmark</strong></td>
+        <td>
+          Combine dense ChromaDB vector search with sparse BM25 lexical keyword retrieval via Reciprocal Rank Fusion (RRF). Develop a standardized benchmark dataset of 150+ labeled claims with ground-truth evidence spans.
+        </td>
+        <td>
+          Eliminates keyword misses for exact regulatory article citations (e.g. "Rule 24.b"). Empirically measures precision, recall, and Top-K retrieval hit rate against published baselines.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>2. Auditable Policy Governance &amp; Versioned Workflow</strong></td>
+        <td>
+          Introduce immutable guideline version snapshots (v1.0 &rarr; v1.1), diff visualizers, reviewer status state machines (Draft &rarr; Reviewed &rarr; Approved), and cryptographically signed PDF compliance audit export certificates.
+        </td>
+        <td>
+          Transforms BrandSentry AI from a single-user checker into an enterprise-grade governance platform. Validated through end-to-end review lifecycle tests.
+        </td>
+      </tr>
+      <tr>
+        <td><strong>3. Multimodal Creative &amp; Visual Brand Compliance</strong></td>
+        <td>
+          Extend ingestion to image and banner assets (PNG/JPEG). Implement Tesseract/Vision OCR to extract text overlays, evaluate color palette adherence against brand hex tokens, and detect logo clear-space violations.
+        </td>
+        <td>
+          Addresses the #1 real-world marketing need: verifying complete creative assets, not just isolated copy. Validated on a benchmark of 50 sample marketing ad creatives.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:2mm;margin-top:2mm;">Round 3 Quantitative Success Criteria</div>
+  <div class="grid-3" style="margin-top:auto;">
+    <div class="card card-blue">
+      <h4>Retrieval Precision</h4>
+      <p>Achieve &ge;92% Top-3 evidence hit rate on our labeled regulatory benchmark dataset, with documented edge cases.</p>
+    </div>
+    <div class="card card-green">
+      <h4>Traceable Governance</h4>
+      <p>Generate 100% reproducible audit reports linking every approved marketing asset to the exact guideline commit hash.</p>
+    </div>
+    <div class="card card-purple">
+      <h4>Multimodal Coverage</h4>
+      <p>Accurately parse text overlays and brand palette hex codes from image creatives with &ge;90% classification accuracy.</p>
+    </div>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 11</span>
+  </div>
+</div></div>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAGE 12: JUDGE QUICK-START & SUBMISSION DETAILS
+══════════════════════════════════════════════════════════ -->
+<div class="page"><div class="pg">
+  <div class="ph">
+    <div class="ph-title"><span class="ph-tag">ROUND 2 BUILD</span> BrandSentry AI &bull; Team Nexora AI</div>
+    <div class="ph-page">Page 12 of 12</div>
+  </div>
+
+  <div class="sec-title"><div class="num">11</div>Judge Quick-Start &amp; Submission Details</div>
+  <div class="sec-desc">Step-by-step instructions for testing the live system and complete submission metadata</div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:1.5mm;">Quick-Start Judge Evaluation Instructions</div>
+  <div class="card card-blue" style="margin-bottom:3mm;">
+    <ol style="padding-left:4mm;font-size:7.5pt;color:var(--mid);line-height:1.55;">
+      <li><strong>Open the Live Web Application:</strong> Access <a href="https://brandsentry-web.onrender.com" target="_blank">https://brandsentry-web.onrender.com</a> in any modern desktop browser.</li>
+      <li><strong>Ingest Guideline:</strong> If the database is empty due to a Render free-tier cold restart, click the <em>"Load Sample Marketing Compliance Guidelines"</em> button, or upload any PDF/TXT guideline.</li>
+      <li><strong>Test Supported Claim:</strong> Enter <code>"Our marketing materials must include traceable evidence sources for every material factual claim."</code> &rarr; Verify green <code>SUPPORTED</code> verdict and exact citation quote.</li>
+      <li><strong>Test Prohibited Guarantee:</strong> Enter <code>"Our product is 100% guaranteed to deliver perfect results."</code> &rarr; Verify red <code>CONTRADICTED</code> verdict and suggested rewrite.</li>
+      <li><strong>Test Missing Evidence:</strong> Enter <code>"Our product increases customer productivity by 85%."</code> &rarr; Verify amber <code>INSUFFICIENT_EVIDENCE</code> verdict and zero fabricated citations.</li>
+      <li><strong>Test Semantic Drift:</strong> Enter <code>"Our product always improves productivity."</code> &rarr; Observe the Semantic Drift panel highlight <code>CERTAINTY_SHIFT</code>.</li>
+    </ol>
+  </div>
+
+  <div style="font-size:8.5pt;font-weight:700;color:var(--dark);margin-bottom:1.5mm;">Official Submission Endpoints &amp; Links</div>
+  <table>
+    <thead>
+      <tr><th style="width:30%;">Resource Name</th><th style="width:45%;">Direct Endpoint / URL</th><th style="width:25%;">Verification Notes</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Live Web Application</strong></td>
+        <td><a href="https://brandsentry-web.onrender.com" target="_blank" class="url-text">https://brandsentry-web.onrender.com</a></td>
+        <td><span class="chip chip-green">OPERATIONAL</span></td>
+      </tr>
+      <tr>
+        <td><strong>Backend REST API</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com" target="_blank" class="url-text">https://brandsentry-api.onrender.com</a></td>
+        <td><span class="chip chip-green">OPERATIONAL</span></td>
+      </tr>
+      <tr>
+        <td><strong>Interactive API Docs</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com/docs" target="_blank" class="url-text">https://brandsentry-api.onrender.com/docs</a></td>
+        <td><span class="chip chip-blue">FASTAPI SWAGGER</span></td>
+      </tr>
+      <tr>
+        <td><strong>Backend Health Check</strong></td>
+        <td><a href="https://brandsentry-api.onrender.com/health" target="_blank" class="url-text">https://brandsentry-api.onrender.com/health</a></td>
+        <td><span class="chip chip-green">HTTP 200 OK</span></td>
+      </tr>
+      <tr>
+        <td><strong>Source Code Repository</strong></td>
+        <td><a href="https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI" target="_blank" class="url-text">https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI</a></td>
+        <td><span class="chip chip-gray">PUBLIC GITHUB</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="grid-2" style="margin-top:auto;">
+    <div class="card card-green">
+      <h4>Participant &amp; Team Details</h4>
+      <p style="font-size:7.5pt;line-height:1.5;">
+        <strong>Team Name:</strong> Nexora AI<br/>
+        <strong>Participant Full Name:</strong> K P Chirag Guptha<br/>
+        <strong>Registration Number:</strong> 24MIS0369<br/>
+        <strong>Institution:</strong> Vellore Institute of Technology (VIT)<br/>
+        <strong>Participation Category:</strong> Individual Solo Participant
+      </p>
+    </div>
+    <div class="card card-blue">
+      <h4>Closing Engineering Statement</h4>
+      <p style="font-size:7.5pt;line-height:1.5;">
+        BrandSentry AI has successfully evolved from a conceptual proposal into a verified, publicly accessible compliance review system. Built with deterministic safeguards, zero hallucinated approvals, and semantic drift detection, it delivers dependable decision support for marketing teams.
+      </p>
+    </div>
+  </div>
+
+  <div class="pf">
+    <span>BrandSentry AI &bull; Team Nexora AI &bull; K P Chirag Guptha (24MIS0369) &bull; VIT Vellore</span>
+    <span>Page 12 &bull; END OF ROUND 2 SUBMISSION DOCUMENT</span>
+  </div>
+</div></div>
+
+</body>
+</html>
