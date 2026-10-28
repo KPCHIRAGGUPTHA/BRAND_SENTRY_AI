@@ -74,26 +74,33 @@ class VectorStoreService:
             )
         return self._client
 
+
     @property
     def collection(self):
         """
         Lazy loader for the named guideline chunks collection.
-
-        Distance metric: ``cosine`` (see module docstring for semantics).
-        Embeddings are provided pre-computed by EmbeddingService; ChromaDB's
-        built-in embedding function is intentionally not used here.
         """
         if self._collection is None:
-            self._collection = self.client.get_or_create_collection(
-                name=self.collection_name,
-                metadata={"hnsw:space": _CHROMA_DISTANCE_METRIC},
-            )
+            try:
+                self._collection = self.client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata={"hnsw:space": _CHROMA_DISTANCE_METRIC},
+                )
+            except Exception:
+                # If something goes completely wrong, recreate client
+                self._client = None
+                self._collection = self.client.get_or_create_collection(
+                    name=self.collection_name,
+                    metadata={"hnsw:space": _CHROMA_DISTANCE_METRIC},
+                )
+
             logger.info(
                 "Opened ChromaDB collection '%s' (distance metric: %s).",
                 self.collection_name,
                 _CHROMA_DISTANCE_METRIC,
             )
         return self._collection
+
 
     def add_chunks(
         self,
@@ -126,12 +133,25 @@ class VectorStoreService:
         ]
 
         # Use upsert to guarantee idempotency
-        self.collection.upsert(
-            ids=ids,
-            embeddings=embeddings,
-            documents=documents,
-            metadatas=metadatas,
-        )
+
+        # Use upsert to guarantee idempotency
+        try:
+            self.collection.upsert(
+                ids=ids,
+                embeddings=embeddings,
+                documents=documents,
+                metadatas=metadatas,
+            )
+        except Exception:
+            self._client = None
+            self._collection = None
+            self.collection.upsert(
+                ids=ids,
+                embeddings=embeddings,
+                documents=documents,
+                metadatas=metadatas,
+            )
+
         logger.info(
             "Successfully upserted %d chunks into collection '%s'.",
             len(chunks),
@@ -152,7 +172,14 @@ class VectorStoreService:
         where_filter = {"document_id": document_id} if document_id else None
 
         # Guard against top_k greater than collection count
-        total_items = self.collection.count()
+
+        try:
+            total_items = self.collection.count()
+        except Exception:
+            self._client = None
+            self._collection = None
+            total_items = self.collection.count()
+
         if total_items == 0:
             return []
 
@@ -226,9 +253,16 @@ class VectorStoreService:
         """Deletes all chunks associated with a specific document_id."""
         self.collection.delete(where={"document_id": document_id})
 
+
     def count(self) -> int:
         """Returns total chunks currently indexed in collection."""
-        return self.collection.count()
+        try:
+            return self.collection.count()
+        except Exception:
+            self._client = None
+            self._collection = None
+            return self.collection.count()
+
 
 
 vector_store_service = VectorStoreService()

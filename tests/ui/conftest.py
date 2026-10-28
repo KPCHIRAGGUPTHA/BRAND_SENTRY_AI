@@ -19,7 +19,9 @@ from typing import Generator
 import pytest
 import requests
 from selenium import webdriver  # type: ignore
-from selenium.webdriver.chrome.options import Options  # type: ignore
+from selenium.webdriver.chrome.options import Options
+
+
 from selenium.webdriver.support.ui import WebDriverWait  # type: ignore
 from selenium.common.exceptions import WebDriverException  # type: ignore
 
