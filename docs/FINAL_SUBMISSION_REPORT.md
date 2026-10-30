@@ -127,14 +127,14 @@ submission time.
 | Live code version after the push | **Not updated.** I polled `/openapi.json` for about 27 minutes after pushing `88cfcec` and the service still ran the old code. See section 4. |
 | Production Docker image build | **Not tested.** The local Docker daemon was not running. |
 | GitHub Actions run [41095740924](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41095740924) on `88cfcec` | The Chrome install step passed after the CI fix. Dependency install and the frontend build passed. **Backend unit tests failed** (the Python 3.11 `NameError` above), so the Selenium steps were skipped. A new run is triggered by the fix commit; check the Actions tab for its result. |
-| GitHub Actions run [41101181893](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41101181893) on `597a59f` | **Failed** (exit code 1, 5m37s). The run uploaded the `selenium-failure-diagnostics` artifact, which only the Selenium UI step produces. That points to the backend unit tests passing and the Selenium suite failing, but I could not confirm it: viewing the logs requires signing in to GitHub. The Selenium suite was not run locally either. |
+| GitHub Actions run [41101181893](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41101181893) on `597a59f` | **Failed** (exit code 1, 5m37s). The run uploaded the `selenium-failure-diagnostics` artifact, which only the Selenium UI step produces. That points to the backend unit tests passing and the Selenium suite failing; viewing the logs requires signing in to GitHub. |
+| Selenium UI suite, reproduced locally (Python 3.11, backend on :8000, `vite preview` on :5173, headless Chrome, `BRANDSENTRY_RUN_LIVE_REVIEW=true`) | **18 passed, 2 failed.** The cause was stale assertions in `tests/ui/test_validation.py` (TC04/TC05). The Round 3 frontend commit `cce16f9` changed the empty-copy message to "Marketing copy cannot be empty. Please provide text to review." The tests still expected "…empty or whitespace-only". Validation itself worked correctly. After updating the assertions: **20 passed, 0 failed, 0 skipped.** |
 
 ### 2.5 Not tested or blocked
 
 - Image OCR review end to end in the browser (unit tests cover it; it was not run manually)
 - Uploading a file through the browser UI (the API upload was verified; the UI file picker was not driven)
 - Optional reranking mode and the optional LLM path (both off in the production configuration)
-- Selenium UI suite (`tests/ui`) run locally
 
 ---
 
@@ -223,6 +223,6 @@ verdicts. The development-set figure is optimistic because the system was tuned 
 ### Not fully verified
 - Building the production Docker image locally
 - Deployment of this release to Render (the live service still runs older code; see section 4)
-- The CI run for the fix commit, including the Selenium UI suite
+- The Selenium UI suite on CI after the assertion fix (it passes locally; check the latest run in the Actions tab)
 - OCR review and browser file upload in the UI
 - Mobile layout (it overflows horizontally)

@@ -37,7 +37,7 @@ def test_tc04_empty_marketing_copy_rejected(driver, base_url):
 
     # Verify validation alert appears
     error_text = page.get_review_error_text()
-    assert "Marketing copy cannot be empty or whitespace-only" in error_text
+    assert "Marketing copy cannot be empty" in error_text
 
     # Verify no results container is incorrectly rendered
     assert not page.is_element_visible(BrandSentryPage.REVIEW_RESULTS_CONTAINER, timeout=1.0)
@@ -64,7 +64,7 @@ def test_tc05_whitespace_only_marketing_copy_rejected(driver, base_url):
 
     # Verify validation error is displayed
     error_text = page.get_review_error_text()
-    assert "Marketing copy cannot be empty or whitespace-only" in error_text
+    assert "Marketing copy cannot be empty" in error_text
 
     # Verify results container is not rendered
     assert not page.is_element_visible(BrandSentryPage.REVIEW_RESULTS_CONTAINER, timeout=1.0)
