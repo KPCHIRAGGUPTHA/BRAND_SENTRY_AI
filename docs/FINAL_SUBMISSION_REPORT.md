@@ -127,6 +127,7 @@ submission time.
 | Live code version after the push | **Not updated.** I polled `/openapi.json` for about 27 minutes after pushing `88cfcec` and the service still ran the old code. See section 4. |
 | Production Docker image build | **Not tested.** The local Docker daemon was not running. |
 | GitHub Actions run [41095740924](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41095740924) on `88cfcec` | The Chrome install step passed after the CI fix. Dependency install and the frontend build passed. **Backend unit tests failed** (the Python 3.11 `NameError` above), so the Selenium steps were skipped. A new run is triggered by the fix commit; check the Actions tab for its result. |
+| GitHub Actions run [41101181893](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41101181893) on `597a59f` | **Failed** (exit code 1, 5m37s). The run uploaded the `selenium-failure-diagnostics` artifact, which only the Selenium UI step produces. That points to the backend unit tests passing and the Selenium suite failing, but I could not confirm it: viewing the logs requires signing in to GitHub. The Selenium suite was not run locally either. |
 
 ### 2.5 Not tested or blocked
 
