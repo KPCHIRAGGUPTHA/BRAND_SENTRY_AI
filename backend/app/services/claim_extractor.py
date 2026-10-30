@@ -1,35 +1,18 @@
 """
-Claim Extraction Service for BrandSentry AI — Phase 3.
+Claim Extraction Service for BrandSentry AI — Phase 3 & Stage 1 Upgrade.
 
-Converts raw marketing content into discrete, testable claims.
+Converts raw marketing content into discrete, testable claims while rigorously
+preserving qualifiers, conditional clauses, negations, numeric bounds, and context.
 
-Strategy
---------
-Phase 3 uses a **deterministic sentence-splitting** approach:
-
-1. Split the input text on sentence-terminal punctuation (., !, ?) while
-   respecting common abbreviations and decimal numbers.
-2. For each resulting sentence, detect common coordinating conjunctions
-   (``; and``, ``; but``, ``; however``) that join semantically independent
-   assertions and split further.
-3. Clean up whitespace, normalise punctuation, and discard empty or
-   single-word fragments.
-4. Assign a stable ``claim-N`` identifier within the review.
-
-Known limitations (documented, not hidden)
-------------------------------------------
-- Simple sentence splitting does NOT parse grammar.  A compound sentence like
-  "Our cream moisturises and firms skin" remains a single claim unless split by
-  a conjunction that appears after a semicolon.
-- Quoted speech, lists, and parenthetical asides may produce imperfect splits.
-- Punctuation inside acronyms (e.g., ``U.S.A.``) can cause over-splitting.
-- Multi-clause sentences joined by ``and`` without a semicolon are kept whole.
-- This extractor is not a replacement for language-model parsing.  If the
-  application is extended with an LLM extractor, that extractor must be
-  implemented behind the ``ClaimExtractorBase`` interface and its failures
-  must fall back to this deterministic implementation.
-
-A model call is NEVER required for the deterministic path to work.
+Capabilities:
+------------
+1. Multi-line marketing copy and bulleted lists (•, -, *, 1., etc.) are separated into individual claims.
+2. Compound sentences joined by coordinating conjunctions (;, and/but/while/whereas with independent clauses)
+   are split when both clauses represent independent assertions.
+3. Complex numeric claims (percentages, decimals, units) are preserved without false splits.
+4. Essential condition qualifiers ("When used...", "Unless approved...", "If applied...")
+   are strictly preserved and never silently stripped.
+5. Deterministic and thread-safe: same input always produces identical discrete claims.
 """
 import re
 import logging
@@ -42,16 +25,25 @@ logger = logging.getLogger(__name__)
 _ABBREVS = frozenset({
     "mr", "mrs", "ms", "dr", "prof", "sr", "jr", "vs", "etc",
     "e.g", "i.e", "fig", "vol", "dept", "approx", "est", "no",
-    "st", "ave", "blvd", "co", "corp", "inc", "ltd",
+    "st", "ave", "blvd", "co", "corp", "inc", "ltd", "u.s", "usa",
 })
 
 # Regex to find candidate sentence-terminal punctuation followed by whitespace
-# and an uppercase letter, digit, or quote.
-_CANDIDATE_SPLIT_RE = re.compile(r'([.!?]+)\s+(?=[A-Z0-9\"])')
+# and an uppercase letter, digit, quote, or bullet.
+_CANDIDATE_SPLIT_RE = re.compile(r'([.!?]+)\s+(?=[A-Z0-9\"•\-\*\(])')
 
-# Secondary split: semicolons followed by coordinating conjunctions
-_CONJUNCTION_SPLIT_RE = re.compile(
-    r';\s*(and|but|however|yet|moreover|furthermore|additionally|also)\s+',
+# Bullet point markers at line boundaries or after punctuation
+_BULLET_PREFIX_RE = re.compile(
+    r'(?:^|\n)\s*(?:[•\-\*–—\u2022\u25cf\u25cb\u25aa\u25ab\u25b6]|\(?\d+[\.\)]\s*)\s*',
+    re.MULTILINE,
+)
+
+# Conjunction split: semicolons followed by coordinating conjunctions, OR
+# comma + conjunction when introducing an independent clause with explicit subject
+_COMPOUND_CLAUSE_SPLIT_RE = re.compile(
+    r'(?:;\s*(?:and|but|however|yet|moreover|furthermore|additionally|also)\s+|'
+    r';\s+|'
+    r',\s*(?:and|but|while|whereas)\s+(?=(?:our|it|we|they|this|these|the|all|each|every|users|customers|results|formula)\b))',
     re.IGNORECASE,
 )
 
@@ -72,13 +64,10 @@ class ExtractedClaim:
 
 class ClaimExtractor:
     """
-    Deterministic sentence-splitting claim extractor.
+    Enhanced deterministic claim extractor.
 
-    This implementation is intentionally simple and testable.  Every
-    transformation is deterministic — the same input always produces the
-    same output.
-
-    The extractor is stateless and thread-safe.
+    Accurately decomposes compound marketing copy into individual compliance-testable
+    claims while preserving conditions, negations, and factual qualifiers.
     """
 
     def extract(self, content: str) -> List[ExtractedClaim]:
@@ -89,23 +78,18 @@ class ClaimExtractor:
             content: Raw marketing copy (non-empty string).
 
         Returns:
-            List of ``ExtractedClaim`` objects, one per detected assertion.
-            The list is always non-empty for non-empty, non-whitespace input.
-            Each claim preserves the original wording as closely as possible.
-
-        Raises:
-            ValueError: If content is empty or whitespace-only.
+            List of ExtractedClaim objects, preserving qualifiers and conditions.
         """
         if not content or not content.strip():
             raise ValueError("Marketing content cannot be empty or whitespace-only.")
 
-        raw_sentences = self._split_into_sentences(content.strip())
+        raw_segments = self._split_into_segments(content.strip())
         claims: List[ExtractedClaim] = []
         claim_index = 0
 
-        for sentence in raw_sentences:
-            # Secondary split on conjunction patterns after semicolons
-            sub_parts = _CONJUNCTION_SPLIT_RE.split(sentence)
+        for segment in raw_segments:
+            # Compound clause splitting (preserving meaning and independent clauses)
+            sub_parts = _COMPOUND_CLAUSE_SPLIT_RE.split(segment)
             for part in sub_parts:
                 cleaned = self._clean_fragment(part)
                 if cleaned and len(cleaned) >= _MIN_CLAIM_CHARS:
@@ -126,57 +110,99 @@ class ClaimExtractor:
         logger.debug("Extracted %d claims from %d characters.", len(claims), len(content))
         return claims
 
-    def _split_into_sentences(self, text: str) -> List[str]:
+    def _split_into_segments(self, text: str) -> List[str]:
         """
-        Split text on terminal punctuation while avoiding common false positives.
-
-        The splitting is conservative: when in doubt, we keep sentences joined
-        rather than over-fragment the input.
+        Splits text on bullet points, newlines, and terminal sentence punctuation,
+        avoiding false splits on decimals, abbreviations, or units.
         """
-        # Replace newline-separated paragraphs as sentence boundaries
-        text = re.sub(r'\n{2,}', ' . ', text)
-        text = re.sub(r'\n', ' ', text)
+        # Step 1: Pre-process bullet points and numbered list items
+        # If text contains bullet points or distinct lines, split on them
+        lines = text.splitlines()
+        candidate_blocks: List[str] = []
+        current_block: List[str] = []
 
+        for line in lines:
+            line_str = line.strip()
+            if not line_str:
+                if current_block:
+                    candidate_blocks.append(" ".join(current_block))
+                    current_block = []
+                continue
+
+            # Check if line begins with a bullet point or numbered item
+            is_bullet = bool(re.match(r'^(?:[•\-\*–—\u2022\u25cf\u25cb\u25aa\u25ab\u25b6]|\(?\d+[\.\)]\s*)', line_str))
+            if is_bullet:
+                if current_block:
+                    candidate_blocks.append(" ".join(current_block))
+                    current_block = []
+                # Strip leading bullet symbol but keep the rest
+                cleaned_line = re.sub(r'^(?:[•\-\*–—\u2022\u25cf\u25cb\u25aa\u25ab\u25b6]|\(?\d+[\.\)]\s*)\s*', '', line_str)
+                candidate_blocks.append(cleaned_line)
+            else:
+                current_block.append(line_str)
+
+        if current_block:
+            candidate_blocks.append(" ".join(current_block))
+
+        # Step 2: For each block, split on sentence-terminal punctuation
         sentences: List[str] = []
-        last_idx = 0
+        for block in candidate_blocks:
+            norm_block = re.sub(r'\s+', ' ', block).strip()
+            if not norm_block:
+                continue
 
-        for match in _CANDIDATE_SPLIT_RE.finditer(text):
-            punct = match.group(1)
-            split_pos = match.start() + len(punct)
-            # Check the word immediately before the punctuation
-            prefix = text[last_idx:match.start()].strip()
-            last_word_match = re.search(r'([a-zA-Z]+)$', prefix)
-            if last_word_match:
-                last_word = last_word_match.group(1).lower()
-                if last_word in _ABBREVS:
-                    # It's an abbreviation, do not split
-                    continue
+            last_idx = 0
+            for match in _CANDIDATE_SPLIT_RE.finditer(norm_block):
+                punct = match.group(1)
+                split_pos = match.start() + len(punct)
+                
+                # Check preceding word to avoid splitting abbreviations (e.g. "Dr.", "e.g.", "U.S.")
+                prefix = norm_block[last_idx:match.start()].strip()
+                last_word_match = re.search(r'([a-zA-Z\.]+)$', prefix)
+                if last_word_match:
+                    last_word = last_word_match.group(1).lower().rstrip('.')
+                    if last_word in _ABBREVS:
+                        continue
 
-            # Valid sentence split
-            segment = text[last_idx:split_pos].strip()
-            if segment:
-                sentences.append(segment)
-            last_idx = match.end()
+                # Check if preceding character is digit and following is digit (decimal check)
+                if match.start() > 0 and match.start() < len(norm_block) - 1:
+                    prev_char = norm_block[match.start() - 1]
+                    next_char = norm_block[match.end()] if match.end() < len(norm_block) else ''
+                    if prev_char.isdigit() and next_char.isdigit():
+                        continue
 
-        # Append remaining text
-        remaining = text[last_idx:].strip()
-        if remaining:
-            sentences.append(remaining)
+                segment = norm_block[last_idx:split_pos].strip()
+                if segment:
+                    sentences.append(segment)
+                last_idx = match.end()
+
+            remaining = norm_block[last_idx:].strip()
+            if remaining:
+                sentences.append(remaining)
 
         return sentences if sentences else [text]
 
     @staticmethod
     def _clean_fragment(text: str) -> str:
-        """Normalize whitespace and punctuation for a single claim fragment."""
-        # Remove leading conjunctions that may appear as split artefacts
+        """
+        Normalize whitespace and punctuation for a single claim fragment.
+        Preserves conditional qualifiers ('Unless...', 'When...', 'If...').
+        """
+        # Strip bullet or numbered list artefacts at start
+        text = re.sub(r'^[•\-\*–—\u2022\u25cf\u25cb\u25aa\u25ab\u25b6\s]+', '', text).strip()
+        text = re.sub(r'^\(?\d+[\.\)]\s*', '', text).strip()
+
+        # Remove leading coordinating conjunctions that appear purely as split artefacts
         text = re.sub(
-            r'^(and|but|yet|however|moreover|furthermore|additionally|also)\b\s*',
+            r'^(?:and|but|yet|however|moreover|furthermore|additionally|also)\b\s*',
             '',
             text,
             flags=re.IGNORECASE,
         ).strip()
-        # Collapse multiple spaces
+
+        # Collapse whitespace
         text = re.sub(r'\s+', ' ', text).strip()
+
         # Ensure sentence ends with terminal punctuation
         if text and not text[-1] in '.!?':
             text += '.'

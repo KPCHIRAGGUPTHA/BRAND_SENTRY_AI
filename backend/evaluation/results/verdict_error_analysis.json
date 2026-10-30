@@ -1,0 +1,1764 @@
+{
+  "dense_accuracy": 0.9666666666666667,
+  "hybrid_accuracy": 0.9833333333333333,
+  "both_correct_count": 58,
+  "dense_only_correct_count": 0,
+  "hybrid_only_correct_count": 1,
+  "both_incorrect_count": 1,
+  "mcnemar_stat": 0.0,
+  "exact_p_value": 1.0,
+  "dense_only_items": [],
+  "hybrid_only_items": [
+    {
+      "id": "eval-proh-19",
+      "category": "prohibited_phrase",
+      "query": "We are officially voted number 1 in the world for customer care.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": false,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials"
+      ]
+    }
+  ],
+  "both_incorrect_items": [
+    {
+      "id": "eval-time-40",
+      "category": "temporal",
+      "query": "Historical audit of customer claims conducted in Q4 2026.",
+      "expected": "SUPPORTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": false,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": false,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-evidence"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees"
+      ]
+    }
+  ],
+  "all_predictions": [
+    {
+      "id": "eval-exact-01",
+      "category": "exact_phrase",
+      "query": "100% guaranteed",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-exact-02",
+      "category": "exact_phrase",
+      "query": "100% safe",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-safety"
+      ],
+      "dense_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-evidence",
+        "chunk-brand-health"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-evidence",
+        "chunk-brand-health"
+      ]
+    },
+    {
+      "id": "eval-exact-03",
+      "category": "exact_phrase",
+      "query": "lowest price ever",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-pricing"
+      ],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-visual",
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-security"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-visual",
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-exact-04",
+      "category": "exact_phrase",
+      "query": "impossible to hack",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-visual"
+      ]
+    },
+    {
+      "id": "eval-exact-05",
+      "category": "exact_phrase",
+      "query": "zero risk",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-environmental",
+        "chunk-brand-security"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-exact-06",
+      "category": "exact_phrase",
+      "query": "carbon neutral",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-visual",
+        "chunk-brand-performance"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-visual",
+        "chunk-brand-performance"
+      ]
+    },
+    {
+      "id": "eval-para-07",
+      "category": "semantic_paraphrase",
+      "query": "Our platform ensures flawless zero vulnerability protection against all threats.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-environmental",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-pricing"
+      ]
+    },
+    {
+      "id": "eval-para-08",
+      "category": "semantic_paraphrase",
+      "query": "This organic formula eradicates chronic diabetes permanently.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-health"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental",
+        "chunk-brand-visual",
+        "chunk-brand-safety"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental",
+        "chunk-brand-visual"
+      ]
+    },
+    {
+      "id": "eval-para-09",
+      "category": "semantic_paraphrase",
+      "query": "Customers will never experience any downtime under any circumstances.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-safety",
+        "chunk-brand-security",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-testimonials",
+        "chunk-brand-safety",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-para-10",
+      "category": "semantic_paraphrase",
+      "query": "Our green initiative leaves absolutely zero footprint on the environment.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-guarantees",
+        "chunk-brand-visual",
+        "chunk-brand-safety",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-guarantees",
+        "chunk-brand-visual",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-pricing"
+      ]
+    },
+    {
+      "id": "eval-para-11",
+      "category": "semantic_paraphrase",
+      "query": "We provide verified reproducible performance benchmarks against legacy systems.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-pricing",
+        "chunk-brand-security",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-security",
+        "chunk-brand-health",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-pricing"
+      ]
+    },
+    {
+      "id": "eval-para-12",
+      "category": "semantic_paraphrase",
+      "query": "Reviewers must supply the direct source citation and page number for every finding.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-review-outcomes"
+      ],
+      "dense_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-guarantees",
+        "chunk-brand-health",
+        "chunk-brand-performance"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-health"
+      ]
+    },
+    {
+      "id": "eval-num-13",
+      "category": "numerical_threshold",
+      "query": "Boost your company productivity by exactly 45% within three weeks.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-guarantees",
+        "chunk-brand-health",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-environmental",
+        "chunk-brand-health"
+      ]
+    },
+    {
+      "id": "eval-num-14",
+      "category": "numerical_threshold",
+      "query": "Instant 70% off markdown across our entire inventory.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-pricing"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-pricing",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-pricing",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ]
+    },
+    {
+      "id": "eval-num-15",
+      "category": "numerical_threshold",
+      "query": "Maintain a 20px clear buffer zone surrounding the corporate emblem.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-visual"
+      ],
+      "dense_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-environmental",
+        "chunk-brand-testimonials",
+        "chunk-brand-evidence",
+        "chunk-brand-guarantees"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-evidence",
+        "chunk-brand-environmental",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-num-16",
+      "category": "numerical_threshold",
+      "query": "Achieved a 99.999% uptime benchmark with audited third-party proof.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-evidence"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-security",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-evidence",
+        "chunk-brand-health",
+        "chunk-brand-safety"
+      ]
+    },
+    {
+      "id": "eval-num-17",
+      "category": "numerical_threshold",
+      "query": "Claiming 100% customer satisfaction across all retail branches.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-testimonials"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials",
+        "chunk-brand-safety"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-testimonials",
+        "chunk-brand-security",
+        "chunk-brand-performance"
+      ]
+    },
+    {
+      "id": "eval-num-18",
+      "category": "numerical_threshold",
+      "query": "Regulatory registration under code 9845-A.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-health-regulatory"
+      ],
+      "dense_chunks": [
+        "chunk-health-regulatory"
+      ],
+      "hybrid_chunks": [
+        "chunk-health-regulatory"
+      ]
+    },
+    {
+      "id": "eval-proh-19",
+      "category": "prohibited_phrase",
+      "query": "We are officially voted number 1 in the world for customer care.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": false,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-proh-20",
+      "category": "prohibited_phrase",
+      "query": "Clinically proven to cure insomnia without prescription.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-health"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-testimonials",
+        "chunk-brand-evidence",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-safety",
+        "chunk-brand-health"
+      ]
+    },
+    {
+      "id": "eval-proh-21",
+      "category": "prohibited_phrase",
+      "query": "Our investment algorithm is 100% pure profit with no downsides.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-performance",
+        "chunk-brand-environmental",
+        "chunk-brand-review-outcomes"
+      ]
+    },
+    {
+      "id": "eval-proh-22",
+      "category": "prohibited_phrase",
+      "query": "Guaranteed to eliminate all computer viruses forever.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-performance"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-performance",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-proh-23",
+      "category": "prohibited_phrase",
+      "query": "This supplement cures cancer in 30 days.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": true,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": true,
+      "expected_chunks": [
+        "chunk-brand-health"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-evidence",
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-evidence",
+        "chunk-brand-visual",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-proh-24",
+      "category": "prohibited_phrase",
+      "query": "Completely secure biometric vault cannot be compromised.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-testimonials",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-pricing",
+        "chunk-brand-testimonials",
+        "chunk-brand-safety",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-exc-25",
+      "category": "exception",
+      "query": "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-health",
+        "chunk-brand-testimonials",
+        "chunk-brand-safety"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-environmental"
+      ]
+    },
+    {
+      "id": "eval-exc-26",
+      "category": "exception",
+      "query": "Historical pricing records verify this is the lowest price ever offered.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-pricing"
+      ],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-security",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-performance",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-exc-27",
+      "category": "exception",
+      "query": "Carbon neutral status has been documented, certified, and approved by the sustainability board.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-safety",
+        "chunk-brand-evidence",
+        "chunk-brand-security"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-security",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-exc-28",
+      "category": "exception",
+      "query": "Clinical trial results have been formally reviewed through the medical regulatory process.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-health"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-safety",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-exc-29",
+      "category": "exception",
+      "query": "Competitor speed comparisons are based on verifiable, current benchmark data.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-pricing",
+        "chunk-brand-evidence",
+        "chunk-brand-security"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-safety"
+      ]
+    },
+    {
+      "id": "eval-exc-30",
+      "category": "exception",
+      "query": "Customer testimonial included mandatory disclosure regarding sponsored incentives.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-testimonials"
+      ],
+      "dense_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-health",
+        "chunk-brand-evidence",
+        "chunk-brand-security",
+        "chunk-brand-guarantees"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-health",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-neg-31",
+      "category": "negation",
+      "query": "This wellness app does not replace professional medical diagnosis or treatment.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-health"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-environmental",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-neg-32",
+      "category": "negation",
+      "query": "We make no promise of guaranteed financial returns.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-health",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-neg-33",
+      "category": "negation",
+      "query": "Product does not claim zero environmental impact.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-neg-34",
+      "category": "negation",
+      "query": "Results shown in customer reviews are not typical for every user.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-testimonials"
+      ],
+      "dense_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-security",
+        "chunk-brand-evidence",
+        "chunk-brand-performance"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-neg-35",
+      "category": "negation",
+      "query": "Security controls do not claim to make the system impossible to hack.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-pricing",
+        "chunk-brand-health"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence",
+        "chunk-brand-pricing"
+      ]
+    },
+    {
+      "id": "eval-neg-36",
+      "category": "negation",
+      "query": "Promotional prices do not hide any undisclosed administrative fees.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-pricing"
+      ],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-safety",
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-safety",
+        "chunk-brand-security",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-time-37",
+      "category": "temporal",
+      "query": "Performance comparisons rely on benchmark records from five years ago.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-pricing",
+        "chunk-brand-testimonials",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-pricing",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ]
+    },
+    {
+      "id": "eval-time-38",
+      "category": "temporal",
+      "query": "All cited marketing evidence is retained and updated annually for review.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-evidence"
+      ],
+      "dense_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-health",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-evidence",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-health",
+        "chunk-brand-environmental",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-time-39",
+      "category": "temporal",
+      "query": "Lowest price ever based strictly on this morning's competitor flyer.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-pricing"
+      ],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-visual"
+      ]
+    },
+    {
+      "id": "eval-time-40",
+      "category": "temporal",
+      "query": "Historical audit of customer claims conducted in Q4 2026.",
+      "expected": "SUPPORTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": false,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": false,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-evidence"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials",
+        "chunk-brand-pricing"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-time-41",
+      "category": "temporal",
+      "query": "Our carbon neutral certification expired in 2021.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-security",
+        "chunk-brand-evidence",
+        "chunk-brand-guarantees"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-security",
+        "chunk-brand-visual",
+        "chunk-brand-testimonials",
+        "chunk-brand-performance"
+      ]
+    },
+    {
+      "id": "eval-time-42",
+      "category": "temporal",
+      "query": "Product safety assessed under current 2026 laboratory protocols.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-safety"
+      ],
+      "dense_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-environmental",
+        "chunk-brand-performance",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-scope-43",
+      "category": "scope_restriction",
+      "query": "Medical device CE marking registration number 9845-A.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-health",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-safety",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-scope-44",
+      "category": "scope_restriction",
+      "query": "Corporate emblem placement requires 20px clear margin.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-health-regulatory"
+      ],
+      "hybrid_chunks": [
+        "chunk-health-regulatory"
+      ]
+    },
+    {
+      "id": "eval-scope-45",
+      "category": "scope_restriction",
+      "query": "Discount claims cannot exceed 50% without compliance officer signoff.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-finance-discounts"
+      ],
+      "dense_chunks": [
+        "chunk-finance-discounts"
+      ],
+      "hybrid_chunks": [
+        "chunk-finance-discounts"
+      ]
+    },
+    {
+      "id": "eval-scope-46",
+      "category": "scope_restriction",
+      "query": "Discount claims cannot exceed 50% without compliance officer signoff.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental",
+        "chunk-brand-performance"
+      ]
+    },
+    {
+      "id": "eval-scope-47",
+      "category": "scope_restriction",
+      "query": "Customer data is encrypted with AES-256 at rest.",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "SUPPORTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-security-encryption"
+      ],
+      "dense_chunks": [
+        "chunk-security-encryption"
+      ],
+      "hybrid_chunks": [
+        "chunk-security-encryption"
+      ]
+    },
+    {
+      "id": "eval-scope-48",
+      "category": "scope_restriction",
+      "query": "Customer data is encrypted with AES-256 at rest.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-health-regulatory"
+      ],
+      "hybrid_chunks": [
+        "chunk-health-regulatory"
+      ]
+    },
+    {
+      "id": "eval-miss-49",
+      "category": "missing_evidence",
+      "query": "Our delivery fleet operates 100 autonomous flying drones in Zurich.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-performance",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-miss-50",
+      "category": "missing_evidence",
+      "query": "Every software engineer on our team possesses a master's degree in robotics.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-visual",
+        "chunk-brand-testimonials",
+        "chunk-brand-performance",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-miss-51",
+      "category": "missing_evidence",
+      "query": "Packaging made from recycled Himalayan sea salt.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-evidence",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-safety",
+        "chunk-brand-evidence",
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-environmental"
+      ]
+    },
+    {
+      "id": "eval-miss-52",
+      "category": "missing_evidence",
+      "query": "We accept payments in 40 international cryptocurrencies.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-pricing",
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-environmental",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-visual",
+        "chunk-brand-pricing",
+        "chunk-brand-security"
+      ]
+    },
+    {
+      "id": "eval-miss-53",
+      "category": "missing_evidence",
+      "query": "Awarded best employer in Scandinavia three years consecutively.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-visual",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees",
+        "chunk-brand-review-outcomes"
+      ]
+    },
+    {
+      "id": "eval-miss-54",
+      "category": "missing_evidence",
+      "query": "Office headquarters are located in downtown Singapore.",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [],
+      "dense_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence",
+        "chunk-brand-safety",
+        "chunk-brand-performance"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-visual",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees"
+      ]
+    },
+    {
+      "id": "eval-sim-55",
+      "category": "similar_passages",
+      "query": "Absolute safety guarantee with zero risk to customer data.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-security"
+      ],
+      "dense_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-pricing",
+        "chunk-brand-environmental"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-environmental",
+        "chunk-brand-testimonials"
+      ]
+    },
+    {
+      "id": "eval-sim-56",
+      "category": "similar_passages",
+      "query": "Eco-friendly green packaging certified zero impact on waterways.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-environmental"
+      ],
+      "dense_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-safety",
+        "chunk-brand-guarantees",
+        "chunk-brand-health",
+        "chunk-brand-evidence"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-environmental",
+        "chunk-brand-guarantees",
+        "chunk-brand-safety",
+        "chunk-brand-health",
+        "chunk-brand-evidence"
+      ]
+    },
+    {
+      "id": "eval-sim-57",
+      "category": "similar_passages",
+      "query": "Medical study proves 100% cure rate for seasonal flu.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-guarantees"
+      ],
+      "dense_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-safety"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-health",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence",
+        "chunk-brand-safety",
+        "chunk-brand-environmental"
+      ]
+    },
+    {
+      "id": "eval-sim-58",
+      "category": "similar_passages",
+      "query": "Customer reviews demonstrate 50% productivity acceleration.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-performance"
+      ],
+      "dense_chunks": [
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes",
+        "chunk-brand-evidence",
+        "chunk-brand-testimonials",
+        "chunk-brand-health"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-testimonials",
+        "chunk-brand-security",
+        "chunk-brand-guarantees",
+        "chunk-brand-performance",
+        "chunk-brand-review-outcomes"
+      ]
+    },
+    {
+      "id": "eval-sim-59",
+      "category": "similar_passages",
+      "query": "Unsubstantiated security certification claims.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-evidence"
+      ],
+      "dense_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-evidence",
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-testimonials"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-security",
+        "chunk-brand-performance",
+        "chunk-brand-guarantees",
+        "chunk-brand-evidence",
+        "chunk-brand-environmental"
+      ]
+    },
+    {
+      "id": "eval-sim-60",
+      "category": "similar_passages",
+      "query": "High semantic similarity score guarantees legal compliance.",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "dense_correct": true,
+      "dense_rule": false,
+      "hybrid_pred": "CONTRADICTED",
+      "hybrid_correct": true,
+      "hybrid_rule": false,
+      "expected_chunks": [
+        "chunk-brand-review-outcomes"
+      ],
+      "dense_chunks": [
+        "chunk-brand-review-outcomes",
+        "chunk-brand-performance",
+        "chunk-brand-testimonials",
+        "chunk-brand-guarantees",
+        "chunk-brand-security"
+      ],
+      "hybrid_chunks": [
+        "chunk-brand-review-outcomes",
+        "chunk-brand-guarantees",
+        "chunk-brand-security",
+        "chunk-brand-safety",
+        "chunk-brand-performance"
+      ]
+    }
+  ]
+}

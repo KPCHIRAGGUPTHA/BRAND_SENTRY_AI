@@ -76,6 +76,25 @@ class EmbeddingService:
         self._cache: OrderedDict[str, List[float]] = OrderedDict()
         self._cache_max_size: int = 2048
         self._cache_lock = threading.Lock()
+        self.cache_hits: int = 0
+        self.cache_misses: int = 0
+
+    def reset_cache_stats(self) -> None:
+        """Resets cache hit and miss counters."""
+        with self._cache_lock:
+            self.cache_hits = 0
+            self.cache_misses = 0
+
+    @property
+    def cache_stats(self) -> Dict[str, int]:
+        """Returns snapshot of current LRU cache metrics."""
+        with self._cache_lock:
+            return {
+                "hits": self.cache_hits,
+                "misses": self.cache_misses,
+                "size": len(self._cache),
+                "max_size": self._cache_max_size,
+            }
 
     @property
     def embed_fn(self):
@@ -187,8 +206,10 @@ class EmbeddingService:
             return []
 
         # Replace empty/whitespace-only strings with a single space to avoid
-        # embedding-engine errors; the caller should avoid submitting such texts.
-        processed_texts = [t.strip() if t.strip() else " " for t in texts]
+        # embedding-engine errors.
+        # Normalize whitespace and case to match all-MiniLM-L6-v2's uncased tokenizer,
+        # ensuring collision-safe, deterministic LRU cache keys.
+        processed_texts = [t.strip().lower() if t.strip() else " " for t in texts]
 
         # 1. Check cache for already-computed embeddings
         result_embeddings: List[Optional[List[float]]] = [None] * len(processed_texts)
@@ -201,7 +222,9 @@ class EmbeddingService:
                 if cached_vec is not None:
                     result_embeddings[i] = cached_vec
                     self._cache.move_to_end(text)
+                    self.cache_hits += 1
                 else:
+                    self.cache_misses += 1
                     if text not in missing_texts_map:
                         missing_texts_map[text] = []
                     missing_texts_map[text].append(i)

@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     DATA_DIR: str = Field(default=_DEFAULT_DATA_DIR)
     UPLOADS_DIR: Optional[str] = Field(default=None)
     CHROMA_PERSIST_DIR: Optional[str] = Field(default=None)
+    BM25_PERSIST_DIR: Optional[str] = Field(default=None)
     DOCUMENTS_DB_PATH: Optional[str] = Field(default=None)
     REVIEWS_DB_PATH: Optional[str] = Field(default=None)
 
@@ -38,6 +39,10 @@ class Settings(BaseSettings):
     @property
     def chroma_persist_dir(self) -> str:
         return self.CHROMA_PERSIST_DIR or os.path.join(self.DATA_DIR, "chroma")
+
+    @property
+    def bm25_persist_dir(self) -> str:
+        return self.BM25_PERSIST_DIR or os.path.join(self.DATA_DIR, "bm25")
 
     @property
     def documents_db_path(self) -> str:
@@ -61,6 +66,37 @@ class Settings(BaseSettings):
     EMBEDDING_PROVIDER: str = Field(default="sentence-transformers")
     EMBEDDING_MODEL_NAME: str = Field(default="all-MiniLM-L6-v2")
     CHROMA_COLLECTION_NAME: str = Field(default="guideline_chunks")
+    RETRIEVAL_MODE: str = Field(
+        default="hybrid",
+        description="Retrieval engine mode: 'hybrid' (Dense + BM25 + RRF), 'hybrid_rerank' (Dense + BM25 + RRF + Cross-Encoder), 'dense', or 'bm25'",
+    )
+    RRF_SMOOTHING_K: int = Field(
+        default=60,
+        description="Reciprocal Rank Fusion smoothing constant k (default: 60)",
+    )
+    RERANKING_ENABLED: bool = Field(
+        default=True,
+        description="Whether Cross-Encoder reranking is enabled",
+    )
+    RERANKER_MODEL_NAME: str = Field(
+        default="Xenova/ms-marco-MiniLM-L-6-v2",
+        description="Cross-Encoder model for claim-passage contextual reranking",
+    )
+    RERANKER_CANDIDATE_POOL: int = Field(
+        default=15,
+        description="Number of candidate passages to retrieve before cross-encoder reranking",
+    )
+    RERANKER_MAX_LENGTH: int = Field(
+        default=256,
+        description="Max token sequence length for cross-encoder query-passage input",
+    )
+
+    # Multimodal & Visual Brand Compliance (Improvement 3)
+    MAX_IMAGE_SIZE_MB: int = Field(default=10, description="Maximum image upload size in MB")
+    TESSERACT_CMD: Optional[str] = Field(
+        default=None,
+        description="Explicit path to tesseract binary if not in PATH",
+    )
 
     # Phase 3 — Review & Verdict Engine
     MAX_REVIEW_CONTENT_LENGTH: int = Field(

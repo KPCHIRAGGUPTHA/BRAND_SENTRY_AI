@@ -13,6 +13,8 @@ export interface GuidelineUploadResponse {
   extracted_characters: number;
   chunk_count: number;
   message?: string;
+  version_id?: string;
+  version_label?: string;
 }
 
 export interface GuidelineChunkMatch {
@@ -24,6 +26,9 @@ export interface GuidelineChunkMatch {
   text: string;
   distance: number;
   similarity_score: number;
+  bm25_score?: number | null;
+  rrf_score?: number | null;
+  rerank_score?: number | null;
 }
 
 export interface GuidelineSearchResponse {
@@ -49,6 +54,20 @@ export interface DocumentListResponse {
   documents: DocumentSummary[];
 }
 
+export interface PolicyVersion {
+  version_id: string;
+  policy_id: string;
+  version_label: string;
+  document_id: string;
+  filename: string;
+  content_hash: string;
+  created_at: string;
+  is_active: boolean;
+  status: string;
+  page_count: number | null;
+  chunk_count: number;
+}
+
 export interface EvidenceItem {
   chunk_id: string;
   document_id: string;
@@ -57,6 +76,9 @@ export interface EvidenceItem {
   quote: string;
   similarity_score: number;
   distance: number;
+  bm25_score?: number | null;
+  rrf_score?: number | null;
+  rerank_score?: number | null;
 }
 
 export interface SemanticDriftIssue {
@@ -74,14 +96,30 @@ export interface SemanticDriftResult {
   uncertainty?: string | null;
 }
 
+export interface RiskWarning {
+  rule_id: string;
+  warning_type: string;
+  severity: string;
+  description: string;
+  triggering_condition: string;
+  explanation: string;
+  legal_basis?: string | null;
+  evidence_source?: string | null;
+}
+
 export interface ClaimVerdict {
   claim_id: string;
   claim_text: string;
   verdict: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE' | string;
+  compliance_verdict?: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE' | string | null;
   explanation: string;
   evidence: EvidenceItem[];
   suggested_correction?: string | null;
   deterministic_rule_fired?: boolean;
+  rule_id?: string | null;
+  rule_category?: string | null;
+  rule_description?: string | null;
+  risk_warning?: RiskWarning | null;
   semantic_drift?: SemanticDriftResult | null;
 }
 
@@ -100,9 +138,69 @@ export interface ReviewResponse {
   summary: ReviewSummary;
   created_at: string;
   warning?: string | null;
+  review_source?: string;
+  ocr_raw_text?: string | null;
+  ocr_user_text?: string | null;
+  policy_versions_used?: string[];
 }
 
 export interface ReviewRequest {
   content: string;
   document_ids?: string[];
+  policy_version_ids?: string[];
+  retrieval_mode?: 'hybrid' | 'dense' | 'bm25';
+}
+
+export interface OCRTextBlock {
+  text: string;
+  confidence: number;
+  bbox?: number[] | null;
+}
+
+export interface ImageOCRResponse {
+  status: string;
+  extracted_text: string;
+  confidence: number;
+  width: number;
+  height: number;
+  blocks: OCRTextBlock[];
+  warning?: string | null;
+}
+
+export interface ImageReviewSubmitRequest {
+  corrected_text: string;
+  raw_ocr_text?: string;
+  document_ids?: string[];
+  policy_version_ids?: string[];
+  retrieval_mode?: 'hybrid' | 'dense' | 'bm25';
+}
+
+export interface AuditReviewSummaryItem {
+  review_id: string;
+  created_at: string;
+  content_preview: string;
+  review_source: string;
+  total_claims: number;
+  supported: number;
+  contradicted: number;
+  insufficient: number;
+  policy_versions_used: string[];
+}
+
+export interface AuditReviewListResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  reviews: AuditReviewSummaryItem[];
+}
+
+export interface DashboardStats {
+  total_reviews: number;
+  text_reviews: number;
+  image_reviews: number;
+  total_claims_evaluated: number;
+  supported_claims: number;
+  contradicted_claims: number;
+  insufficient_claims: number;
+  unique_guidelines_used: number;
 }

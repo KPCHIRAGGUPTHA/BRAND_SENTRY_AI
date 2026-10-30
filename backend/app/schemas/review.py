@@ -19,6 +19,17 @@ class ReviewRequest(BaseModel):
             "If omitted or empty, all indexed guidelines are searched."
         ),
     )
+    policy_version_ids: Optional[List[str]] = Field(
+        default=None,
+        description=(
+            "Optional list of policy version identifiers (e.g. 'ver-xxxx') to scope the evidence search. "
+            "If specified, only guidelines corresponding to these exact versions are searched."
+        ),
+    )
+    retrieval_mode: Optional[str] = Field(
+        default=None,
+        description="Optional retrieval mode override ('hybrid', 'dense', or 'bm25'). Defaults to server configuration.",
+    )
 
     @field_validator("content")
     @classmethod
@@ -52,6 +63,18 @@ class EvidenceItemSchema(BaseModel):
     distance: float = Field(
         description="ChromaDB cosine distance (1 - similarity_score). Range [0.0, 1.0]."
     )
+    bm25_score: Optional[float] = Field(
+        default=None,
+        description="BM25 score if retrieved via lexical search",
+    )
+    rrf_score: Optional[float] = Field(
+        default=None,
+        description="Reciprocal Rank Fusion score if retrieved via hybrid search",
+    )
+    rerank_score: Optional[float] = Field(
+        default=None,
+        description="Cross-Encoder score if retrieved via hybrid reranking",
+    )
 
 
 
@@ -81,18 +104,49 @@ class SemanticDriftResult(BaseModel):
     )
 
 
+
+class RiskWarningSchema(BaseModel):
+    """Statutory or regulatory risk warning separate from uploaded brand guideline evidence."""
+    rule_id: str = Field(description="Unique rule identifier (e.g. 'RULE-UNIV-ABS-001').")
+    warning_type: str = Field(
+        default="UNIVERSAL_RISK_WARNING",
+        description="Category: 'UNIVERSAL_RISK_WARNING' | 'REGULATORY_ALERT'.",
+    )
+    severity: str = Field(
+        default="HIGH",
+        description="Warning severity: 'LOW' | 'MEDIUM' | 'HIGH'.",
+    )
+    description: str = Field(description="Summary of the potential advertising risk pattern.")
+    triggering_condition: str = Field(description="Condition or pattern in the claim that triggered the warning.")
+    explanation: str = Field(description="Informational advertising or regulatory risk explanation.")
+    legal_basis: Optional[str] = Field(
+        default=None,
+        description="Informational reference to regulatory standards (jurisdiction not established).",
+    )
+    evidence_source: Optional[str] = Field(
+        default=None,
+        description="Formal regulatory guidance or doctrine establishing this advertising standard.",
+    )
+
+
 class ClaimVerdictSchema(BaseModel):
     """Compliance verdict for a single extracted marketing claim."""
     claim_id: str = Field(description="Stable identifier: 'claim-1', 'claim-2', etc.")
     claim_text: str = Field(description="Original claim text as extracted from marketing content.")
     verdict: str = Field(
         description=(
-            "Three-way compliance verdict: "
-            "'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'. "
-            "SUPPORTED: evidence affirmatively supports the claim. "
-            "CONTRADICTED: evidence or a deterministic rule conflicts with the claim. "
-            "INSUFFICIENT_EVIDENCE: available guidelines cannot determine compliance."
+            "Authoritative three-way compliance verdict: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'. "
+            "SUPPORTED: guideline evidence affirmatively supports the claim. "
+            "CONTRADICTED: guideline evidence explicitly conflicts with the claim or proves a violation. "
+            "INSUFFICIENT_EVIDENCE: guidelines do not establish support or contradiction (including warning-only claims)."
         )
+    )
+    compliance_verdict: Optional[str] = Field(
+        default=None,
+        description=(
+            "Authoritative evidence-grounded compliance verdict (strictly identical to verdict): "
+            "'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'."
+        ),
     )
     explanation: str = Field(
         description="Factual explanation of the verdict, citing specific guideline passages where applicable."
@@ -111,6 +165,22 @@ class ClaimVerdictSchema(BaseModel):
     deterministic_rule_fired: bool = Field(
         default=False,
         description="True when the verdict was determined by an explicit prohibited-phrase rule, not by retrieval.",
+    )
+    rule_id: Optional[str] = Field(
+        default=None,
+        description="Identifier of the compliance rule triggered (e.g. 'RULE-UNIV-ABS-001').",
+    )
+    rule_category: Optional[str] = Field(
+        default=None,
+        description="Rule category: 'UNIVERSAL_RISK_WARNING' | 'ORG_GUIDELINE_VIOLATION' | 'EVIDENCE_COMPLIANCE'.",
+    )
+    rule_description: Optional[str] = Field(
+        default=None,
+        description="Formal description of the triggered compliance rule.",
+    )
+    risk_warning: Optional[RiskWarningSchema] = Field(
+        default=None,
+        description="Explicit universal statutory risk warning when triggered without organization guideline evidence.",
     )
     semantic_drift: Optional[SemanticDriftResult] = Field(
         default=None,
@@ -147,3 +217,68 @@ class ReviewResponse(BaseModel):
         default=None,
         description="Non-fatal warning, e.g. 'No guidelines indexed — evidence not available.'",
     )
+    review_source: str = Field(
+        default="text",
+        description="Origin of reviewed content: 'text' or 'image'",
+    )
+    ocr_raw_text: Optional[str] = Field(
+        default=None,
+        description="Raw text extracted by OCR if source was image",
+    )
+    ocr_user_text: Optional[str] = Field(
+        default=None,
+        description="User-corrected text before compliance review",
+    )
+    policy_versions_used: List[str] = Field(
+        default_factory=list,
+        description="Policy version identifiers enforced in this review.",
+    )
+
+
+class OCRTextBlock(BaseModel):
+    text: str
+    confidence: float
+    bbox: Optional[List[int]] = Field(default=None, description="[x, y, width, height]")
+
+
+class ImageOCRResponse(BaseModel):
+    """Response returned upon uploading promotional image for OCR extraction."""
+    status: str = Field(description="'success', 'empty_text', or 'error'")
+    extracted_text: str = Field(description="Full concatenated text extracted from image")
+    confidence: float = Field(description="Mean OCR confidence percentage [0.0 - 100.0]")
+    width: int
+    height: int
+    blocks: List[OCRTextBlock] = Field(default_factory=list)
+    warning: Optional[str] = None
+
+
+class ImageReviewSubmitRequest(BaseModel):
+    """Request to review user-verified OCR text through compliance engine."""
+    corrected_text: str = Field(
+        ...,
+        min_length=1,
+        description="User-reviewed marketing text extracted from the promotional image",
+    )
+    raw_ocr_text: Optional[str] = Field(
+        default=None,
+        description="Original uncorrected OCR text for audit traceability",
+    )
+    document_ids: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of guideline document UUIDs to scope evidence retrieval",
+    )
+    policy_version_ids: Optional[List[str]] = Field(
+        default=None,
+        description="Optional list of policy version identifiers to scope evidence retrieval",
+    )
+    retrieval_mode: Optional[str] = Field(
+        default=None,
+        description="Optional retrieval mode override ('hybrid', 'dense', or 'bm25')",
+    )
+
+    @field_validator("corrected_text")
+    @classmethod
+    def text_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Corrected promotional text cannot be empty or whitespace.")
+        return v

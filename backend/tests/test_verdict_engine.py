@@ -51,35 +51,46 @@ def engine():
 # ---------------------------------------------------------------------------
 
 class TestProhibitedPhraseRules:
-    def test_100_pct_guaranteed_is_contradicted(self, engine):
+    def test_100_pct_guaranteed_is_warning_without_evidence(self, engine):
         cv = engine.classify("claim-1", "Our serum is 100% guaranteed to work.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
         assert cv.deterministic_rule_fired is True
+        assert cv.risk_warning is not None
+        assert cv.risk_warning.rule_id == "RULE-UNIV-ABS-001"
+        assert cv.evidence == []
 
-    def test_100_pct_safe_is_contradicted(self, engine):
+    def test_100_pct_safe_is_warning_without_evidence(self, engine):
         cv = engine.classify("claim-1", "This product is 100% safe for all users.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
         assert cv.deterministic_rule_fired is True
+        assert cv.risk_warning is not None
 
-    def test_100_pct_natural_is_contradicted(self, engine):
+    def test_100_pct_natural_is_warning_without_evidence(self, engine):
         cv = engine.classify("claim-1", "Our ingredients are 100% natural.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
         assert cv.deterministic_rule_fired is True
+        assert cv.risk_warning is not None
 
-    def test_clinically_proven_is_contradicted(self, engine):
+    def test_clinically_proven_is_warning_without_evidence(self, engine):
         cv = engine.classify("claim-1", "Clinically proven to reduce fine lines.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
         assert cv.deterministic_rule_fired is True
+        assert cv.risk_warning is not None
 
-    def test_prohibited_phrase_overrides_retrieval(self, engine):
-        # Even with a supportive passage, a prohibited phrase must be contradicted
+    def test_prohibited_phrase_with_explicit_guideline_is_contradicted(self, engine):
         passage = _make_passage(
-            "This product is approved for sale and use.",
+            "Brand Safety Policy: Claims asserting our product is 100% safe are strictly forbidden.",
             similarity_score=0.95,
         )
         cv = engine.classify("claim-1", "Our product is 100% safe.", [passage])
         assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.compliance_verdict == VERDICT_CONTRADICTED
         assert cv.deterministic_rule_fired is True
+        assert len(cv.evidence) >= 1
 
     def test_non_prohibited_claim_not_contradicted_by_rule(self, engine):
         cv = engine.classify("claim-1", "Our product supports healthy skin.", [])
@@ -307,15 +318,16 @@ class TestLLMOutputParsing:
 # ---------------------------------------------------------------------------
 
 class TestSuggestedCorrections:
-    def test_contradicted_claim_has_correction(self, engine):
+    def test_warning_claim_has_correction(self, engine):
         cv = engine.classify("claim-1", "Our product is 100% guaranteed to work.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
         assert cv.suggested_correction is not None
         assert len(cv.suggested_correction) > 10
 
     def test_correction_does_not_retain_prohibited_phrase(self, engine):
         cv = engine.classify("claim-1", "This is 100% guaranteed effective.", [])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        assert cv.verdict == VERDICT_INSUFFICIENT
         if cv.suggested_correction:
             assert "100% guaranteed" not in cv.suggested_correction.lower().replace(
                 "[draft", ""
@@ -467,7 +479,10 @@ class TestEvidenceRelevance:
         )
         # Guideline only prohibits 100% guaranteed, says nothing about safety
         cv = engine.classify("claim-1", "Our product is 100% safe.", [passage_guarantee])
-        assert cv.verdict == VERDICT_CONTRADICTED
+        # In authoritative semantics, warning without guideline evidence produces INSUFFICIENT_EVIDENCE
+        assert cv.verdict == VERDICT_INSUFFICIENT
+        assert cv.compliance_verdict == VERDICT_INSUFFICIENT
+        assert cv.risk_warning is not None
         # Evidence must NOT cite the unrelated guarantee rule as evidence for 100% safe
         assert cv.evidence == []
 
