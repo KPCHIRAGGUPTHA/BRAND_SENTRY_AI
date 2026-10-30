@@ -10,7 +10,7 @@ import uuid
 import time
 import logging
 from datetime import datetime, timezone
-from typing import Optional, List
+from typing import Optional, List, Tuple
 
 import anyio
 from fastapi import APIRouter, HTTPException, status, UploadFile, File

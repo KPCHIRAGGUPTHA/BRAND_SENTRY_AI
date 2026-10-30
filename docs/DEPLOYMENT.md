@@ -178,6 +178,9 @@ Replace `$API` / `$WEB` with your URLs (Render: `https://brandsentry-api.onrende
   to RRF ordering.
 - OCR requires the Tesseract binary (present in the Docker image, optional locally).
 - `/api/*` has no authentication or rate limiting; treat a public deployment as a demo.
-- The production Docker image was not built during the final release check (local Docker daemon was not
-  running); it is unchanged from the previously deployed configuration apart from application code.
+- The production Docker image was not built during the final release check because the local Docker daemon
+  was not running. The backend test suite was run on Python 3.11.16, the image's Python version, and
+  270 tests passed.
+- The image runs Python 3.11, so a change that only passes on newer Python can break production. Run the test
+  suite on 3.11 before deploying (CI does this).
 - Compliance reasoning limitations are listed in `docs/FINAL_SUBMISSION_REPORT.md`.
