@@ -124,16 +124,19 @@ submission time.
 | `https://brandsentry-api.onrender.com/health` | **Verified**: HTTP 200 `{"status":"ok","version":"0.3.0","environment":"production"}`. The first request took 43.6 s (cold start). |
 | `GET /api/guidelines` on the live API | **Verified**: `{"total":0}` after a cold start, confirming ephemeral storage |
 | Live code version before the merge | The OpenAPI schema had no `rrf_score` or `compliance_verdict`, so the service was running pre-Round-3 code (the old `main`) |
-| Live code version after the push | **Not updated.** I polled `/openapi.json` for about 27 minutes after pushing `88cfcec` and the service still ran the old code. See section 4. |
+| Live code version after the push | **Verified updated.** The old code was still live about 27 minutes after `88cfcec`. After the Python 3.11 fix, the schema includes `compliance_verdict`. See section 4. |
+| Live API smoke test | **Verified**: uploading the sample guideline indexed it. Reviewing `Our product is 100% safe for everyone. Our office is open on weekdays.` returned `CONTRADICTED` with the verbatim citation and a `[DRAFT — requires human review]` correction, plus `INSUFFICIENT_EVIDENCE` with no evidence. `verdict == compliance_verdict` held for both claims. |
+| Live UI test (https://brandsentry-web.onrender.com) | **Verified in a browser**: review submitted from the UI, summary showed 2 claims / 1 contradicted / 1 insufficient, citation and corrected risk-warning text rendered, no console errors. |
+| Live CORS preflight from the frontend origin | **Verified**: allowed |
 | Production Docker image build | **Not tested.** The local Docker daemon was not running. |
 | GitHub Actions run [41095740924](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41095740924) on `88cfcec` | The Chrome install step passed after the CI fix. Dependency install and the frontend build passed. **Backend unit tests failed** (the Python 3.11 `NameError` above), so the Selenium steps were skipped. A new run is triggered by the fix commit; check the Actions tab for its result. |
 | GitHub Actions run [41101181893](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41101181893) on `597a59f` | **Failed** (exit code 1, 5m37s). The run uploaded the `selenium-failure-diagnostics` artifact, which only the Selenium UI step produces. That points to the backend unit tests passing and the Selenium suite failing; viewing the logs requires signing in to GitHub. |
 | Selenium UI suite, reproduced locally (Python 3.11, backend on :8000, `vite preview` on :5173, headless Chrome, `BRANDSENTRY_RUN_LIVE_REVIEW=true`) | **18 passed, 2 failed.** The cause was stale assertions in `tests/ui/test_validation.py` (TC04/TC05). The Round 3 frontend commit `cce16f9` changed the empty-copy message to "Marketing copy cannot be empty. Please provide text to review." The tests still expected "…empty or whitespace-only". Validation itself worked correctly. After updating the assertions: **20 passed, 0 failed, 0 skipped.** |
+| GitHub Actions run [41104467623](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI/actions/runs/41104467623) on `510c138` | **Passed.** This workflow runs the backend unit tests and the Selenium UI suite on Ubuntu with Python 3.11. |
 
 ### 2.5 Not tested or blocked
 
 - Image OCR review end to end in the browser (unit tests cover it; it was not run manually)
-- Uploading a file through the browser UI (the API upload was verified; the UI file picker was not driven)
 - Optional reranking mode and the optional LLM path (both off in the production configuration)
 
 ---
@@ -147,7 +150,7 @@ submission time.
 | Release commits on `round-3-final` | `1fb23e0` feat(engine): Stage 1–3.5 compliance reasoning, optional reranking, and holdout evaluation; `af15951` chore(release): prepare BrandSentry AI final submission |
 | Merge | `88cfcec`: a `--no-ff` merge of `round-3-final` into `main`, with no conflicts. `origin/main` (`48d2fb5`) was already an ancestor, so the merge did not diverge. |
 | Push | `48d2fb5..88cfcec main -> main` and `41b6241..af15951 round-3-final -> round-3-final`. Both were normal pushes, with no force. |
-| Post-merge fix | The Python 3.11 import fix and this report were committed on `main`. `round-3-final` was then fast-forwarded to the same commit, and both branches were pushed normally. |
+| Post-merge commits on `main` | `597a59f` (Python 3.11 import fix + this report), `021b8bb` (report), `510c138` (Selenium assertion fix), then report updates. `round-3-final` was fast-forwarded to match after each, and all pushes were normal. |
 | Final branch | `main` |
 | Development branch | `round-3-final` is kept locally and on GitHub |
 
@@ -173,18 +176,14 @@ unknown and it was not merged. Its CI fix (dropping `libgconf-2-4`) was applied 
 | Required env | `ALLOWED_ORIGINS` and `VITE_API_BASE_URL`. `LLM_API_KEY` is optional and set only in the dashboard. |
 | Persistence | Ephemeral on the free tier. Uploads, ChromaDB, BM25 and SQLite are lost on restart or redeploy. |
 
-**Auto-deploy status: not confirmed. The live service is still running pre-Round-3 code.** After the push
-to `main`, the live OpenAPI schema still had no `compliance_verdict` field for about 27 minutes. I have no
-access to the Render dashboard, so I could not tell whether auto-deploy is turned off, deploys from another
-branch, or failed. One possible cause is that a deploy of `88cfcec` would have crashed at startup because of the
-Python 3.11 `NameError` described in 2.1. The fix commit on `main` resolves that.
+**Deployment status: live and verified (section 2.4).** The live service was on pre-Round-3 code at first. After the push
+to `main`, the live OpenAPI schema still had no `compliance_verdict` field for about 27 minutes. The new release went live after the Python
+3.11 fix was pushed, with no dashboard action from me. That is consistent with Render auto-deploying `main` and the
+earlier deploy failing on the `NameError` from 2.1, but I have no dashboard access, so this is an inference. The
+exact deployed commit is also not visible from outside; the live behaviour includes both the backend fix and the
+UI fix. The sample guideline and test reviews from the smoke test remain on the live service until its next restart.
 
-**Manual steps (Render dashboard):**
-1. Open `brandsentry-api` → **Settings** and confirm that **Branch = `main`** and Auto-Deploy is on.
-2. Open **Events / Deploys** and check whether a deploy of `88cfcec` failed. If so, its logs should show the `NameError`.
-3. Click **Manual Deploy → Deploy latest commit** for `brandsentry-api`, then for `brandsentry-web`.
-4. Confirm `LLM_API_KEY` is set (or deliberately left empty) under **Environment**. Do not paste it anywhere else.
-5. Verify the release with `curl -s https://brandsentry-api.onrender.com/openapi.json | grep -c compliance_verdict`. The result should be ≥ 1. Then follow the steps in `DEPLOYMENT.md` section G.
+To re-check at any time: `curl -s https://brandsentry-api.onrender.com/openapi.json | grep -c compliance_verdict` should print ≥ 1. Then follow `DEPLOYMENT.md` section G. Whether `LLM_API_KEY` is set on Render could not be checked from outside.
 
 Full configuration and verification steps are in [`DEPLOYMENT.md`](DEPLOYMENT.md).
 
@@ -222,7 +221,5 @@ verdicts. The development-set figure is optimistic because the system was tuned 
 
 ### Not fully verified
 - Building the production Docker image locally
-- Deployment of this release to Render (the live service still runs older code; see section 4)
-- The Selenium UI suite on CI after the assertion fix (it passes locally; check the latest run in the Actions tab)
-- OCR review and browser file upload in the UI
+- OCR review in the UI
 - Mobile layout (it overflows horizontally)
