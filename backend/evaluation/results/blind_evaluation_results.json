@@ -1,0 +1,922 @@
+{
+  "dataset_name": "Blind Final Evaluation Set (Stage 3.5)",
+  "total_cases": 32,
+  "dense_metrics": {
+    "total": 32,
+    "correct": 23,
+    "accuracy": 0.7188,
+    "confusion_matrix": {
+      "SUPPORTED": {
+        "SUPPORTED": 8,
+        "CONTRADICTED": 1,
+        "INSUFFICIENT_EVIDENCE": 1
+      },
+      "CONTRADICTED": {
+        "SUPPORTED": 0,
+        "CONTRADICTED": 10,
+        "INSUFFICIENT_EVIDENCE": 2
+      },
+      "INSUFFICIENT_EVIDENCE": {
+        "SUPPORTED": 1,
+        "CONTRADICTED": 4,
+        "INSUFFICIENT_EVIDENCE": 5
+      }
+    },
+    "per_class": {
+      "SUPPORTED": {
+        "tp": 8,
+        "fp": 1,
+        "fn": 2,
+        "precision": 0.8889,
+        "recall": 0.8,
+        "f1": 0.8421
+      },
+      "CONTRADICTED": {
+        "tp": 10,
+        "fp": 5,
+        "fn": 2,
+        "precision": 0.6667,
+        "recall": 0.8333,
+        "f1": 0.7407
+      },
+      "INSUFFICIENT_EVIDENCE": {
+        "tp": 5,
+        "fp": 3,
+        "fn": 5,
+        "precision": 0.625,
+        "recall": 0.5,
+        "f1": 0.5556
+      }
+    },
+    "false_positive_support": 1,
+    "false_positive_support_rate": 0.0312,
+    "false_positive_contradiction": 5,
+    "false_positive_contradiction_rate": 0.1562,
+    "category_accuracy": {
+      "approximate_numerical": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "comparative_superlative": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "compound_claims": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "double_negatives": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "environmental_claims": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "exact_identifiers": {
+        "total": 4,
+        "correct": 4,
+        "accuracy": 1.0
+      },
+      "expired_evidence": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "financial_guarantees": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "internal_operational_instructions": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "medical_claims": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "medical_disclaimers": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "missing_documentary_evidence": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "numerical_thresholds": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      },
+      "out_of_scope_document": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "percentage_performance_comparisons": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "policy_restatement": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "security_disclaimers": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "security_guarantees": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "self_reported_approval": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "similar_unrelated_passages": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "technical_specifications": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "testimonials": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "visual_specifications": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "hybrid_metrics": {
+    "total": 32,
+    "correct": 24,
+    "accuracy": 0.75,
+    "confusion_matrix": {
+      "SUPPORTED": {
+        "SUPPORTED": 8,
+        "CONTRADICTED": 1,
+        "INSUFFICIENT_EVIDENCE": 1
+      },
+      "CONTRADICTED": {
+        "SUPPORTED": 0,
+        "CONTRADICTED": 10,
+        "INSUFFICIENT_EVIDENCE": 2
+      },
+      "INSUFFICIENT_EVIDENCE": {
+        "SUPPORTED": 1,
+        "CONTRADICTED": 3,
+        "INSUFFICIENT_EVIDENCE": 6
+      }
+    },
+    "per_class": {
+      "SUPPORTED": {
+        "tp": 8,
+        "fp": 1,
+        "fn": 2,
+        "precision": 0.8889,
+        "recall": 0.8,
+        "f1": 0.8421
+      },
+      "CONTRADICTED": {
+        "tp": 10,
+        "fp": 4,
+        "fn": 2,
+        "precision": 0.7143,
+        "recall": 0.8333,
+        "f1": 0.7692
+      },
+      "INSUFFICIENT_EVIDENCE": {
+        "tp": 6,
+        "fp": 3,
+        "fn": 4,
+        "precision": 0.6667,
+        "recall": 0.6,
+        "f1": 0.6316
+      }
+    },
+    "false_positive_support": 1,
+    "false_positive_support_rate": 0.0312,
+    "false_positive_contradiction": 4,
+    "false_positive_contradiction_rate": 0.125,
+    "category_accuracy": {
+      "approximate_numerical": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "comparative_superlative": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "compound_claims": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "double_negatives": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "environmental_claims": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "exact_identifiers": {
+        "total": 4,
+        "correct": 4,
+        "accuracy": 1.0
+      },
+      "expired_evidence": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "financial_guarantees": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "internal_operational_instructions": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "medical_claims": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "medical_disclaimers": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "missing_documentary_evidence": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "numerical_thresholds": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      },
+      "out_of_scope_document": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "percentage_performance_comparisons": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "policy_restatement": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "security_disclaimers": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "security_guarantees": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "self_reported_approval": {
+        "total": 2,
+        "correct": 1,
+        "accuracy": 0.5
+      },
+      "similar_unrelated_passages": {
+        "total": 1,
+        "correct": 1,
+        "accuracy": 1.0
+      },
+      "technical_specifications": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "testimonials": {
+        "total": 1,
+        "correct": 0,
+        "accuracy": 0.0
+      },
+      "visual_specifications": {
+        "total": 2,
+        "correct": 2,
+        "accuracy": 1.0
+      }
+    }
+  },
+  "hybrid_failures": [
+    {
+      "id": "blind-id-05",
+      "query": "Customer data is encrypted with AES-256 at rest across all storage clusters.",
+      "category": "out_of_scope_document",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('must not') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
+      ]
+    },
+    {
+      "id": "blind-ops-08",
+      "query": "Factory employees must wear safety goggles in assembly zones while heavy machinery operates.",
+      "category": "internal_operational_instructions",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('must not') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"SAFETY CLAIMS: Marketing materials must not describe a product as '100% safe'.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "SAFETY CLAIMS: Marketing materials must not describe a product as '100% safe'."
+      ]
+    },
+    {
+      "id": "blind-appr-17",
+      "query": "Regional director verbally confirmed legal approved our 60% promotional discount.",
+      "category": "self_reported_approval",
+      "document_scope": "doc-finance",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('cannot') in guideline 'Financial_Compliance_Policy_2026.pdf': \"FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization."
+      ]
+    },
+    {
+      "id": "blind-miss-19",
+      "query": "Clinical trial verification spreadsheet is stored on internal network drive G: and substantiates wellness results.",
+      "category": "missing_documentary_evidence",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Affirmative guideline policy from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Health-related performance claims must be supported by appropriate clinical trial evidence and reviewed before publication.\" supports this claim.",
+      "hybrid_evidence": [
+        "Health-related performance claims must be supported by appropriate clinical trial evidence and reviewed before publication."
+      ]
+    },
+    {
+      "id": "blind-env-24",
+      "query": "Avoid broad environmental claims and restrict ecological statements to assessed product features.",
+      "category": "environmental_claims",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "General guideline recommendation matched ('Avoid') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Avoid broad environmental claims when only a limited product feature has been assessed.\". The guideline advises against this claim phrasing. Human review is recommended to confirm applicability.",
+      "hybrid_evidence": [
+        "Avoid broad environmental claims when only a limited product feature has been assessed."
+      ]
+    },
+    {
+      "id": "blind-fin-26",
+      "query": "Our high-yield savings program guarantees double-digit returns within thirty calendar days.",
+      "category": "financial_guarantees",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-tme-29",
+      "query": "Storage clusters perform cryptographic key rotation automatically every 90 days.",
+      "category": "technical_specifications",
+      "document_scope": "doc-security",
+      "expected": "SUPPORTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines (retrieved from 'Enterprise_Information_Security_Standard.pdf') do not provide sufficient evidence to affirmatively support or contradict this claim. Independent human review is required before publication.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-tst-31",
+      "query": "Customer reviews demonstrate users save $50,000 monthly with our automation tools.",
+      "category": "testimonials",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    }
+  ],
+  "predictions": [
+    {
+      "id": "blind-id-01",
+      "query": "Medical devices distributed under clinical guidelines must state CE marked with specific registration number 9845-A.",
+      "category": "exact_identifiers",
+      "document_scope": "doc-health",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Direct factual alignment with guideline specification from 'Healthcare_Compliance_Manual_2026.pdf': \"HEALTHCARE REGULATORY SPECIFICATIONS: Medical devices distributed under clinical guidelines must state FDA approved or CE marked with specific registration number 9845-A.\".",
+      "hybrid_evidence": [
+        "HEALTHCARE REGULATORY SPECIFICATIONS: Medical devices distributed under clinical guidelines must state FDA approved or CE marked with specific registration number 9845-A."
+      ]
+    },
+    {
+      "id": "blind-id-02",
+      "query": "Medical devices distributed under clinical guidelines display authorized registration code 6712-B.",
+      "category": "exact_identifiers",
+      "document_scope": "doc-health",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Claim specifies identifier(s) {'6712-B'} not substantiated by guideline 'Healthcare_Compliance_Manual_2026.pdf' which requires {'9845-A'}.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-id-03",
+      "query": "Regional distribution materials omit regulatory registration number 9845-A to simplify flyer layout.",
+      "category": "exact_identifiers",
+      "document_scope": "doc-health",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Claim omits mandatory regulatory identifier, violating guideline from 'Healthcare_Compliance_Manual_2026.pdf': \"HEALTHCARE REGULATORY SPECIFICATIONS: Medical devices distributed under clinical guidelines must state FDA approved or CE marked with specific registration number 9845-A.\".",
+      "hybrid_evidence": [
+        "HEALTHCARE REGULATORY SPECIFICATIONS: Medical devices distributed under clinical guidelines must state FDA approved or CE marked with specific registration number 9845-A."
+      ]
+    },
+    {
+      "id": "blind-id-04",
+      "query": "Customer data is encrypted with AES-256 at rest and TLS 1.3 in transit across all distributed storage clusters.",
+      "category": "exact_identifiers",
+      "document_scope": "doc-security",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Direct factual alignment with guideline specification from 'Enterprise_Information_Security_Standard.pdf': \"DATA PROTECTION ARCHITECTURE: Customer data is encrypted with AES-256 at rest and TLS 1.3 in transit across all distributed storage clusters.\".",
+      "hybrid_evidence": [
+        "DATA PROTECTION ARCHITECTURE: Customer data is encrypted with AES-256 at rest and TLS 1.3 in transit across all distributed storage clusters."
+      ]
+    },
+    {
+      "id": "blind-id-05",
+      "query": "Customer data is encrypted with AES-256 at rest across all storage clusters.",
+      "category": "out_of_scope_document",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('must not') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
+      ]
+    },
+    {
+      "id": "blind-sec-06",
+      "query": "Our cloud platform guarantees customer data is impossible to hack under any circumstances.",
+      "category": "security_guarantees",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Contradicts policy against absolute claims from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
+      "hybrid_evidence": [
+        "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
+      ]
+    },
+    {
+      "id": "blind-sec-07",
+      "query": "Our platform is not completely secure and requires multi-factor authentication for sensitive operations.",
+      "category": "security_disclaimers",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Compliant disclaimer aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
+      "hybrid_evidence": [
+        "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
+      ]
+    },
+    {
+      "id": "blind-ops-08",
+      "query": "Factory employees must wear safety goggles in assembly zones while heavy machinery operates.",
+      "category": "internal_operational_instructions",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('must not') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"SAFETY CLAIMS: Marketing materials must not describe a product as '100% safe'.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "SAFETY CLAIMS: Marketing materials must not describe a product as '100% safe'."
+      ]
+    },
+    {
+      "id": "blind-ops-09",
+      "query": "Human resources ensures confidential submission of anonymous workplace feedback during quarterly reviews.",
+      "category": "internal_operational_instructions",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The submitted text is an internal operational, workplace safety, or human resources instruction outside the scope of commercial brand marketing compliance guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-rst-10",
+      "query": "Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances.",
+      "category": "policy_restatement",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Directly restates and conforms to guideline policy requirement from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances.\".",
+      "hybrid_evidence": [
+        "Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances."
+      ]
+    },
+    {
+      "id": "blind-hlth-11",
+      "query": "Our dietary supplement does not cure, treat, or prevent chronic disease.",
+      "category": "medical_disclaimers",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Compliant disclaimer aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\".",
+      "hybrid_evidence": [
+        "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
+      ]
+    },
+    {
+      "id": "blind-hlth-12",
+      "query": "Our organic syrup cures chronic diabetes in adults within thirty days.",
+      "category": "medical_claims",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": true,
+      "hybrid_rule": true,
+      "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase 'cures chronic diabetes'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\". Note: Statutory/regulatory warning (RULE-UNIV-MED-002) also applies as an informational reference.",
+      "hybrid_evidence": [
+        "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
+      ]
+    },
+    {
+      "id": "blind-num-13",
+      "query": "Special limited-time 65% discount on commercial enterprise accounts.",
+      "category": "numerical_thresholds",
+      "document_scope": "doc-finance",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Discount of 65% exceeds mandatory 50% cap without authorized compliance signoff from 'Financial_Compliance_Policy_2026.pdf': \"FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization.\".",
+      "hybrid_evidence": [
+        "FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization."
+      ]
+    },
+    {
+      "id": "blind-num-14",
+      "query": "Promotional financing offers a 35% discount across standard accounts.",
+      "category": "numerical_thresholds",
+      "document_scope": "doc-finance",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Discount of 35% conforms to mandatory cap stating discounts cannot exceed 50% from 'Financial_Compliance_Policy_2026.pdf': \"FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization.\".",
+      "hybrid_evidence": [
+        "FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization."
+      ]
+    },
+    {
+      "id": "blind-vis-15",
+      "query": "Brand logo appears in the top-left corner with a 25px clear buffer margin.",
+      "category": "visual_specifications",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Emblem margin of 25px satisfies minimum 20px buffer threshold from 'BrandSentry_Marketing_Compliance_2026.pdf': \"VISUAL BRAND IDENTITY: Brand logo and corporate emblem must always be positioned in the top-left corner with at least 20px clear buffer margin.\".",
+      "hybrid_evidence": [
+        "VISUAL BRAND IDENTITY: Brand logo and corporate emblem must always be positioned in the top-left corner with at least 20px clear buffer margin."
+      ]
+    },
+    {
+      "id": "blind-vis-16",
+      "query": "Brand logo is displayed with an 8px margin to maximize header banner space.",
+      "category": "visual_specifications",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Emblem margin of 8px violates mandatory minimum threshold of 20px from 'BrandSentry_Marketing_Compliance_2026.pdf': \"VISUAL BRAND IDENTITY: Brand logo and corporate emblem must always be positioned in the top-left corner with at least 20px clear buffer margin.\".",
+      "hybrid_evidence": [
+        "VISUAL BRAND IDENTITY: Brand logo and corporate emblem must always be positioned in the top-left corner with at least 20px clear buffer margin."
+      ]
+    },
+    {
+      "id": "blind-appr-17",
+      "query": "Regional director verbally confirmed legal approved our 60% promotional discount.",
+      "category": "self_reported_approval",
+      "document_scope": "doc-finance",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('cannot') in guideline 'Financial_Compliance_Policy_2026.pdf': \"FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "FINANCIAL PROMOTIONS AND DISCOUNT CAPS: Pricing discount claims cannot exceed 50% without prior written compliance officer authorization."
+      ]
+    },
+    {
+      "id": "blind-appr-18",
+      "query": "Marketing director verbally approved stating our herbal beverage cures seasonal allergies.",
+      "category": "self_reported_approval",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('must not') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\". The guideline explicitly prohibits this claim.",
+      "hybrid_evidence": [
+        "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
+      ]
+    },
+    {
+      "id": "blind-miss-19",
+      "query": "Clinical trial verification spreadsheet is stored on internal network drive G: and substantiates wellness results.",
+      "category": "missing_documentary_evidence",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Affirmative guideline policy from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Health-related performance claims must be supported by appropriate clinical trial evidence and reviewed before publication.\" supports this claim.",
+      "hybrid_evidence": [
+        "Health-related performance claims must be supported by appropriate clinical trial evidence and reviewed before publication."
+      ]
+    },
+    {
+      "id": "blind-cmp-20",
+      "query": "Logo maintains 25px clear margin, and our system guarantees 100% impenetrable barrier against malware.",
+      "category": "compound_claims",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": true,
+      "hybrid_rule": true,
+      "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase '100% impenetrable'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim\". Note: Statutory/regulatory warning (RULE-UNIV-ABS-001) also applies as an informational reference.",
+      "hybrid_evidence": [
+        "8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim"
+      ]
+    },
+    {
+      "id": "blind-apx-21",
+      "query": "Users achieve roughly 40% higher productivity across operational workflows.",
+      "category": "approximate_numerical",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Explicit policy rule matched ('do not state a specific percentage improvement') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Do not state a specific percentage improvement unless the underlying measurement and methodology are documented.\". The guideline explicitly prohibits unsubstantiated or approximate percentage claims.",
+      "hybrid_evidence": [
+        "Do not state a specific percentage improvement unless the underlying measurement and methodology are documented."
+      ]
+    },
+    {
+      "id": "blind-apx-22",
+      "query": "Our query engine is 45% faster than competing relational databases.",
+      "category": "percentage_performance_comparisons",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-env-23",
+      "query": "Our server hardware is 100% green and completely eliminates environmental waste.",
+      "category": "environmental_claims",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Contradicts policy against absolute claims from 'BrandSentry_Marketing_Compliance_2026.pdf': \"ENVIRONMENTAL CLAIMS: Environmental claims such as 'eco-friendly', 'green', or 'zero impact' must be specific and supported by documented evidence.\".",
+      "hybrid_evidence": [
+        "ENVIRONMENTAL CLAIMS: Environmental claims such as 'eco-friendly', 'green', or 'zero impact' must be specific and supported by documented evidence."
+      ]
+    },
+    {
+      "id": "blind-env-24",
+      "query": "Avoid broad environmental claims and restrict ecological statements to assessed product features.",
+      "category": "environmental_claims",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "General guideline recommendation matched ('Avoid') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Avoid broad environmental claims when only a limited product feature has been assessed.\". The guideline advises against this claim phrasing. Human review is recommended to confirm applicability.",
+      "hybrid_evidence": [
+        "Avoid broad environmental claims when only a limited product feature has been assessed."
+      ]
+    },
+    {
+      "id": "blind-sup-25",
+      "query": "Our cloud solution is rated number 1 in the world by enterprise software reviewers.",
+      "category": "comparative_superlative",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "CONTRADICTED",
+      "dense_rule": true,
+      "hybrid_rule": true,
+      "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase 'number 1 in the world'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Unsubstantiated claims such as number 1 in the world are prohibited.\". Note: Statutory/regulatory warning (RULE-UNIV-SUP-004) also applies as an informational reference.",
+      "hybrid_evidence": [
+        "Unsubstantiated claims such as number 1 in the world are prohibited."
+      ]
+    },
+    {
+      "id": "blind-fin-26",
+      "query": "Our high-yield savings program guarantees double-digit returns within thirty calendar days.",
+      "category": "financial_guarantees",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-dne-27",
+      "query": "Our promotional campaigns never fail to clearly disclose material limitations and eligibility conditions.",
+      "category": "double_negatives",
+      "document_scope": "doc-brand",
+      "expected": "SUPPORTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "Compliant disclaimer aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Material limitations, fees, and eligibility conditions must be clearly disclosed.\".",
+      "hybrid_evidence": [
+        "Material limitations, fees, and eligibility conditions must be clearly disclosed."
+      ]
+    },
+    {
+      "id": "blind-unr-28",
+      "query": "Software engineers must write descriptive git commit messages before pushing merge requests.",
+      "category": "similar_unrelated_passages",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-tme-29",
+      "query": "Storage clusters perform cryptographic key rotation automatically every 90 days.",
+      "category": "technical_specifications",
+      "document_scope": "doc-security",
+      "expected": "SUPPORTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines (retrieved from 'Enterprise_Information_Security_Standard.pdf') do not provide sufficient evidence to affirmatively support or contradict this claim. Independent human review is required before publication.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-tme-30",
+      "query": "Compliance approval granted for the 2023 promotional discount authorizes our 2026 spring catalog.",
+      "category": "expired_evidence",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "CONTRADICTED",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines (retrieved from 'BrandSentry_Marketing_Compliance_2026.pdf') do not provide sufficient evidence to affirmatively support or contradict this claim. Independent human review is required before publication.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-tst-31",
+      "query": "Customer reviews demonstrate users save $50,000 monthly with our automation tools.",
+      "category": "testimonials",
+      "document_scope": "doc-brand",
+      "expected": "CONTRADICTED",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    },
+    {
+      "id": "blind-doc-32",
+      "query": "Employee travel meal per-diem allowances must not exceed $75 per calendar day.",
+      "category": "out_of_scope_document",
+      "document_scope": "doc-brand",
+      "expected": "INSUFFICIENT_EVIDENCE",
+      "dense_pred": "INSUFFICIENT_EVIDENCE",
+      "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+      "dense_rule": false,
+      "hybrid_rule": false,
+      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_evidence": []
+    }
+  ]
+}

@@ -727,15 +727,31 @@ export const ClaimReview: React.FC = () => {
                       >
                         {claim.claim_id}
                       </span>
-                      {claim.deterministic_rule_fired && (
+                      {claim.risk_warning ? (
+                        <span
+                          className="badge badge-warning"
+                          style={{ fontSize: '0.72rem', background: '#FEF3C7', color: '#92400E', border: '1px solid #F59E0B' }}
+                          title={`Statutory warning: ${claim.risk_warning.description}`}
+                        >
+                          Universal Risk Warning
+                        </span>
+                      ) : claim.rule_category === 'ORG_GUIDELINE_VIOLATION' ? (
+                        <span
+                          className="badge badge-error"
+                          style={{ fontSize: '0.72rem' }}
+                          title="Direct violation of an uploaded brand guideline"
+                        >
+                          Guideline Violation
+                        </span>
+                      ) : claim.deterministic_rule_fired ? (
                         <span
                           className="badge badge-primary"
                           style={{ fontSize: '0.72rem' }}
-                          title="Determined by an explicit rule prohibiting absolute terms without evidence"
+                          title="Determined by an explicit compliance rule"
                         >
                           Deterministic Rule Fired
                         </span>
-                      )}
+                      ) : null}
                     </div>
                     <div>{getVerdictBadge(claim.verdict)}</div>
                   </div>
@@ -749,6 +765,44 @@ export const ClaimReview: React.FC = () => {
                       &ldquo;{claim.claim_text}&rdquo;
                     </p>
                   </div>
+
+                  {/* Universal Risk Warning Details */}
+                  {claim.risk_warning && (
+                    <div
+                      style={{
+                        padding: '10px 12px',
+                        background: '#FFFBEB',
+                        border: '1px solid #FCD34D',
+                        borderRadius: 'var(--radius-sm)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '4px',
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#B45309' }}>
+                          Statutory Warning: {claim.risk_warning.rule_id}
+                        </span>
+                        <span style={{ fontSize: '0.70rem', color: '#92400E', fontWeight: 600 }}>
+                          Severity: {claim.risk_warning.severity}
+                        </span>
+                      </div>
+                      <p style={{ fontSize: '0.84rem', color: '#78350F', margin: 0 }}>
+                        {claim.risk_warning.explanation}
+                      </p>
+                      {claim.risk_warning.legal_basis && (
+                        <span style={{ fontSize: '0.75rem', color: '#92400E' }}>
+                          <strong>Regulatory Basis:</strong> {claim.risk_warning.legal_basis}
+                        </span>
+                      )}
+                      <span style={{ fontSize: '0.75rem', color: '#6B7280', fontStyle: 'italic' }}>
+                        Guideline Compliance: {claim.compliance_verdict || claim.verdict}{' '}
+                        {claim.evidence.length > 0
+                          ? '(Grounded in the cited guideline evidence below)'
+                          : '(No specific organizational policy chunk found)'}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Explanation */}
                   <div>

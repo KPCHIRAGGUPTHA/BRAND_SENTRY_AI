@@ -1,0 +1,126 @@
+{
+  "threshold_metrics": [
+    {
+      "threshold": 0.2,
+      "supported_precision": 0.8,
+      "contradicted_precision": 0.7727,
+      "false_approval_rate": 0.0333,
+      "insufficient_rate": 0.4667,
+      "predicted_supported": 10,
+      "predicted_contradicted": 22,
+      "predicted_insufficient": 28
+    },
+    {
+      "threshold": 0.25,
+      "supported_precision": 0.8,
+      "contradicted_precision": 0.7727,
+      "false_approval_rate": 0.0333,
+      "insufficient_rate": 0.4667,
+      "predicted_supported": 10,
+      "predicted_contradicted": 22,
+      "predicted_insufficient": 28
+    },
+    {
+      "threshold": 0.3,
+      "supported_precision": 0.8,
+      "contradicted_precision": 0.7619,
+      "false_approval_rate": 0.0333,
+      "insufficient_rate": 0.4833,
+      "predicted_supported": 10,
+      "predicted_contradicted": 21,
+      "predicted_insufficient": 29
+    },
+    {
+      "threshold": 0.35,
+      "supported_precision": 0.875,
+      "contradicted_precision": 0.75,
+      "false_approval_rate": 0.0167,
+      "insufficient_rate": 0.5333,
+      "predicted_supported": 8,
+      "predicted_contradicted": 20,
+      "predicted_insufficient": 32
+    },
+    {
+      "threshold": 0.4,
+      "supported_precision": 0.8571,
+      "contradicted_precision": 0.8125,
+      "false_approval_rate": 0.0167,
+      "insufficient_rate": 0.6167,
+      "predicted_supported": 7,
+      "predicted_contradicted": 16,
+      "predicted_insufficient": 37
+    },
+    {
+      "threshold": 0.45,
+      "supported_precision": 1.0,
+      "contradicted_precision": 0.8,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.6833,
+      "predicted_supported": 4,
+      "predicted_contradicted": 15,
+      "predicted_insufficient": 41
+    },
+    {
+      "threshold": 0.5,
+      "supported_precision": 1.0,
+      "contradicted_precision": 0.8333,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.7333,
+      "predicted_supported": 4,
+      "predicted_contradicted": 12,
+      "predicted_insufficient": 44
+    },
+    {
+      "threshold": 0.55,
+      "supported_precision": 1.0,
+      "contradicted_precision": 0.8182,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.75,
+      "predicted_supported": 4,
+      "predicted_contradicted": 11,
+      "predicted_insufficient": 45
+    },
+    {
+      "threshold": 0.6,
+      "supported_precision": 1.0,
+      "contradicted_precision": 0.8,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.7833,
+      "predicted_supported": 3,
+      "predicted_contradicted": 10,
+      "predicted_insufficient": 47
+    },
+    {
+      "threshold": 0.65,
+      "supported_precision": 1.0,
+      "contradicted_precision": 0.8,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.8,
+      "predicted_supported": 2,
+      "predicted_contradicted": 10,
+      "predicted_insufficient": 48
+    },
+    {
+      "threshold": 0.7,
+      "supported_precision": 1.0,
+      "contradicted_precision": 1.0,
+      "false_approval_rate": 0.0,
+      "insufficient_rate": 0.85,
+      "predicted_supported": 1,
+      "predicted_contradicted": 8,
+      "predicted_insufficient": 51
+    }
+  ],
+  "relevant_top1_stats": {
+    "min": 0.0321,
+    "median": 0.4232,
+    "mean": 0.43744800000000006,
+    "max": 0.7174
+  },
+  "irrelevant_top1_stats": {
+    "min": 0.0529,
+    "median": 0.1316,
+    "mean": 0.14972000000000002,
+    "max": 0.3885
+  }
+}

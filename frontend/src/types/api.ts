@@ -28,6 +28,7 @@ export interface GuidelineChunkMatch {
   similarity_score: number;
   bm25_score?: number | null;
   rrf_score?: number | null;
+  rerank_score?: number | null;
 }
 
 export interface GuidelineSearchResponse {
@@ -77,6 +78,7 @@ export interface EvidenceItem {
   distance: number;
   bm25_score?: number | null;
   rrf_score?: number | null;
+  rerank_score?: number | null;
 }
 
 export interface SemanticDriftIssue {
@@ -94,14 +96,30 @@ export interface SemanticDriftResult {
   uncertainty?: string | null;
 }
 
+export interface RiskWarning {
+  rule_id: string;
+  warning_type: string;
+  severity: string;
+  description: string;
+  triggering_condition: string;
+  explanation: string;
+  legal_basis?: string | null;
+  evidence_source?: string | null;
+}
+
 export interface ClaimVerdict {
   claim_id: string;
   claim_text: string;
   verdict: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE' | string;
+  compliance_verdict?: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE' | string | null;
   explanation: string;
   evidence: EvidenceItem[];
   suggested_correction?: string | null;
   deterministic_rule_fired?: boolean;
+  rule_id?: string | null;
+  rule_category?: string | null;
+  rule_description?: string | null;
+  risk_warning?: RiskWarning | null;
   semantic_drift?: SemanticDriftResult | null;
 }
 

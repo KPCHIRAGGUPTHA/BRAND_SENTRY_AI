@@ -1,7 +1,8 @@
 """
 Hybrid Document Retriever for BrandSentry AI.
 Combines Dense Semantic Vector Search (ChromaDB + all-MiniLM-L6-v2)
-with Sparse Lexical Search (BM25Okapi) using Reciprocal Rank Fusion (RRF).
+with Sparse Lexical Search (BM25Okapi) using Reciprocal Rank Fusion (RRF),
+with optional Cross-Encoder reranking (Xenova/ms-marco-MiniLM-L-6-v2).
 """
 import re
 import logging
@@ -11,15 +12,18 @@ from backend.app.core.config import settings
 from backend.app.retrieval.vector_store import vector_store_service, VectorStoreService
 from backend.app.retrieval.bm25_retriever import bm25_retriever, BM25RetrieverService
 from backend.app.retrieval.embeddings import embedding_service, EmbeddingService
+from backend.app.retrieval.reranker import reranker_service, CrossEncoderRerankerService
 
 logger = logging.getLogger(__name__)
 
 
 class HybridRetrieverService:
     """
-    Hybrid retriever that unifies semantic vector search and BM25 keyword search.
+    Hybrid retriever that unifies semantic vector search, BM25 keyword search,
+    and optional Cross-Encoder reranking.
     Calculates fused candidate ranks using Reciprocal Rank Fusion:
         RRF(d) = sum(1.0 / (k + rank(d)))
+    Followed by cross-attention contextual reranking when enabled.
     """
 
     def __init__(
@@ -27,11 +31,13 @@ class HybridRetrieverService:
         vector_store: Optional[VectorStoreService] = None,
         bm25_service: Optional[BM25RetrieverService] = None,
         embeddings: Optional[EmbeddingService] = None,
+        reranker: Optional[CrossEncoderRerankerService] = None,
         smoothing_k: Optional[int] = None,
     ):
         self.vector_store = vector_store or vector_store_service
         self.bm25 = bm25_service or bm25_retriever
         self.embeddings = embeddings or embedding_service
+        self.reranker = reranker or reranker_service
         self.smoothing_k = smoothing_k if smoothing_k is not None else settings.RRF_SMOOTHING_K
 
     def search(
@@ -42,6 +48,7 @@ class HybridRetrieverService:
         top_k: int = 5,
         query_embedding: Optional[List[float]] = None,
         mode: Optional[str] = None,
+        rerank: Optional[bool] = None,
     ) -> List[Dict[str, Any]]:
         """
         Retrieves top-k evidence passages for a given query or claim.
@@ -52,7 +59,9 @@ class HybridRetrieverService:
             document_ids: Optional list of document IDs for multi-document scoping.
             top_k: Number of final passages to return.
             query_embedding: Optional pre-computed query embedding.
-            mode: Retrieval mode ('hybrid', 'dense', or 'bm25'). Defaults to settings.RETRIEVAL_MODE.
+            mode: Retrieval mode ('hybrid', 'hybrid_rerank', 'dense', or 'bm25').
+                  Defaults to settings.RETRIEVAL_MODE.
+            rerank: Explicit override to enable or disable cross-encoder reranking.
 
         Returns:
             List of passage dicts sorted by relevance, with metadata and scores.
@@ -74,8 +83,11 @@ class HybridRetrieverService:
             return self._dense_search(clean_query, target_doc_ids, top_k, query_embedding)
         elif active_mode == "bm25":
             return self._bm25_search(clean_query, target_doc_ids, top_k)
+        elif active_mode in ("hybrid_rerank", "rerank"):
+            return self._hybrid_search(clean_query, target_doc_ids, top_k, query_embedding, rerank=True)
         else:
-            return self._hybrid_search(clean_query, target_doc_ids, top_k, query_embedding)
+            should_rerank = rerank if rerank is not None else (active_mode == "hybrid_rerank")
+            return self._hybrid_search(clean_query, target_doc_ids, top_k, query_embedding, rerank=should_rerank)
 
     def _dense_search(
         self,
@@ -149,12 +161,14 @@ class HybridRetrieverService:
         target_doc_ids: Optional[List[str]],
         top_k: int,
         query_embedding: Optional[List[float]] = None,
+        rerank: bool = False,
     ) -> List[Dict[str, Any]]:
         """
-        Combines dense vector search and BM25 lexical search via Reciprocal Rank Fusion (RRF).
+        Combines dense vector search and BM25 lexical search via Reciprocal Rank Fusion (RRF),
+        followed by optional Cross-Encoder reranking.
         RRF formula: RRF_score(d) = sum(1.0 / (k + rank_i(d)))
         """
-        candidate_pool_size = max(top_k * 3, 15)
+        candidate_pool_size = max(top_k * 3, getattr(settings, "RERANKER_CANDIDATE_POOL", 15))
 
         # 1. Retrieve dense candidates
         dense_candidates = self._dense_search(
@@ -213,12 +227,21 @@ class HybridRetrieverService:
             reverse=True,
         )
 
-        return self._deduplicate_passages(merged_candidates, top_k)
+        deduped_candidates = self._deduplicate_passages(merged_candidates, top_k=None)
+
+        if rerank and self.reranker is not None:
+            try:
+                return self.reranker.rerank(query=query, candidates=deduped_candidates, top_k=top_k)
+            except Exception as e:
+                logger.error("Cross-encoder reranking failed: %s. Falling back to RRF candidate order.", e)
+                return deduped_candidates[:top_k]
+
+        return deduped_candidates[:top_k]
 
     def _deduplicate_passages(
         self,
         passages: List[Dict[str, Any]],
-        top_k: int,
+        top_k: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """Removes exact and near-identical passage duplicates."""
         seen_chunk_ids = set()
@@ -239,10 +262,11 @@ class HybridRetrieverService:
             seen_texts.add(norm_text)
             deduped.append(p)
 
-            if len(deduped) >= top_k:
+            if top_k is not None and len(deduped) >= top_k:
                 break
 
         return deduped
 
 
 hybrid_retriever = HybridRetrieverService()
+

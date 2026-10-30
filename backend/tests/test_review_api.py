@@ -158,10 +158,13 @@ class TestReviewSuccess:
         )
         assert response.status_code == 200
         data = response.json()
-        verdicts = [c["verdict"] for c in data["claims"]]
-        assert "CONTRADICTED" in verdicts, (
-            f"Expected CONTRADICTED for '100% guaranteed' claim, got: {verdicts}"
-        )
+        claim = data["claims"][0]
+        # In authoritative semantics, warning without guideline evidence produces INSUFFICIENT_EVIDENCE
+        assert claim["verdict"] == "INSUFFICIENT_EVIDENCE"
+        assert claim["compliance_verdict"] == "INSUFFICIENT_EVIDENCE"
+        assert claim["risk_warning"] is not None
+        assert claim["risk_warning"]["rule_id"] == "RULE-UNIV-ABS-001"
+        assert claim["evidence"] == []
 
     @patch("backend.app.api.review.embedding_service")
     @patch("backend.app.api.review.vector_store_service")

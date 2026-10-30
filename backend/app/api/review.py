@@ -21,6 +21,7 @@ from backend.app.schemas.review import (
     ReviewResponse,
     ClaimVerdictSchema,
     EvidenceItemSchema,
+    RiskWarningSchema,
     ReviewSummary,
     SemanticDriftResult,
     SemanticDriftIssue,
@@ -226,6 +227,7 @@ def _execute_review_pipeline(
                 distance=round(e.distance, 4),
                 bm25_score=passage_meta_map.get(e.chunk_id, {}).get("bm25_score"),
                 rrf_score=passage_meta_map.get(e.chunk_id, {}).get("rrf_score"),
+                rerank_score=passage_meta_map.get(e.chunk_id, {}).get("rerank_score"),
             )
             for e in cv.evidence
         ]
@@ -249,15 +251,34 @@ def _execute_review_pipeline(
                 uncertainty=sd.uncertainty,
             )
 
+        risk_warning_schema = None
+        if getattr(cv, "risk_warning", None) is not None:
+            rw = cv.risk_warning
+            risk_warning_schema = RiskWarningSchema(
+                rule_id=rw.rule_id,
+                warning_type=rw.warning_type,
+                severity=rw.severity,
+                description=rw.description,
+                triggering_condition=rw.triggering_condition,
+                explanation=rw.explanation,
+                legal_basis=rw.legal_basis,
+                evidence_source=rw.evidence_source,
+            )
+
         claim_verdicts.append(
             ClaimVerdictSchema(
                 claim_id=cv.claim_id,
                 claim_text=cv.claim_text,
                 verdict=cv.verdict,
+                compliance_verdict=getattr(cv, "compliance_verdict", cv.verdict),
                 explanation=cv.explanation,
                 evidence=evidence_schemas,
                 suggested_correction=cv.suggested_correction,
                 deterministic_rule_fired=cv.deterministic_rule_fired,
+                rule_id=getattr(cv, "rule_id", None),
+                rule_category=getattr(cv, "rule_category", None),
+                rule_description=getattr(cv, "rule_description", None),
+                risk_warning=risk_warning_schema,
                 semantic_drift=drift_schema,
             )
         )

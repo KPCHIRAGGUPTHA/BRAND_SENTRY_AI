@@ -68,11 +68,27 @@ class Settings(BaseSettings):
     CHROMA_COLLECTION_NAME: str = Field(default="guideline_chunks")
     RETRIEVAL_MODE: str = Field(
         default="hybrid",
-        description="Retrieval engine mode: 'hybrid' (Dense + BM25 + RRF), 'dense', or 'bm25'",
+        description="Retrieval engine mode: 'hybrid' (Dense + BM25 + RRF), 'hybrid_rerank' (Dense + BM25 + RRF + Cross-Encoder), 'dense', or 'bm25'",
     )
     RRF_SMOOTHING_K: int = Field(
         default=60,
         description="Reciprocal Rank Fusion smoothing constant k (default: 60)",
+    )
+    RERANKING_ENABLED: bool = Field(
+        default=True,
+        description="Whether Cross-Encoder reranking is enabled",
+    )
+    RERANKER_MODEL_NAME: str = Field(
+        default="Xenova/ms-marco-MiniLM-L-6-v2",
+        description="Cross-Encoder model for claim-passage contextual reranking",
+    )
+    RERANKER_CANDIDATE_POOL: int = Field(
+        default=15,
+        description="Number of candidate passages to retrieve before cross-encoder reranking",
+    )
+    RERANKER_MAX_LENGTH: int = Field(
+        default=256,
+        description="Max token sequence length for cross-encoder query-passage input",
     )
 
     # Multimodal & Visual Brand Compliance (Improvement 3)

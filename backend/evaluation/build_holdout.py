@@ -1,0 +1,1159 @@
+import json
+
+cases = [
+    # ---------------------------------------------------------------------------
+    # 1. Negation and Disclaimers (8 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-neg-001",
+        "query": "This software does not guarantee continuous uninterrupted uptime under adverse network conditions.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative disclaimer explicitly declining to promise absolute uptime, conforming to brand guarantee policy."
+    },
+    {
+        "id": "holdout-neg-002",
+        "query": "Our dietary supplement does not cure, treat, or prevent cardiovascular disease.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Mandatory statutory disclaimer explicitly disclaiming disease treatment, aligned with health policy."
+    },
+    {
+        "id": "holdout-neg-003",
+        "query": "We make no promise that every client will achieve identical investment returns.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Explicit disclaimer rejecting uniform outcome guarantees, compliant with brand guarantee rules."
+    },
+    {
+        "id": "holdout-neg-004",
+        "query": "This product does not replace professional medical consultation, diagnosis, or clinical therapy.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Standard mandatory disclaimer aligning with requirement not to imply product replaces professional advice."
+    },
+    {
+        "id": "holdout-neg-005",
+        "query": "Marketing communications will not hide mandatory processing surcharges or account setup fees.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative commitment to transparent fee disclosure, aligning with pricing policy."
+    },
+    {
+        "id": "holdout-neg-006",
+        "query": "We do not claim our consumer gadget produces zero impact on local waterways.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Explicit negative disclaimer avoiding prohibited broad zero impact environmental claims."
+    },
+    {
+        "id": "holdout-neg-007",
+        "query": "Our platform is not completely secure against nation-state zero-day exploits.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Explicit rejection of prohibited 'completely secure' claim, conforming to cybersecurity disclosure policy."
+    },
+    {
+        "id": "holdout-neg-008",
+        "query": "We never describe any clearance promotion as our lowest price ever without archival pricing verification.",
+        "category": "negation_disclaimers",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Negative phrasing stating strict adherence to historical pricing substantiation rule."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 2. Double Negatives (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-dbl-009",
+        "query": "It is not the case that our promotional materials fail to clearly disclose mandatory service fees.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Convoluted double negation asserting full disclosure of fees, compliant with pricing policy."
+    },
+    {
+        "id": "holdout-dbl-010",
+        "query": "Our team never fails to retain verifiable research evidence for every factual marketing claim.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-brand-evidence"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Double negation asserting complete retention of evidence, supporting evidence guideline."
+    },
+    {
+        "id": "holdout-dbl-011",
+        "query": "We do not distribute products without ensuring customer data is not left unencrypted at rest.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-security-encryption"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-security",
+        "notes": "Double negation asserting data is encrypted at rest, compliant with data protection architecture."
+    },
+    {
+        "id": "holdout-dbl-012",
+        "query": "No promotional campaign is ever launched that does not omit mandatory legal risk disclosures.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-brand-pricing", "chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Double negative resolving to admitting campaigns omit mandatory disclosures, violating policy."
+    },
+    {
+        "id": "holdout-dbl-013",
+        "query": "It is not untrue that our software guarantees zero downtime under every operational workload.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Double negative affirming a guarantee of zero downtime, which directly violates brand guarantee rules."
+    },
+    {
+        "id": "holdout-dbl-014",
+        "query": "Our compliance audits never neglect to verify that emblem padding does not drop below 20px.",
+        "category": "double_negatives",
+        "expected_chunk_ids": ["chunk-brand-visual"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Double negative affirming adherence to the 20px buffer rule."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 3. Compound Claims (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-cmp-015",
+        "query": "Our emblem maintains a 20px clear margin, and our platform guarantees 100% security against all hackers.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-brand-visual", "chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Compound claim containing one compliant clause and one absolute security violation; entire compound claim is CONTRADICTED."
+    },
+    {
+        "id": "holdout-cmp-016",
+        "query": "We provide reproducible benchmark reports, but we guarantee that our system cures severe chronic insomnia.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-brand-performance", "chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Compound claim with valid benchmark clause and an illegal medical cure claim; overall CONTRADICTED."
+    },
+    {
+        "id": "holdout-cmp-017",
+        "query": "All administrative fees are clearly disclosed, and advertised promotional discounts never exceed 45%.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-brand-pricing", "chunk-finance-discounts"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": None,
+        "notes": "Compound claim where both clauses comply with fee disclosure and discount cap policies."
+    },
+    {
+        "id": "holdout-cmp-018",
+        "query": "We disclose all financing conditions, and our servers use AES-256 encryption across all storage clusters.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-brand-pricing", "chunk-security-encryption"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": None,
+        "notes": "Compound claim with two affirmatively compliant statements across pricing and security."
+    },
+    {
+        "id": "holdout-cmp-019",
+        "query": "Customer data is encrypted with AES-256 at rest, but our service guarantees zero investment risk.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-security-encryption", "chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": None,
+        "notes": "Compound claim containing valid technical specification coupled with a prohibited 'zero risk' guarantee."
+    },
+    {
+        "id": "holdout-cmp-020",
+        "query": "Our organic formula is lab tested, and it permanently eradicates chronic arthritis in adults.",
+        "category": "compound_claims",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Compound claim alleging disease eradication; statutory violation overrides general lab testing mention."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 4. Conditional Approval (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-cnd-021",
+        "query": "Subject to formal medical and regulatory approval, our therapeutic balm treats minor dermal abrasions.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Conditionality ('subject to approval') indicates approval has not yet completed; cannot be published as verified truth."
+    },
+    {
+        "id": "holdout-cnd-022",
+        "query": "Promotional discounts reaching 60% are valid only after written compliance officer authorization is finalized.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-finance",
+        "notes": "Correct restatement of financial policy condition: discounts over 50% require prior compliance officer signoff."
+    },
+    {
+        "id": "holdout-cnd-023",
+        "query": "Pending final corporate legal review, our commercial campaign promises 100% money-back satisfaction.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Pending status means approval is absent at review time; requires documentary confirmation before release."
+    },
+    {
+        "id": "holdout-cnd-024",
+        "query": "Environmental claims of carbon neutrality are released only when documented lifecycle basis is formally certified.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative restatement of policy requirement that carbon neutral claims require documented approval."
+    },
+    {
+        "id": "holdout-cnd-025",
+        "query": "If independent clinical trials corroborate findings, our clinic will publicize a 40% recovery acceleration.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-brand-health", "chunk-brand-performance"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Hypothetical future claim conditioned on future clinical trials; current evidence is insufficient."
+    },
+    {
+        "id": "holdout-cnd-026",
+        "query": "Safety claims asserting zero adverse reactions are strictly withheld until laboratory toxicology reports are verified.",
+        "category": "conditional_approval",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirms compliance policy prohibiting unsubstantiated 'no risk' claims without documented lab protocols."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 5. Self-Reported Approval (Case A) (7 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-appr-027",
+        "query": "Our marketing VP orally approved claiming our hedge fund carries zero risk for retirement accounts.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Self-attestation of internal VP approval cannot exempt a prohibited 'zero risk' guarantee; universal risk stands."
+    },
+    {
+        "id": "holdout-appr-028",
+        "query": "Our legal team has approved our claim that this herbal extract cures adult diabetes.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Self-reported legal approval cannot legalize an unapproved medical disease cure claim; statutory violation."
+    },
+    {
+        "id": "holdout-appr-029",
+        "query": "Internal counsel verified our status as officially voted number 1 in the world for customer satisfaction.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Self-attestation cannot bypass explicit policy ban on 'number 1 in the world' claims without documented third-party basis."
+    },
+    {
+        "id": "holdout-appr-030",
+        "query": "We have received full legal signoff confirming our product is completely secure and impossible to hack.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Self-attestation of signoff does not override explicit guideline rule banning 'completely secure' and 'impossible to hack'."
+    },
+    {
+        "id": "holdout-appr-031",
+        "query": "Compliance has signed off on describing our new sedan as 100% safe for all driving conditions.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline explicitly states materials must not describe a product as '100% safe'; internal self-attestation is rejected."
+    },
+    {
+        "id": "holdout-appr-032",
+        "query": "Management confirmed that legal approved our 65% storewide discount, though no authorization file was attached.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-finance",
+        "notes": "Discount over 50% requires documentary compliance authorization; self-attested oral management approval is insufficient."
+    },
+    {
+        "id": "holdout-appr-033",
+        "query": "The product manager notes that legal approved calling this package carbon neutral without providing supporting lifecycle studies.",
+        "category": "self_reported_approval",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Carbon neutral claims require documented and approved basis; self-reported manager notes without documentation are insufficient."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 6. Cross-Product Approval (Case B) (5 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-xprd-034",
+        "query": "Regulatory registration 9845-A certifies our line of consumer wellness tea bags.",
+        "category": "cross_product_approval",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Code 9845-A in Healthcare Manual applies to clinical medical devices, not consumer wellness tea; out of scope."
+    },
+    {
+        "id": "holdout-xprd-035",
+        "query": "CE mark registration 9845-A authorizes international commercial sales of our financial mobile app.",
+        "category": "cross_product_approval",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Medical device CE code 9845-A has no applicability to financial mobile software; cross-domain mismatch."
+    },
+    {
+        "id": "holdout-xprd-036",
+        "query": "Compliance approval granted for the 2024 holiday sale authorizes a 60% discount for our 2026 spring catalog.",
+        "category": "cross_product_approval",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-finance",
+        "notes": "Past campaign authorization for 2024 cannot be mechanically transposed to a new 2026 campaign."
+    },
+    {
+        "id": "holdout-xprd-037",
+        "query": "The security certification covering our legacy on-premise server applies to our multi-tenant SaaS cloud.",
+        "category": "cross_product_approval",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Transferring security credentials across different product architectures without verification is unsubstantiated."
+    },
+    {
+        "id": "holdout-xprd-038",
+        "query": "Toxicology laboratory signoff on packaging cardboard authorizes describing the ingested food ingredients as 100% safe.",
+        "category": "cross_product_approval",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline bans describing products as '100% safe', and packaging approval does not cover food ingestion safety."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 7. Uncovered Approval Scope (Case C) (5 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-uncov-039",
+        "query": "Our CE mark registration 9845-A proves that our diagnostic hardware cures acute viral pneumonia.",
+        "category": "uncovered_approval",
+        "expected_chunk_ids": ["chunk-health-regulatory", "chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": None,
+        "notes": "Device distribution code 9845-A does not authorize therapeutic cure representations; disease cure claim is prohibited."
+    },
+    {
+        "id": "holdout-uncov-040",
+        "query": "Compliance officer signoff on 10% introductory rates permits advertising a 70% rate discount.",
+        "category": "uncovered_approval",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-finance",
+        "notes": "Authorization for a 10% promotion does not cover an unapproved 70% discount; exceeds 50% cap."
+    },
+    {
+        "id": "holdout-uncov-041",
+        "query": "Approval to test beta software under an NDA allows public advertising of guaranteed zero downtime.",
+        "category": "uncovered_approval",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Internal testing approval does not cover external public advertising of absolute guarantees."
+    },
+    {
+        "id": "holdout-uncov-042",
+        "query": "Laboratory certification of our battery fire resistance permits advertising the whole device as 100% safe.",
+        "category": "uncovered_approval",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Component-level fire resistance certification does not permit broad prohibited '100% safe' claims."
+    },
+    {
+        "id": "holdout-uncov-043",
+        "query": "Written legal approval of our standard return policy permits advertising guaranteed financial trading profits.",
+        "category": "uncovered_approval",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Approval of commercial return policy does not cover unapproved financial return guarantees."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 8. Missing Documentary Evidence (Case D) (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-miss-044",
+        "query": "Internal ledger spreadsheets from 2018 demonstrate this is our lowest price ever.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Claim cites private internal spreadsheets not provided in the evaluation guidelines corpus."
+    },
+    {
+        "id": "holdout-miss-045",
+        "query": "An undisclosed university laboratory trial demonstrated our lotion eliminates skin redness.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Unsupplied third-party clinical trial cannot serve as verified evidence under evidence guidelines."
+    },
+    {
+        "id": "holdout-miss-046",
+        "query": "Customer sentiment surveys stored on an offline server prove 99% satisfaction.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-brand-testimonials"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Surveys mentioned but missing from the repository constitute insufficient evidence."
+    },
+    {
+        "id": "holdout-miss-047",
+        "query": "Our carbon offset certificates are filed in our central archives and prove full carbon neutrality.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Carbon neutral claim requires documented and verified basis; unsupplied archive files are insufficient."
+    },
+    {
+        "id": "holdout-miss-048",
+        "query": "Detailed micro-benchmark logs retained on an engineer's laptop confirm a 35% latency drop.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Unpublished local telemetry logs cannot substantiate a specific percentage performance improvement."
+    },
+    {
+        "id": "holdout-miss-049",
+        "query": "Written compliance authorization was granted via an unindexed email chain for our 55% discount.",
+        "category": "missing_documentary_evidence",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-finance",
+        "notes": "Unindexed email mentioned but not supplied fails the requirement for verified documentary authorization."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 9. Historical and Expired Evidence (Case E) (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-exp-050",
+        "query": "Our software was ranked number 1 in the world in a 2016 consumer tech survey.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline prohibits 'number 1 in the world' claims and requires current, up-to-date comparative evidence."
+    },
+    {
+        "id": "holdout-exp-051",
+        "query": "Based on laboratory toxicology tests completed seven years ago, our formulation is non-hazardous.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Safety statements must be substantiated under current laboratory protocols, not outdated 7-year-old tests."
+    },
+    {
+        "id": "holdout-exp-052",
+        "query": "Historical pricing records from five years ago substantiate this holiday offer as our lowest price ever.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Outdated historical pricing records from 5 years ago fail the requirement for current, comprehensive pricing history."
+    },
+    {
+        "id": "holdout-exp-053",
+        "query": "We rely on a 2019 clinical trial that expired in 2021 to support our therapeutic efficacy claims.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Expired clinical trials contradict the requirement that evidence must be current and reproducible."
+    },
+    {
+        "id": "holdout-exp-054",
+        "query": "Performance comparisons are based on legacy 2017 benchmark suites that are never updated.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Comparisons with competitors must use verifiable and up-to-date information, not obsolete frozen benchmarks."
+    },
+    {
+        "id": "holdout-exp-055",
+        "query": "Our carbon neutral certification expired in 2022, but we continue to display the certified badge.",
+        "category": "historical_expired_evidence",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Displaying expired environmental certifications directly contradicts verified substantiation standards."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 10. Numerical Thresholds (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-num-056",
+        "query": "Promotional financing packages feature a 42% discount across standard accounts.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-finance",
+        "notes": "Discount of 42% conforms to the cap stating pricing discount claims cannot exceed 50%."
+    },
+    {
+        "id": "holdout-num-057",
+        "query": "Take advantage of our limited-time 58% discount on commercial enterprise loans.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-finance",
+        "notes": "Discount of 58% violates the financial policy rule that discount claims cannot exceed 50% without authorization."
+    },
+    {
+        "id": "holdout-num-058",
+        "query": "The visual design system mandates at least a 25px clear buffer zone around the emblem.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-brand-visual"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Buffer zone of 25px satisfies the requirement for 'at least 20px clear buffer margin'."
+    },
+    {
+        "id": "holdout-num-059",
+        "query": "Place the company emblem with a 12px clear margin from adjacent layout elements.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-brand-visual"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Margin of 12px violates the mandatory minimum threshold of 20px clear buffer margin."
+    },
+    {
+        "id": "holdout-num-060",
+        "query": "Storage clusters perform cryptographic key rotation automatically every 90 days.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-security-encryption"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-security",
+        "notes": "Matches explicit architectural specification stating key rotation occurs automatically every 90 days."
+    },
+    {
+        "id": "holdout-num-061",
+        "query": "Promotional APR advertisements must display the composite APR calculation formula.",
+        "category": "numerical_thresholds",
+        "expected_chunk_ids": ["chunk-finance-discounts"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-finance",
+        "notes": "Direct alignment with rule stating all promotional APR rates must display the composite APR formula."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 11. Approximate Numerical Claims (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-apx-062",
+        "query": "Users achieve roughly 35% faster document turnaround times.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Policy explicitly commands 'Do not state a specific percentage improvement unless underlying measurement and methodology are documented'."
+    },
+    {
+        "id": "holdout-apx-063",
+        "query": "Nearly 50% of surveyed clients reported exceptional cost reductions.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-testimonials", "chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Contradicts rule that exceptional results must not be implied to be typical without representative evidence."
+    },
+    {
+        "id": "holdout-apx-064",
+        "query": "Our platform delivers approximately 60% higher processing throughput.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Percentage performance improvement asserted without documented methodology, violating performance policy."
+    },
+    {
+        "id": "holdout-apx-065",
+        "query": "Customers save around 25% on annual subscription renewal expenses.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Claims about savings or performance must be supported by documented measurement and reproducible evidence."
+    },
+    {
+        "id": "holdout-apx-066",
+        "query": "Over 90% of chronic fatigue sufferers noticed immediate therapeutic relief.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Health-related outcome percentages must be supported by clinical trials; unbacked efficacy claims are prohibited."
+    },
+    {
+        "id": "holdout-apx-067",
+        "query": "Documented laboratory benchmarks demonstrate an exact 28% decrease in latency.",
+        "category": "approximate_numerical",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Mentions documented laboratory benchmarks, but the actual underlying data is not in the corpus."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 12. Comparative and Superlative Claims (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-sup-068",
+        "query": "We are universally recognized as number 1 in the world for cloud infrastructure reliability.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline explicitly states: 'Unsubstantiated claims such as number 1 in the world are prohibited'."
+    },
+    {
+        "id": "holdout-sup-069",
+        "query": "Our software operates twice as fast as all competing platforms in every configuration.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Comparisons with competitors must use fair, verifiable, up-to-date data, not sweeping unsubstantiated superlatives."
+    },
+    {
+        "id": "holdout-sup-070",
+        "query": "This weekend only: grab the lowest price ever on all wireless headphones.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline prohibits 'lowest price ever' unless historical pricing records substantiate the claim."
+    },
+    {
+        "id": "holdout-sup-071",
+        "query": "Our customer service is the absolute premier support team in the global economy.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Unsubstantiated superlative ranking claim violating comparative advertising rules."
+    },
+    {
+        "id": "holdout-sup-072",
+        "query": "Competitor comparisons use verified third-party published benchmarks updated monthly.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative commitment adhering to rule requiring fair, verifiable, and up-to-date competitor comparison data."
+    },
+    {
+        "id": "holdout-sup-073",
+        "query": "Our mobile application delivers unrivaled superiority over every alternate solution.",
+        "category": "comparative_superlative",
+        "expected_chunk_ids": ["chunk-brand-performance"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Broad unsubstantiated comparative superlative without documentation or reproducible evidence."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 13. Medical Efficacy Claims (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-med-074",
+        "query": "Our herbal tincture is clinically proven to cure chronic hypertension permanently.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Statutory violation and guideline breach: materials must not claim a product cures or treats a disease."
+    },
+    {
+        "id": "holdout-med-075",
+        "query": "Daily application of this cream eliminates psoriasis without prescription medication.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Claims to eliminate a medical condition and replace professional prescription therapy; prohibited."
+    },
+    {
+        "id": "holdout-med-076",
+        "query": "This organic syrup eradicates seasonal influenza symptoms within twenty-four hours.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct violation of prohibition against claiming a product cures, treats, or eradicates diseases."
+    },
+    {
+        "id": "holdout-med-077",
+        "query": "Our fitness tracker does not claim to diagnose or treat cardiac arrhythmias.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Compliant medical disclaimer explicitly rejecting diagnostic or treatment claims."
+    },
+    {
+        "id": "holdout-med-078",
+        "query": "Medical devices distributed under clinical guidelines state FDA approved or CE marked with registration number 9845-A.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-health",
+        "notes": "Factual alignment with Healthcare Compliance Manual regulatory specification."
+    },
+    {
+        "id": "holdout-med-079",
+        "query": "Health wellness promotions must be supported by documented clinical trials reviewed before publication.",
+        "category": "medical_efficacy",
+        "expected_chunk_ids": ["chunk-brand-health"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative restatement of guideline requirement for clinical trial evidence."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 14. Environmental Claims (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-env-080",
+        "query": "Our cloud computing infrastructure produces zero impact on terrestrial wildlife.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Contradicts policy rule restricting broad unsubstantiated 'zero impact' environmental claims."
+    },
+    {
+        "id": "holdout-env-081",
+        "query": "Purchase our eco-friendly water bottle for flawless zero footprint hydration.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Violates environmental policy against broad, absolute 'zero footprint' claims."
+    },
+    {
+        "id": "holdout-env-082",
+        "query": "Our server hardware is 100% green and completely eliminates environmental waste.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Violates rule requiring specific evidence and prohibiting broad unsubstantiated 'green' claims."
+    },
+    {
+        "id": "holdout-env-083",
+        "query": "Packaging cardboard uses 30% recycled post-consumer fiber as verified by supplier invoices.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Specific limited claim citing external supplier invoices not present in the reference documents."
+    },
+    {
+        "id": "holdout-env-084",
+        "query": "We avoid broad environmental claims and restrict ecological statements to assessed product features.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct alignment with environmental guideline policy command: 'Avoid broad environmental claims'."
+    },
+    {
+        "id": "holdout-env-085",
+        "query": "Our corporation operates with net zero environmental emissions across all factories.",
+        "category": "environmental_claims",
+        "expected_chunk_ids": ["chunk-brand-environmental"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Broad unapproved 'zero emissions' environmental claim without documented basis."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 15. Financial Guarantees (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-fin-086",
+        "query": "We provide a 100% guaranteed 15% annual yield on corporate bond deposits.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Statutory marketing violation: promising guaranteed investment yield violates guarantee policy."
+    },
+    {
+        "id": "holdout-fin-087",
+        "query": "Our automated trading algorithm ensures zero financial risk for speculative portfolios.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Policy prohibits claims using 'zero risk' and promising guaranteed outcomes when results depend on conditions."
+    },
+    {
+        "id": "holdout-fin-088",
+        "query": "Investors will always achieve profitable returns regardless of economic recessions.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Prohibits words such as 'always' and promising guaranteed outcomes independent of customer circumstances."
+    },
+    {
+        "id": "holdout-fin-089",
+        "query": "Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Verbatim affirmative restatement of brand guideline guarantee policy."
+    },
+    {
+        "id": "holdout-fin-090",
+        "query": "We clearly disclose all maintenance fees, withdrawal limitations, and eligibility conditions.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative compliance with pricing policy requirement to clearly disclose limitations and fees."
+    },
+    {
+        "id": "holdout-fin-091",
+        "query": "Our high-yield certificate guarantees double-digit returns within thirty calendar days.",
+        "category": "financial_guarantees",
+        "expected_chunk_ids": ["chunk-brand-guarantees"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Unlawful financial outcome guarantee violating guarantee policies and statutory consumer protection."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 16. Security Guarantees (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-sec-092",
+        "query": "Our next-generation firewall guarantees 100% impenetrable barrier against ransomware.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Guideline prohibits claims that customer data is 'completely secure' or 'impossible to hack'."
+    },
+    {
+        "id": "holdout-sec-093",
+        "query": "Our encryption architecture is completely impossible to hack by any threat actor.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct violation of explicit policy rule: 'impossible to hack must not be used'."
+    },
+    {
+        "id": "holdout-sec-094",
+        "query": "Customer records are completely secure against all forms of cyber vulnerability.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct violation of explicit policy rule: 'completely secure must not be used'."
+    },
+    {
+        "id": "holdout-sec-095",
+        "query": "Network transit traffic is encrypted with TLS 1.3 across all distributed clusters.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-security-encryption"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-security",
+        "notes": "Direct factual match with Enterprise Information Security Standard specification."
+    },
+    {
+        "id": "holdout-sec-096",
+        "query": "Security and privacy statements must accurately reflect verified controls and documented practices.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct restatement of mandatory policy rule from BrandSentry Marketing Compliance guideline."
+    },
+    {
+        "id": "holdout-sec-097",
+        "query": "Our cloud platform guarantees zero vulnerability to zero-day memory exploits.",
+        "category": "security_guarantees",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Absolute security guarantee violating prohibitions against 'completely secure' and 'impossible to hack'."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 17. Exact Regulatory Identifiers (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-reg-098",
+        "query": "Medical devices distributed under clinical guidelines state FDA approved or CE marked with specific registration number 9845-A.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-health",
+        "notes": "Direct match with Healthcare Compliance Manual code requirement."
+    },
+    {
+        "id": "holdout-reg-099",
+        "query": "Our clinical ultrasound machine is registered under regulatory device code 9845-A.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-health",
+        "notes": "Factual specification match adhering to Healthcare Compliance Manual code 9845-A."
+    },
+    {
+        "id": "holdout-reg-100",
+        "query": "Our surgical monitoring apparatus is certified under device registration code 4412-K.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Healthcare manual specifically mandates code 9845-A; code 4412-K is unverified in available evidence."
+    },
+    {
+        "id": "holdout-reg-101",
+        "query": "Marketing materials omit regulatory registration code 9845-A from medical device promotions.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-health",
+        "notes": "Guideline explicitly states: 'Any promotion omitting this code is subject to immediate recall'."
+    },
+    {
+        "id": "holdout-reg-102",
+        "query": "Our financial trading portal holds regulatory broker registration certificate 9845-A.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-health-regulatory"],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Code 9845-A is a healthcare device code; asserting it for financial brokerage is unevidenced."
+    },
+    {
+        "id": "holdout-reg-103",
+        "query": "Do not claim regulatory certification or compliance unless the relevant status has been verified.",
+        "category": "exact_regulatory_ids",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "SUPPORTED",
+        "document_scope": "doc-brand",
+        "notes": "Affirmative restatement of mandatory guideline rule in BrandSentry security section."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 18. Similar but Unrelated Distractor Passages (6 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-sim-104",
+        "query": "Warehouse employees must wear high-visibility vests to guarantee physical safety in loading zones.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Occupational workplace safety rule; shares keywords 'guarantee' and 'safety' with marketing guidelines but is completely out of scope."
+    },
+    {
+        "id": "holdout-sim-105",
+        "query": "Senior software developers must complete peer code reviews before merging pull requests.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Internal engineering pull request review practice; unrelated to consumer review or testimonial guidelines."
+    },
+    {
+        "id": "holdout-sim-106",
+        "query": "Our human resources department guarantees 100% confidentiality during grievance hearings.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "HR grievance policy distractor; not governed by commercial advertising guidelines."
+    },
+    {
+        "id": "holdout-sim-107",
+        "query": "Office building thermostats are set to 22 degrees Celsius to maintain environmental comfort.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Facilities HVAC management distractor; unrelated to product eco-friendly or carbon neutral claims."
+    },
+    {
+        "id": "holdout-sim-108",
+        "query": "Employees must not describe corporate cafeteria food as 100% organic without canteen receipts.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "Cafeteria food distractor sharing wording but completely unrelated to published marketing claims."
+    },
+    {
+        "id": "holdout-sim-109",
+        "query": "Routine database maintenance must be conducted annually to optimize disk indexing.",
+        "category": "similar_unrelated_passages",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "IT infrastructure maintenance distractor matching 'updated annually' phrasing."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 19. Conflicting Evidence Scenarios (4 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-cnf-110",
+        "query": "A regional flyer claims lowest price ever based on verbal recollections while pricing records show lower prices last quarter.",
+        "category": "conflicting_evidence",
+        "expected_chunk_ids": ["chunk-brand-pricing"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Verbal recollections conflict with actual pricing records; contradictory evidence renders claim false."
+    },
+    {
+        "id": "holdout-cnf-111",
+        "query": "Marketing states customer data is completely secure while IT audit reports show open unencrypted endpoints.",
+        "category": "conflicting_evidence",
+        "expected_chunk_ids": ["chunk-brand-security"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Conflicting evidence: audit report conflicts with claim, violating security disclosure policy."
+    },
+    {
+        "id": "holdout-cnf-112",
+        "query": "Ad copy describes a formula as non-toxic while internal lab toxicity tests show mild dermal irritation.",
+        "category": "conflicting_evidence",
+        "expected_chunk_ids": ["chunk-brand-safety"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Direct conflict between marketing assertion and documented laboratory protocols."
+    },
+    {
+        "id": "holdout-cnf-113",
+        "query": "Testimonials claim a product works 100% of the time, while the methodology footnote states only 60% responded.",
+        "category": "conflicting_evidence",
+        "expected_chunk_ids": ["chunk-brand-testimonials"],
+        "expected_verdict": "CONTRADICTED",
+        "document_scope": "doc-brand",
+        "notes": "Conflicting testimonial data violating rule against implying exceptional results are typical."
+    },
+
+    # ---------------------------------------------------------------------------
+    # 20. Out-of-Scope Document Scenarios (5 items)
+    # ---------------------------------------------------------------------------
+    {
+        "id": "holdout-scp-114",
+        "query": "Customer data is encrypted with AES-256 at rest across all storage clusters.",
+        "category": "out_of_scope_documents",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-brand",
+        "notes": "The Brand Marketing guideline does not contain technical AES-256 encryption architecture; document isolation requires INSUFFICIENT_EVIDENCE."
+    },
+    {
+        "id": "holdout-scp-115",
+        "query": "Pricing discount claims cannot exceed 50% without compliance officer authorization.",
+        "category": "out_of_scope_documents",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-health",
+        "notes": "Healthcare Compliance Manual does not govern financial discount caps; document isolation requires INSUFFICIENT_EVIDENCE."
+    },
+    {
+        "id": "holdout-scp-116",
+        "query": "Corporate emblem placement requires at least 20px clear buffer margin.",
+        "category": "out_of_scope_documents",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-security",
+        "notes": "Information Security Standard does not contain visual brand emblem rules; document isolation requires INSUFFICIENT_EVIDENCE."
+    },
+    {
+        "id": "holdout-scp-117",
+        "query": "Medical devices distributed under clinical guidelines require registration code 9845-A.",
+        "category": "out_of_scope_documents",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-finance",
+        "notes": "Financial Compliance Policy does not contain healthcare registration codes; document isolation requires INSUFFICIENT_EVIDENCE."
+    },
+    {
+        "id": "holdout-scp-118",
+        "query": "Promotional APR rates must display the composite APR calculation formula.",
+        "category": "out_of_scope_documents",
+        "expected_chunk_ids": [],
+        "expected_verdict": "INSUFFICIENT_EVIDENCE",
+        "document_scope": "doc-security",
+        "notes": "Information Security Standard does not contain financial APR disclosure rules; document isolation requires INSUFFICIENT_EVIDENCE."
+    }
+]
+
+with open("backend/evaluation/datasets/independent_holdout_benchmark.jsonl", "w", encoding="utf-8") as f:
+    for c in cases:
+        f.write(json.dumps(c, ensure_ascii=False) + "\n")
+
+print(f"Successfully generated {len(cases)} independent holdout cases.")
+verdicts = {}
+for c in cases:
+    v = c["expected_verdict"]
+    verdicts[v] = verdicts.get(v, 0) + 1
+print("Verdict distribution:", verdicts)
+cats = set(c["category"] for c in cases)
+print(f"Categories ({len(cats)}):", sorted(list(cats)))
+

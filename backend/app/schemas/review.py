@@ -71,6 +71,10 @@ class EvidenceItemSchema(BaseModel):
         default=None,
         description="Reciprocal Rank Fusion score if retrieved via hybrid search",
     )
+    rerank_score: Optional[float] = Field(
+        default=None,
+        description="Cross-Encoder score if retrieved via hybrid reranking",
+    )
 
 
 
@@ -100,18 +104,49 @@ class SemanticDriftResult(BaseModel):
     )
 
 
+
+class RiskWarningSchema(BaseModel):
+    """Statutory or regulatory risk warning separate from uploaded brand guideline evidence."""
+    rule_id: str = Field(description="Unique rule identifier (e.g. 'RULE-UNIV-ABS-001').")
+    warning_type: str = Field(
+        default="UNIVERSAL_RISK_WARNING",
+        description="Category: 'UNIVERSAL_RISK_WARNING' | 'REGULATORY_ALERT'.",
+    )
+    severity: str = Field(
+        default="HIGH",
+        description="Warning severity: 'LOW' | 'MEDIUM' | 'HIGH'.",
+    )
+    description: str = Field(description="Summary of the potential advertising risk pattern.")
+    triggering_condition: str = Field(description="Condition or pattern in the claim that triggered the warning.")
+    explanation: str = Field(description="Informational advertising or regulatory risk explanation.")
+    legal_basis: Optional[str] = Field(
+        default=None,
+        description="Informational reference to regulatory standards (jurisdiction not established).",
+    )
+    evidence_source: Optional[str] = Field(
+        default=None,
+        description="Formal regulatory guidance or doctrine establishing this advertising standard.",
+    )
+
+
 class ClaimVerdictSchema(BaseModel):
     """Compliance verdict for a single extracted marketing claim."""
     claim_id: str = Field(description="Stable identifier: 'claim-1', 'claim-2', etc.")
     claim_text: str = Field(description="Original claim text as extracted from marketing content.")
     verdict: str = Field(
         description=(
-            "Three-way compliance verdict: "
-            "'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'. "
-            "SUPPORTED: evidence affirmatively supports the claim. "
-            "CONTRADICTED: evidence or a deterministic rule conflicts with the claim. "
-            "INSUFFICIENT_EVIDENCE: available guidelines cannot determine compliance."
+            "Authoritative three-way compliance verdict: 'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'. "
+            "SUPPORTED: guideline evidence affirmatively supports the claim. "
+            "CONTRADICTED: guideline evidence explicitly conflicts with the claim or proves a violation. "
+            "INSUFFICIENT_EVIDENCE: guidelines do not establish support or contradiction (including warning-only claims)."
         )
+    )
+    compliance_verdict: Optional[str] = Field(
+        default=None,
+        description=(
+            "Authoritative evidence-grounded compliance verdict (strictly identical to verdict): "
+            "'SUPPORTED' | 'CONTRADICTED' | 'INSUFFICIENT_EVIDENCE'."
+        ),
     )
     explanation: str = Field(
         description="Factual explanation of the verdict, citing specific guideline passages where applicable."
@@ -130,6 +165,22 @@ class ClaimVerdictSchema(BaseModel):
     deterministic_rule_fired: bool = Field(
         default=False,
         description="True when the verdict was determined by an explicit prohibited-phrase rule, not by retrieval.",
+    )
+    rule_id: Optional[str] = Field(
+        default=None,
+        description="Identifier of the compliance rule triggered (e.g. 'RULE-UNIV-ABS-001').",
+    )
+    rule_category: Optional[str] = Field(
+        default=None,
+        description="Rule category: 'UNIVERSAL_RISK_WARNING' | 'ORG_GUIDELINE_VIOLATION' | 'EVIDENCE_COMPLIANCE'.",
+    )
+    rule_description: Optional[str] = Field(
+        default=None,
+        description="Formal description of the triggered compliance rule.",
+    )
+    risk_warning: Optional[RiskWarningSchema] = Field(
+        default=None,
+        description="Explicit universal statutory risk warning when triggered without organization guideline evidence.",
     )
     semantic_drift: Optional[SemanticDriftResult] = Field(
         default=None,
