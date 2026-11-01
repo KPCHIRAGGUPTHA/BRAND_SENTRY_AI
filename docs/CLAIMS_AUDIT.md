@@ -86,6 +86,19 @@ Environment: Windows AMD64, Python 3.11.16, 16 CPUs.
 The cache hit ratio describes the workload, not the system: it is high only when claims repeat.
 
 
+Measured on the live Render free tier (`854d281`), from one client:
+
+| Metric | Report | Live |
+| :--- | ---: | ---: |
+| Single claim, first time | not stated | 5.2 to 7.7 s |
+| Single claim, repeated | 42.8 ms | 0.27 s |
+| 10 claims, first time | not stated | 20.4 s |
+| 10 claims, repeated | 184.5 ms | 0.87 s |
+| `/health` during warm-up | not stated | 0.75 s at worst |
+| Cold start: first response, then ready | not stated | 24 s, then 44.5 s |
+
+Live times include network travel. Live memory use could not be measured from outside the service.
+
 ## Engine rules that match benchmark-specific phrases
 
 Each rule was disabled alone, then benchmarks and backend tests were run. Baseline: dev 93.33, holdout 81.36, blind 78.12. This table was measured at `top_k=5`, before the depth change above.
