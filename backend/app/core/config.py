@@ -107,7 +107,7 @@ class Settings(BaseSettings):
         description="Maximum characters in a marketing content review request.",
     )
     REVIEW_EVIDENCE_TOP_K: int = Field(
-        default=4,
+        default=8,
         description="Number of guideline passages retrieved per claim for verdict grounding.",
     )
     # WARNING: This threshold is approximate and NOT a calibrated confidence measure.

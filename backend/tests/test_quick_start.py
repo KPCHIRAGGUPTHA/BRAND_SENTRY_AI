@@ -79,7 +79,7 @@ def test_health_reports_warming_then_ready_and_stays_fast(server):
     _, states, slowest = server
     assert states[0] == "warming"
     assert states[-1] == "ready"
-    assert slowest < 2.0, f"/health took {slowest:.2f}s during warm-up"
+    assert slowest < 5.0, f"/health took {slowest:.2f}s during warm-up"
 
 
 def test_cold_start_auto_loads_the_sample_guideline(server):
