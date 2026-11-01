@@ -1147,17 +1147,6 @@ class VerdictEngine:
                 suggested_correction=None,
                 rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
             )
-        if re.search(r'\bno\s+promotional\s+campaign\s+is\s+ever\s+launched\s+that\s+does\s+not\s+omit\b', claim_text, re.IGNORECASE):
-            return ClaimVerdict(
-                claim_id=claim_id,
-                claim_text=claim_text,
-                verdict=VERDICT_CONTRADICTED,
-                explanation=f"Admits failure to include mandatory disclosures, contradicting guideline from '{doc_name}': \"{quote}\".",
-                evidence=[ev_item],
-                suggested_correction=None,
-                rule_category=CATEGORY_ORG_VIOLATION,
-            )
-
         # 19. Exact technical and regulatory specification match
         if claim_spec_codes and passage_spec_codes and (claim_spec_codes & passage_spec_codes):
             if re.search(r'\b(omits?|omitting|lacks?|without|missing|fails?\s+to|does\s+not\s+(?:include|state|display))\b', claim_text, re.IGNORECASE):
