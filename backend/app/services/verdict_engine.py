@@ -1123,19 +1123,7 @@ class VerdictEngine:
                     rule_category=CATEGORY_ORG_VIOLATION,
                 )
 
-        # 16. Bare "zero risk" and "carbon neutral"
-        if re.fullmatch(r'zero\s+risk', claim_text.strip(), re.IGNORECASE):
-            if re.search(r'\b(zero\s+risk|no\s+risks)\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Contradicts policy restricting 'zero risk' claims from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "zero risk"),
-                    rule_category=CATEGORY_ORG_VIOLATION,
-                )
-
+        # 16. Bare "carbon neutral"
         if re.fullmatch(r'carbon\s+neutral', claim_text.strip(), re.IGNORECASE):
             return ClaimVerdict(
                 claim_id=claim_id,
