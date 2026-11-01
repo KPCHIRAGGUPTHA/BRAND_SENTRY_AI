@@ -31,6 +31,7 @@ PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+from backend.app.core.config import settings
 from backend.evaluation.evaluate_retrieval import load_corpus
 from backend.app.retrieval.bm25_retriever import BM25RetrieverService
 from backend.app.retrieval.vector_store import VectorStoreService
@@ -181,11 +182,11 @@ def run_evaluation():
                 scope = item.get("document_scope")
                 expected = item["expected_verdict"]
 
-                d_passages = retriever.search(query=query, document_id=scope, top_k=5, mode="dense")
+                d_passages = retriever.search(query=query, document_id=scope, top_k=settings.REVIEW_EVIDENCE_TOP_K, mode="dense")
                 d_obj = verdict_engine.classify(claim_id=qid, claim_text=query, retrieved_passages=d_passages)
                 d_pred = d_obj.verdict
 
-                h_passages = retriever.search(query=query, document_id=scope, top_k=5, mode="hybrid")
+                h_passages = retriever.search(query=query, document_id=scope, top_k=settings.REVIEW_EVIDENCE_TOP_K, mode="hybrid")
                 h_obj = verdict_engine.classify(claim_id=qid, claim_text=query, retrieved_passages=h_passages)
                 h_pred = h_obj.verdict
 

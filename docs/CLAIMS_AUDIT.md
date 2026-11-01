@@ -51,6 +51,21 @@ The report's "Recall@1 86.67%" is really precision@1. Dense scores higher than h
 (0.9385), and on the holdout verdict accuracy (83.05% vs 81.36%), so the report's claim that hybrid improves
 retrieval is not supported by the current results.
 
+## Benchmark configuration
+
+Production retrieved `top_k=4` chunks per claim, but the benchmark scripts hard-coded `top_k=5`, so reported
+scores did not describe the live system. The scripts now use the production setting.
+
+| `top_k` | Dev | Holdout | Blind | Note |
+| ---: | ---: | ---: | ---: | :--- |
+| 4 | 91.67 | 81.36 | 75.00 | What production actually ran |
+| 5 | 93.33 | 81.36 | 78.12 | What the scripts measured |
+| 8 | 93.33 | 83.05 | 78.12 | **New production setting** |
+
+A depth of 4 also let other active guidelines crowd out the right chunk, which changed quick-start answers once
+another document was uploaded. Depth 8 fixes the cases tested. A large enough set of active guidelines can still
+crowd out a rule; selecting one guideline in the Scope menu avoids this.
+
 ## Performance
 
 Reproduce with `python scripts/measure_perf.py`. This measures a local machine, not Render, whose free tier has
@@ -70,9 +85,10 @@ Environment: Windows AMD64, Python 3.11.16, 16 CPUs.
 
 The cache hit ratio describes the workload, not the system: it is high only when claims repeat.
 
+
 ## Engine rules that match benchmark-specific phrases
 
-Each rule was disabled alone, then benchmarks and backend tests were run. Baseline: dev 93.33, holdout 81.36, blind 78.12.
+Each rule was disabled alone, then benchmarks and backend tests were run. Baseline: dev 93.33, holdout 81.36, blind 78.12. This table was measured at `top_k=5`, before the depth change above.
 
 | Rule | Dev | Holdout | Blind | Tests | Covered by `guideline_directives.py`? | Outcome |
 | :--- | ---: | ---: | ---: | :--- | :--- | :--- |
@@ -99,7 +115,7 @@ Each rule was disabled alone, then benchmarks and backend tests were run. Baseli
 | Internal operations (warehouse, cafeteria) | 93.33 | 78.81 | 78.12 | Pass | No | Kept |
 | Constraint restatement | 91.67 | 81.36 | 78.12 | 1 fails | No | Kept |
 
-Benchmarks after each of the 8 removals and generalisations stayed at 93.33 / 81.36 / 78.12, with false approvals at
+Benchmarks after each of the 7 removal and generalisation commits stayed at 93.33 / 81.36 / 78.12, with false approvals at
 0 / 1 / 1. **Removing a rule without a score change shows those benchmarks do not depend on it, not that the
 rule was never useful.** Smaller phrase lists were not measured individually: `_is_compliant_disclaimer`,
 `_DOMAIN_SYNONYMS`, and the scoring boosts for "fees" and "exceptional result". Those phrase rules still mean the

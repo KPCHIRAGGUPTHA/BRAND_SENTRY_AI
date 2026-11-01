@@ -614,7 +614,8 @@
       "hybrid_rule": true,
       "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase 'cures chronic diabetes'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\". Note: Statutory/regulatory warning (RULE-UNIV-MED-002) also applies as an informational reference.",
       "hybrid_evidence": [
-        "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
+        "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.",
+        "8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim"
       ]
     },
     {
@@ -762,7 +763,7 @@
       "hybrid_pred": "INSUFFICIENT_EVIDENCE",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "The selected guidelines do not provide sufficient evidence to evaluate this claim. No relevant passages were found in the selected documents. This claim requires independent human review against uploaded guidelines.",
+      "hybrid_explanation": "Guideline policy from 'BrandSentry_Marketing_Compliance_2026.pdf' requires current, reproducible evidence and documented methodology for percentage performance comparisons, which are not supplied in the retrieved documentation: \"Do not state a specific percentage improvement unless the underlying measurement and methodology are documented.\".",
       "hybrid_evidence": []
     },
     {

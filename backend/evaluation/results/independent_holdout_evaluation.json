@@ -4,8 +4,8 @@
     "count": 60,
     "dense_metrics": {
       "total": 60,
-      "correct": 55,
-      "accuracy": 0.9167,
+      "correct": 56,
+      "accuracy": 0.9333,
       "confusion_matrix": {
         "SUPPORTED": {
           "SUPPORTED": 18,
@@ -14,8 +14,8 @@
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
-          "CONTRADICTED": 25,
-          "INSUFFICIENT_EVIDENCE": 1
+          "CONTRADICTED": 26,
+          "INSUFFICIENT_EVIDENCE": 0
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 0,
@@ -33,20 +33,20 @@
           "f1": 0.9
         },
         "CONTRADICTED": {
-          "tp": 25,
+          "tp": 26,
           "fp": 0,
-          "fn": 1,
+          "fn": 0,
           "precision": 1.0,
-          "recall": 0.9615,
-          "f1": 0.9804
+          "recall": 1.0,
+          "f1": 1.0
         },
         "INSUFFICIENT_EVIDENCE": {
           "tp": 12,
-          "fp": 5,
+          "fp": 4,
           "fn": 0,
-          "precision": 0.7059,
+          "precision": 0.75,
           "recall": 1.0,
-          "f1": 0.8276
+          "f1": 0.8571
         }
       },
       "false_positive_support": 0,
@@ -79,8 +79,8 @@
         },
         "prohibited_phrase": {
           "total": 6,
-          "correct": 5,
-          "accuracy": 0.8333
+          "correct": 6,
+          "accuracy": 1.0
         },
         "scope_restriction": {
           "total": 6,
@@ -220,14 +220,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-health",
           "chunk-brand-testimonials",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -251,14 +257,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -282,14 +294,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -313,14 +331,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -331,37 +355,6 @@
       }
     ],
     "dense_failures": [
-      {
-        "id": "eval-proh-19",
-        "query": "We are officially voted number 1 in the world for customer care.",
-        "category": "prohibited_phrase",
-        "document_scope": "doc-brand",
-        "expected": "CONTRADICTED",
-        "dense_pred": "INSUFFICIENT_EVIDENCE",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-security",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees",
-          "chunk-brand-pricing",
-          "chunk-brand-testimonials"
-        ],
-        "h_chunks": [
-          "chunk-brand-guarantees",
-          "chunk-brand-security",
-          "chunk-brand-performance",
-          "chunk-brand-evidence",
-          "chunk-brand-testimonials"
-        ],
-        "dense_rule": true,
-        "hybrid_rule": true,
-        "hybrid_evidence": [
-          "Unsubstantiated claims such as number 1 in the world are prohibited."
-        ],
-        "notes": "Unsubstantiated global number 1 claim.",
-        "root_cause": "POLICY_NUANCE",
-        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
-      },
       {
         "id": "eval-exc-25",
         "query": "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
@@ -375,14 +368,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-health",
           "chunk-brand-testimonials",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -406,14 +405,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -437,14 +442,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -468,14 +479,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -499,14 +516,20 @@
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -528,14 +551,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -557,14 +586,20 @@
           "chunk-brand-visual",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-visual",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -586,14 +621,20 @@
           "chunk-brand-safety",
           "chunk-brand-performance",
           "chunk-brand-visual",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-performance",
           "chunk-brand-evidence",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -615,14 +656,20 @@
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-environmental",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -644,14 +691,20 @@
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
           "chunk-brand-visual",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
           "chunk-brand-visual",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -671,14 +724,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-environmental",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -700,14 +759,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-visual",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -729,14 +794,20 @@
           "chunk-brand-pricing",
           "chunk-brand-safety",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
           "chunk-brand-safety",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -758,14 +829,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-review-outcomes",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -787,14 +864,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -816,14 +899,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -845,14 +934,20 @@
           "chunk-brand-visual",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-environmental",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -874,14 +969,20 @@
           "chunk-brand-visual",
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-visual",
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -901,14 +1002,20 @@
           "chunk-brand-environmental",
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-evidence",
           "chunk-brand-environmental",
           "chunk-brand-review-outcomes",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -930,14 +1037,20 @@
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-pricing",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -959,14 +1072,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
           "chunk-brand-security",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1002,21 +1121,27 @@
         "category": "prohibited_phrase",
         "document_scope": "doc-brand",
         "expected": "CONTRADICTED",
-        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "dense_pred": "CONTRADICTED",
         "hybrid_pred": "CONTRADICTED",
         "d_chunks": [
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-evidence",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-environmental"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1038,14 +1163,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-safety",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1067,14 +1198,20 @@
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-performance",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-performance",
           "chunk-brand-environmental",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-visual",
+          "chunk-brand-security",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1097,14 +1234,20 @@
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-health",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-visual",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-pricing",
+          "chunk-brand-visual"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1126,14 +1269,20 @@
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-visual",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-visual",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -1155,14 +1304,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1184,14 +1339,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-health",
           "chunk-brand-testimonials",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1213,14 +1374,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1242,14 +1409,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1271,14 +1444,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-safety",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1300,14 +1479,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
           "chunk-brand-evidence",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1329,14 +1514,20 @@
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-testimonials",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1358,14 +1549,20 @@
           "chunk-brand-security",
           "chunk-brand-environmental",
           "chunk-brand-review-outcomes",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1387,14 +1584,20 @@
           "chunk-brand-pricing",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-health",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1416,14 +1619,20 @@
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1445,14 +1654,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1474,14 +1689,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1503,14 +1724,20 @@
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1532,14 +1759,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1561,14 +1794,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-health",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-health",
           "chunk-brand-environmental",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1590,14 +1829,20 @@
           "chunk-brand-performance",
           "chunk-brand-visual",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-performance",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1619,14 +1864,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1646,14 +1897,20 @@
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-visual",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1675,14 +1932,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-environmental",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-guarantees",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1704,14 +1967,20 @@
           "chunk-brand-health",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1771,14 +2040,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1838,14 +2113,20 @@
           "chunk-brand-safety",
           "chunk-brand-pricing",
           "chunk-brand-performance",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-performance",
           "chunk-brand-visual",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1865,14 +2146,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-safety",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1892,14 +2179,20 @@
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1919,14 +2212,20 @@
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-environmental",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-visual",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1946,14 +2245,20 @@
           "chunk-brand-visual",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -1973,14 +2278,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2000,14 +2311,20 @@
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-pricing",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-environmental",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2029,14 +2346,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-security",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-health",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-security",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2058,14 +2381,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2087,14 +2416,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-testimonials",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2116,14 +2451,20 @@
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-safety",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2145,14 +2486,20 @@
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2320,8 +2667,8 @@
     },
     "hybrid_metrics": {
       "total": 118,
-      "correct": 96,
-      "accuracy": 0.8136,
+      "correct": 98,
+      "accuracy": 0.8305,
       "confusion_matrix": {
         "SUPPORTED": {
           "SUPPORTED": 27,
@@ -2330,13 +2677,13 @@
         },
         "CONTRADICTED": {
           "SUPPORTED": 1,
-          "CONTRADICTED": 46,
-          "INSUFFICIENT_EVIDENCE": 8
+          "CONTRADICTED": 47,
+          "INSUFFICIENT_EVIDENCE": 7
         },
         "INSUFFICIENT_EVIDENCE": {
           "SUPPORTED": 0,
-          "CONTRADICTED": 7,
-          "INSUFFICIENT_EVIDENCE": 23
+          "CONTRADICTED": 6,
+          "INSUFFICIENT_EVIDENCE": 24
         }
       },
       "per_class": {
@@ -2349,24 +2696,24 @@
           "f1": 0.8852
         },
         "CONTRADICTED": {
-          "tp": 46,
-          "fp": 8,
-          "fn": 9,
-          "precision": 0.8519,
-          "recall": 0.8364,
-          "f1": 0.844
+          "tp": 47,
+          "fp": 7,
+          "fn": 8,
+          "precision": 0.8704,
+          "recall": 0.8545,
+          "f1": 0.8624
         },
         "INSUFFICIENT_EVIDENCE": {
-          "tp": 23,
-          "fp": 13,
-          "fn": 7,
-          "precision": 0.6389,
-          "recall": 0.7667,
-          "f1": 0.697
+          "tp": 24,
+          "fp": 12,
+          "fn": 6,
+          "precision": 0.6667,
+          "recall": 0.8,
+          "f1": 0.7273
         }
       },
       "false_positive_support": 1,
-      "false_positive_contradiction": 8,
+      "false_positive_contradiction": 7,
       "category_accuracy": {
         "approximate_numerical": {
           "total": 6,
@@ -2385,8 +2732,8 @@
         },
         "conditional_approval": {
           "total": 6,
-          "correct": 1,
-          "accuracy": 0.1667
+          "correct": 2,
+          "accuracy": 0.3333
         },
         "conflicting_evidence": {
           "total": 4,
@@ -2425,8 +2772,8 @@
         },
         "medical_efficacy": {
           "total": 6,
-          "correct": 4,
-          "accuracy": 0.6667
+          "correct": 5,
+          "accuracy": 0.8333
         },
         "missing_documentary_evidence": {
           "total": 6,
@@ -2484,14 +2831,20 @@
           "chunk-brand-security",
           "chunk-brand-health",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2534,14 +2887,20 @@
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2576,37 +2935,6 @@
         "diagnosis": "Engine fired policy prohibition on claim that adhered to guidelines."
       },
       {
-        "id": "holdout-cnd-023",
-        "query": "Pending final corporate legal review, our commercial campaign promises 100% money-back satisfaction.",
-        "category": "conditional_approval",
-        "document_scope": "doc-brand",
-        "expected": "INSUFFICIENT_EVIDENCE",
-        "dense_pred": "INSUFFICIENT_EVIDENCE",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-guarantees",
-          "chunk-brand-health",
-          "chunk-brand-evidence",
-          "chunk-brand-safety",
-          "chunk-brand-performance"
-        ],
-        "h_chunks": [
-          "chunk-brand-guarantees",
-          "chunk-brand-safety",
-          "chunk-brand-evidence",
-          "chunk-brand-visual",
-          "chunk-brand-review-outcomes"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "GUARANTEES AND ABSOLUTE CLAIMS: Marketing materials must not use the phrase '100% guaranteed' unless the Legal team has provided written approval."
-        ],
-        "notes": "Pending status means approval is absent at review time; requires documentary confirmation before release.",
-        "root_cause": "FALSE_POSITIVE_CONTRADICTION",
-        "diagnosis": "Engine asserted definitive contradiction where evidence was absent or inconclusive."
-      },
-      {
         "id": "holdout-cnd-024",
         "query": "Environmental claims of carbon neutrality are released only when documented lifecycle basis is formally certified.",
         "category": "conditional_approval",
@@ -2619,14 +2947,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2650,14 +2984,20 @@
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2704,14 +3044,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2735,14 +3081,20 @@
           "chunk-brand-health",
           "chunk-brand-visual",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-security-encryption",
+          "chunk-brand-safety",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-health-regulatory",
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2766,14 +3118,20 @@
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2839,14 +3197,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2868,14 +3232,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2897,14 +3267,20 @@
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
           "chunk-brand-visual",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -2926,48 +3302,25 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
         "hybrid_evidence": [],
         "notes": "Broad unsubstantiated comparative superlative without documentation or reproducible evidence.",
-        "root_cause": "POLICY_NUANCE",
-        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
-      },
-      {
-        "id": "holdout-med-074",
-        "query": "Our herbal tincture is clinically proven to cure chronic hypertension permanently.",
-        "category": "medical_efficacy",
-        "document_scope": "doc-brand",
-        "expected": "CONTRADICTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
-        "d_chunks": [
-          "chunk-brand-health",
-          "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-evidence",
-          "chunk-brand-testimonials"
-        ],
-        "h_chunks": [
-          "chunk-brand-safety",
-          "chunk-brand-evidence",
-          "chunk-brand-security",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-performance"
-        ],
-        "dense_rule": true,
-        "hybrid_rule": true,
-        "hybrid_evidence": [],
-        "notes": "Statutory violation and guideline breach: materials must not claim a product cures or treats a disease.",
         "root_cause": "POLICY_NUANCE",
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
@@ -2984,14 +3337,20 @@
           "chunk-brand-environmental",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-environmental",
           "chunk-brand-visual",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3013,14 +3372,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3042,14 +3407,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-environmental",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3071,14 +3442,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-visual",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3104,14 +3481,20 @@
           "chunk-brand-security",
           "chunk-brand-health",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3154,14 +3537,20 @@
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3208,14 +3597,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3239,14 +3634,20 @@
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3293,14 +3694,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3324,14 +3731,20 @@
           "chunk-brand-health",
           "chunk-brand-visual",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-security-encryption",
+          "chunk-brand-safety",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-health-regulatory",
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3355,14 +3768,20 @@
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3428,14 +3847,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3457,14 +3882,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3486,14 +3917,20 @@
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
           "chunk-brand-visual",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3515,14 +3952,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3544,14 +3987,20 @@
           "chunk-brand-environmental",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-environmental",
           "chunk-brand-visual",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3573,14 +4022,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3602,14 +4057,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-environmental",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3631,14 +4092,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-visual",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3664,14 +4131,20 @@
           "chunk-brand-security",
           "chunk-brand-health",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3691,14 +4164,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3720,14 +4199,20 @@
           "chunk-brand-pricing",
           "chunk-brand-security",
           "chunk-brand-health",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3749,14 +4234,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-safety",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3778,14 +4269,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3807,14 +4304,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-security",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3836,14 +4339,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3865,14 +4374,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3894,14 +4409,20 @@
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3923,14 +4444,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -3971,14 +4498,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4000,14 +4533,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4029,14 +4568,20 @@
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-safety",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4058,14 +4603,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-health"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -4087,14 +4638,20 @@
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4116,14 +4673,20 @@
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-finance-discounts",
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4145,14 +4708,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-finance-discounts",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-health-regulatory"
         ],
         "h_chunks": [
           "chunk-security-encryption",
           "chunk-finance-discounts",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4174,14 +4743,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-finance-discounts",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-security-encryption",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-health-regulatory",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4203,14 +4778,20 @@
           "chunk-brand-safety",
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-environmental",
           "chunk-brand-performance",
           "chunk-brand-safety",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-visual",
+          "chunk-brand-security",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4232,14 +4813,20 @@
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4276,26 +4863,30 @@
         "document_scope": "doc-brand",
         "expected": "INSUFFICIENT_EVIDENCE",
         "dense_pred": "INSUFFICIENT_EVIDENCE",
-        "hybrid_pred": "CONTRADICTED",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-visual",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
-        "hybrid_evidence": [
-          "GUARANTEES AND ABSOLUTE CLAIMS: Marketing materials must not use the phrase '100% guaranteed' unless the Legal team has provided written approval."
-        ],
+        "hybrid_evidence": [],
         "notes": "Pending status means approval is absent at review time; requires documentary confirmation before release."
       },
       {
@@ -4311,14 +4902,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4340,14 +4937,20 @@
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4369,14 +4972,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-security",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4398,14 +5007,20 @@
           "chunk-brand-safety",
           "chunk-brand-environmental",
           "chunk-brand-security",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-pricing",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4427,19 +5042,26 @@
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
         "hybrid_evidence": [
-          "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
+          "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.",
+          "8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim"
         ],
         "notes": "Self-reported legal approval cannot legalize an unapproved medical disease cure claim; statutory violation."
       },
@@ -4456,14 +5078,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
           "chunk-brand-performance",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -4485,14 +5113,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4514,14 +5148,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-environmental",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-security",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -4562,14 +5202,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4650,14 +5296,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4679,14 +5331,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-evidence",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -4708,14 +5366,20 @@
           "chunk-brand-health",
           "chunk-brand-visual",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-security-encryption",
+          "chunk-brand-safety",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-health-regulatory",
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4758,14 +5422,20 @@
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-pricing",
           "chunk-brand-safety",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4787,14 +5457,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-pricing",
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -4816,14 +5492,20 @@
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-safety",
           "chunk-brand-review-outcomes",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-pricing",
+          "chunk-brand-performance"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4845,14 +5527,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-evidence",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-visual",
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-environmental",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4874,14 +5562,20 @@
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4901,14 +5595,20 @@
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4928,14 +5628,20 @@
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-testimonials",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -4957,14 +5663,20 @@
           "chunk-brand-pricing",
           "chunk-brand-review-outcomes",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-pricing",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5003,14 +5715,20 @@
           "chunk-brand-pricing",
           "chunk-brand-security",
           "chunk-brand-guarantees",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-visual",
+          "chunk-brand-security",
+          "chunk-brand-evidence"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -5032,14 +5750,20 @@
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-security",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5061,14 +5785,20 @@
           "chunk-brand-performance",
           "chunk-brand-evidence",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-environmental",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5090,14 +5820,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-evidence",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5119,14 +5855,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-health",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5148,14 +5890,20 @@
           "chunk-brand-visual",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-visual",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5219,14 +5967,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-environmental",
           "chunk-brand-performance",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
           "chunk-brand-evidence",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5248,14 +6002,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
           "chunk-brand-environmental",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-visual",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-performance",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5315,14 +6075,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5344,14 +6110,20 @@
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
           "chunk-brand-health",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-testimonials",
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-health",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees",
+          "chunk-brand-security",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5373,14 +6145,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-review-outcomes",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5402,14 +6180,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5429,14 +6213,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5456,14 +6246,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-guarantees"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-testimonials",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-visual",
+          "chunk-brand-environmental",
+          "chunk-brand-guarantees"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5483,14 +6279,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-evidence",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-visual",
+          "chunk-brand-security"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -5512,14 +6314,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-health",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-visual",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5541,14 +6349,20 @@
           "chunk-brand-performance",
           "chunk-brand-health",
           "chunk-brand-guarantees",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-security",
+          "chunk-brand-safety",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-performance",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-visual",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5570,14 +6384,20 @@
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
           "chunk-brand-visual",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-performance",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5597,14 +6417,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-pricing",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-guarantees"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5626,14 +6452,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
           "chunk-brand-health",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-performance",
           "chunk-brand-review-outcomes",
           "chunk-brand-guarantees",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5647,24 +6479,32 @@
         "document_scope": "doc-brand",
         "expected": "CONTRADICTED",
         "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "CONTRADICTED",
         "d_chunks": [
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-review-outcomes",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-health"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
-        "hybrid_evidence": [],
+        "hybrid_evidence": [
+          "3. HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process. Do not imply that a product"
+        ],
         "notes": "Statutory violation and guideline breach: materials must not claim a product cures or treats a disease."
       },
       {
@@ -5680,14 +6520,20 @@
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-safety",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5709,14 +6555,20 @@
           "chunk-brand-environmental",
           "chunk-brand-visual",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-health",
           "chunk-brand-environmental",
           "chunk-brand-visual",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5736,14 +6588,20 @@
           "chunk-brand-security",
           "chunk-brand-evidence",
           "chunk-brand-environmental",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5786,14 +6644,20 @@
           "chunk-brand-review-outcomes",
           "chunk-brand-evidence",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-safety",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-health",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-environmental",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5815,14 +6679,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5844,14 +6714,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-safety",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5873,14 +6749,20 @@
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-performance",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-visual",
+          "chunk-brand-health",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-guarantees",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-pricing",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5902,14 +6784,20 @@
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-performance",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5929,14 +6817,20 @@
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-security",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5958,14 +6852,20 @@
           "chunk-brand-safety",
           "chunk-brand-visual",
           "chunk-brand-guarantees",
-          "chunk-brand-security"
+          "chunk-brand-security",
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-performance",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -5987,14 +6887,20 @@
           "chunk-brand-performance",
           "chunk-brand-visual",
           "chunk-brand-testimonials",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-pricing",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -6016,14 +6922,20 @@
           "chunk-brand-pricing",
           "chunk-brand-safety",
           "chunk-brand-security",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-visual"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-pricing",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-health",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6045,14 +6957,20 @@
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-pricing",
           "chunk-brand-testimonials",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-safety",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6074,14 +6992,20 @@
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-evidence",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-pricing",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-security",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6103,14 +7027,20 @@
           "chunk-brand-pricing",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-performance",
-          "chunk-brand-health"
+          "chunk-brand-health",
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6132,14 +7062,20 @@
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-performance",
           "chunk-brand-security",
           "chunk-brand-pricing",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6159,14 +7095,20 @@
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-performance",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-performance",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence"
         ],
         "dense_rule": true,
         "hybrid_rule": true,
@@ -6188,14 +7130,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6217,14 +7165,20 @@
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-evidence"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-safety",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6267,14 +7221,20 @@
           "chunk-brand-evidence",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-performance",
+          "chunk-brand-pricing",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6296,14 +7256,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-safety",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-security",
           "chunk-brand-environmental",
           "chunk-brand-safety",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6424,14 +7390,20 @@
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-safety",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-environmental",
           "chunk-brand-safety",
           "chunk-brand-health",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6453,14 +7425,20 @@
           "chunk-brand-security",
           "chunk-brand-guarantees",
           "chunk-brand-evidence",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-performance",
+          "chunk-brand-health",
+          "chunk-brand-testimonials"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-evidence",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-health"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6480,14 +7458,20 @@
           "chunk-brand-evidence",
           "chunk-brand-security",
           "chunk-brand-testimonials",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-environmental",
+          "chunk-brand-health",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
           "chunk-brand-health",
           "chunk-brand-security",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6507,14 +7491,20 @@
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-testimonials",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-security",
           "chunk-brand-testimonials",
-          "chunk-brand-review-outcomes"
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6534,14 +7524,20 @@
           "chunk-brand-guarantees",
           "chunk-brand-visual",
           "chunk-brand-security",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-environmental",
           "chunk-brand-security",
           "chunk-brand-performance",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual",
+          "chunk-brand-pricing"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6561,14 +7557,20 @@
           "chunk-brand-environmental",
           "chunk-brand-guarantees",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-testimonials",
+          "chunk-brand-health"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-pricing",
           "chunk-brand-security",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-testimonials",
+          "chunk-brand-environmental",
+          "chunk-brand-visual"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6588,14 +7590,20 @@
           "chunk-brand-security",
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
-          "chunk-brand-visual"
+          "chunk-brand-visual",
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-performance",
           "chunk-brand-pricing",
           "chunk-brand-evidence",
-          "chunk-brand-safety"
+          "chunk-brand-safety",
+          "chunk-brand-guarantees",
+          "chunk-brand-visual",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6615,14 +7623,20 @@
           "chunk-brand-performance",
           "chunk-brand-environmental",
           "chunk-brand-evidence",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-testimonials",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes"
         ],
         "h_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-environmental",
           "chunk-brand-performance",
           "chunk-brand-guarantees",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-testimonials"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6644,14 +7658,20 @@
           "chunk-brand-safety",
           "chunk-brand-evidence",
           "chunk-brand-guarantees",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-health",
+          "chunk-brand-performance",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-safety",
           "chunk-brand-guarantees",
           "chunk-brand-testimonials",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-health",
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6673,14 +7693,20 @@
           "chunk-brand-health",
           "chunk-brand-evidence",
           "chunk-brand-environmental",
-          "chunk-brand-guarantees"
+          "chunk-brand-guarantees",
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-pricing"
         ],
         "h_chunks": [
           "chunk-brand-safety",
           "chunk-brand-environmental",
           "chunk-brand-evidence",
           "chunk-brand-health",
-          "chunk-brand-pricing"
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6702,14 +7728,20 @@
           "chunk-brand-performance",
           "chunk-brand-health",
           "chunk-brand-review-outcomes",
-          "chunk-brand-testimonials"
+          "chunk-brand-testimonials",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-environmental"
         ],
         "h_chunks": [
           "chunk-brand-performance",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
           "chunk-brand-health",
-          "chunk-brand-environmental"
+          "chunk-brand-environmental",
+          "chunk-brand-testimonials",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-evidence"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
@@ -6731,14 +7763,20 @@
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-safety",
-          "chunk-brand-evidence"
+          "chunk-brand-evidence",
+          "chunk-brand-pricing",
+          "chunk-brand-health",
+          "chunk-brand-performance"
         ],
         "h_chunks": [
           "chunk-brand-security",
           "chunk-brand-testimonials",
           "chunk-brand-guarantees",
           "chunk-brand-visual",
-          "chunk-brand-performance"
+          "chunk-brand-performance",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-environmental",
+          "chunk-brand-safety"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
