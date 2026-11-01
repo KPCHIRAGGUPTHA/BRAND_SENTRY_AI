@@ -959,15 +959,17 @@ class VerdictEngine:
                     )
 
         discount_match = re.search(r'\b(\d+)%\s*(?:off|discount|markdown)\b|\b(?:discount|markdown|off)\s+[\w\s]{0,10}?\b(\d+)%\b', claim_text, re.IGNORECASE)
-        if discount_match and re.search(r'cannot\s+exceed\s+50%', best_clean, re.IGNORECASE):
+        discount_cap = re.search(r'cannot\s+exceed\s+(\d+)%', best_clean, re.IGNORECASE)
+        if discount_match and discount_cap:
             disc_val = int(discount_match.group(1) or discount_match.group(2))
-            if disc_val > 50:
+            cap_val = int(discount_cap.group(1))
+            if disc_val > cap_val:
                 if re.search(r'\b(only\s+after|requires?|without)\b', claim_text, re.IGNORECASE) and re.search(r'\bwritten\s+compliance\s+officer\s+authorization\s+is\s+finalized\b', claim_text, re.IGNORECASE):
                     return ClaimVerdict(
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_SUPPORTED,
-                        explanation=f"Correctly states condition that discounts exceeding 50% require prior compliance authorization from '{doc_name}': \"{quote}\".",
+                        explanation=f"Correctly states condition that discounts exceeding {cap_val}% require prior compliance authorization from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=None,
                         rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
@@ -976,22 +978,20 @@ class VerdictEngine:
                     claim_id=claim_id,
                     claim_text=claim_text,
                     verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Discount of {disc_val}% exceeds mandatory 50% cap without authorized compliance signoff from '{doc_name}': \"{quote}\".",
+                    explanation=f"Discount of {disc_val}% exceeds mandatory {cap_val}% cap without authorized compliance signoff from '{doc_name}': \"{quote}\".",
                     evidence=[ev_item],
                     suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "discount cap"),
                     rule_category=CATEGORY_ORG_VIOLATION,
                 )
-            elif disc_val <= 50:
-                if best_p.get("document_id") == "doc-finance":
-                    return ClaimVerdict(
-                        claim_id=claim_id,
-                        claim_text=claim_text,
-                        verdict=VERDICT_SUPPORTED,
-                        explanation=f"Discount of {disc_val}% conforms to mandatory cap stating discounts cannot exceed 50% from '{doc_name}': \"{quote}\".",
-                        evidence=[ev_item],
-                        suggested_correction=None,
-                        rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                    )
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_SUPPORTED,
+                explanation=f"Discount of {disc_val}% conforms to mandatory cap stating discounts cannot exceed {cap_val}% from '{doc_name}': \"{quote}\".",
+                evidence=[ev_item],
+                suggested_correction=None,
+                rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
+            )
 
         # 10. Temporal contradiction (e.g. five years ago, expired)
         if re.search(r'\b(five\s+years\s+ago|seven\s+years\s+ago|expired\s+in\s+\d{4}|in\s+a\s+2016\b|completed\s+seven\s+years\s+ago|never\s+updated|expired\s+in\s+2022)\b', claim_text, re.IGNORECASE):
