@@ -1123,19 +1123,6 @@ class VerdictEngine:
                     rule_category=CATEGORY_ORG_VIOLATION,
                 )
 
-        # 15. Unapproved medical cures
-        if re.search(r'\b(proves?\s+100%\s+cure|cure\s+rate|eradicates?\s+(\w+\s+)?(?:diabetes|cancer|hypertension|disease|illness|influenza)|cures?\s+(\w+\s+)?(?:diabetes|cancer|hypertension|disease|illness)|eliminates?\s+(?:psoriasis|chronic))\b', claim_text, re.IGNORECASE) and not claim_is_negated:
-            if re.search(r'\b(must\s+not\s+claim\s+that\s+a\s+product\s+cures|health\s+and\s+medical)\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Contradicts medical claims policy from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_ORG_VIOLATION,
-                )
-
         # 16. Bare "zero risk" and "carbon neutral"
         if re.fullmatch(r'zero\s+risk', claim_text.strip(), re.IGNORECASE):
             if re.search(r'\b(zero\s+risk|no\s+risks)\b', best_clean, re.IGNORECASE):
