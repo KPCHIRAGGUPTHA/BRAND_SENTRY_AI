@@ -265,6 +265,9 @@ the citation is the sentence that decided the verdict. No phrases from the sampl
 | Backend tests, Python 3.14.5 and 3.11.16 | **379 passed** on each |
 | Frontend build and tests | Build succeeded, **15 passed** |
 | Selenium UI suite, production-mode backend | **20 passed** |
+| GitHub Actions run 41322818050 on `1030b2d` (backend tests and Selenium) | **Passed** |
+| Same 100 cases on the deployed API, https://brandsentry-api.onrender.com | **60/60, 20/20, 20/20** |
+| Deployed frontend bundle | Contains the corrected UI text |
 
 **Do not read these as real-world accuracy.** The same author wrote the claims, labels and rules, so the sealed sets
 test paraphrase and transfer, not independent judgement. The benchmarks in section 5 remain the better indicator,
