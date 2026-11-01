@@ -889,19 +889,6 @@ class VerdictEngine:
                 suggested_correction=None,
             )
 
-        # 6. Check for policy directive / compliance restatement (Task 2)
-        if _is_policy_directive(claim_text):
-            if best_candidate["score"] >= 2:
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_SUPPORTED,
-                    explanation=f"Directly restates and conforms to guideline policy requirement from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                )
-
         # 7. Check for compliant negative disclaimers (Task 2)
         if claim_is_negated:
             if re.search(r'\b(must\s+not|do\s+not|cannot|never|prohibited|clearly\s+disclosed|fees|must\s+be\s+specific|zero\s+impact|completely\s+secure|cures?)\b', best_clean, re.IGNORECASE):
