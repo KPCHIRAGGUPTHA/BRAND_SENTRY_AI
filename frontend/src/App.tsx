@@ -1,5 +1,6 @@
 import React from 'react';
 import { Header } from './components/Header';
+import { BackendStatusBanner } from './components/BackendStatusBanner';
 import { HealthStatus } from './components/HealthStatus';
 import { GuidelineExplorer } from './components/GuidelineExplorer';
 import { ClaimReview } from './components/ClaimReview';
@@ -25,6 +26,7 @@ export const App: React.FC = () => {
     <BackendConnectionProvider>
       <div className="app-wrapper">
         <Header />
+        <BackendStatusBanner />
 
         <main className="container" style={{ flex: 1, paddingBottom: '48px' }}>
           {/* Hero Section */}

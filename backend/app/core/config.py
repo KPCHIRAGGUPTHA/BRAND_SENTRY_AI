@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     def reviews_db_path(self) -> str:
         return self.REVIEWS_DB_PATH or os.path.join(self.DATA_DIR, "reviews.db")
 
+    # Load the bundled sample guideline after a cold start when the store is empty (production only)
+    AUTO_LOAD_SAMPLE_GUIDELINE: bool = Field(default=True)
+
     # Ingestion constraints
     MAX_UPLOAD_SIZE_MB: int = Field(default=10)
     MAX_QUERY_LENGTH: int = Field(default=1000)

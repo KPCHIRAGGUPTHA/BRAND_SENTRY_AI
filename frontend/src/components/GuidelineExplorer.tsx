@@ -16,12 +16,14 @@ import {
 } from 'lucide-react';
 import {
   uploadGuideline,
+  loadSampleGuideline,
+  fetchPolicyVersionDiff,
   searchGuidelines,
   fetchGuidelines,
   fetchPolicyVersions,
   activatePolicyVersion,
 } from '../services/api';
-import { GuidelineChunkMatch, DocumentSummary, PolicyVersion } from '../types/api';
+import { GuidelineChunkMatch, DocumentSummary, PolicyVersion, PolicyVersionDiff } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
 
 export const GuidelineExplorer: React.FC = () => {
@@ -39,10 +41,12 @@ export const GuidelineExplorer: React.FC = () => {
 
   const [documents, setDocuments] = useState<DocumentSummary[]>([]);
   const [versions, setVersions] = useState<PolicyVersion[]>([]);
+  const [versionDiff, setVersionDiff] = useState<PolicyVersionDiff | null>(null);
+  const [diffError, setDiffError] = useState<string | null>(null);
   const [loadingDocs, setLoadingDocs] = useState<boolean>(false);
   const [selectedDocId, setSelectedDocId] = useState<string>('');
 
-  const { status } = useBackendConnection();
+  const { status, data } = useBackendConnection();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -84,7 +88,7 @@ export const GuidelineExplorer: React.FC = () => {
     if (status === 'connected' && documents.length === 0) {
       loadDocuments();
     }
-  }, [status, documents.length]);
+  }, [status, documents.length, data?.readiness]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -149,6 +153,7 @@ export const GuidelineExplorer: React.FC = () => {
         fileInputRef.current.value = '';
       }
       await loadDocuments();
+      window.dispatchEvent(new Event('guidelines-changed'));
       setSelectedDocId(result.document_id);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -156,6 +161,42 @@ export const GuidelineExplorer: React.FC = () => {
       } else {
         setUploadError('Failed to upload and index document.');
       }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // The most recent earlier version of the same policy, if there is one
+  const previousVersion = (ver: PolicyVersion): PolicyVersion | undefined =>
+    versions
+      .filter((v) => v.policy_id === ver.policy_id && v.created_at < ver.created_at)
+      .sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0];
+
+  const handleCompare = async (ver: PolicyVersion) => {
+    const previous = previousVersion(ver);
+    if (!previous) return;
+    setDiffError(null);
+    try {
+      setVersionDiff(await fetchPolicyVersionDiff(previous.version_id, ver.version_id));
+    } catch (err: unknown) {
+      setVersionDiff(null);
+      setDiffError(err instanceof Error ? err.message : 'Could not compare versions.');
+    }
+  };
+
+  const handleLoadSample = async () => {
+    if (uploading) return;
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
+    try {
+      const result = await loadSampleGuideline();
+      setUploadSuccess(`${result.message} "${result.filename}" is ready for review.`);
+      await loadDocuments();
+      window.dispatchEvent(new Event('guidelines-changed'));
+      setSelectedDocId(result.document_id);
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Could not load the sample guideline.');
     } finally {
       setUploading(false);
     }
@@ -205,6 +246,18 @@ export const GuidelineExplorer: React.FC = () => {
             PDF &bull; TXT
           </span>
         </div>
+
+        <button
+          type="button"
+          className="btn btn-secondary"
+          id="load-sample-guideline"
+          onClick={handleLoadSample}
+          disabled={uploading}
+          style={{ marginBottom: '12px' }}
+        >
+          <FileCheck size={14} />
+          <span>Load Sample Marketing Compliance Guidelines</span>
+        </button>
 
         <form onSubmit={handleUpload}>
           <label
@@ -481,6 +534,16 @@ export const GuidelineExplorer: React.FC = () => {
                         {new Date(ver.created_at).toLocaleDateString()}
                       </td>
                       <td>
+                        {previousVersion(ver) && (
+                          <button
+                            type="button"
+                            className="btn btn-secondary"
+                            style={{ fontSize: '0.72rem', padding: '3px 8px', marginRight: '4px' }}
+                            onClick={() => handleCompare(ver)}
+                          >
+                            Compare
+                          </button>
+                        )}
                         {!ver.is_active ? (
                           <button
                             type="button"
@@ -499,6 +562,28 @@ export const GuidelineExplorer: React.FC = () => {
                 </tbody>
               </table>
             </div>
+
+            {diffError && (
+              <div className="alert alert-error" role="alert">
+                <span>{diffError}</span>
+              </div>
+            )}
+            {versionDiff && (
+              <div id="version-diff" style={{ marginTop: '12px', fontSize: '0.82rem' }}>
+                <strong>
+                  Changes from {versionDiff.from_version} to {versionDiff.to_version} ({versionDiff.unchanged_count} sentences unchanged)
+                </strong>
+                {versionDiff.added.length === 0 && versionDiff.removed.length === 0 && <p>No wording changes.</p>}
+                <ul style={{ paddingLeft: '18px', marginTop: '6px' }}>
+                  {versionDiff.removed.map((sentence, i) => (
+                    <li key={`removed-${i}`} style={{ color: '#C53030' }}>Removed: {sentence}</li>
+                  ))}
+                  {versionDiff.added.map((sentence, i) => (
+                    <li key={`added-${i}`} style={{ color: '#1B6A3B' }}>Added: {sentence}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         )}
       </section>

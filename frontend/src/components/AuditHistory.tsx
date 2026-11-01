@@ -6,7 +6,7 @@ import {
   Eye,
   X,
 } from 'lucide-react';
-import { fetchReviewHistory, fetchReviewById, getExportUrl } from '../services/api';
+import { fetchReviewHistory, fetchReviewById, getExportUrl, transitionReview } from '../services/api';
 import { AuditReviewSummaryItem } from '../types/api';
 
 export const AuditHistory: React.FC = () => {
@@ -21,6 +21,28 @@ export const AuditHistory: React.FC = () => {
   // Selected review for modal inspection
   const [selectedReview, setSelectedReview] = useState<any | null>(null);
   const [, setLoadingDetail] = useState<boolean>(false);
+  const [nextState, setNextState] = useState<string>('');
+  const [justification, setJustification] = useState<string>('');
+  const [reviewerName, setReviewerName] = useState<string>('');
+  const [transitionError, setTransitionError] = useState<string | null>(null);
+
+  const handleTransition = async () => {
+    if (!selectedReview) return;
+    const target = nextState || selectedReview.allowed_transitions?.[0];
+    if (!justification.trim()) {
+      setTransitionError('A written justification is required.');
+      return;
+    }
+    setTransitionError(null);
+    try {
+      setSelectedReview(await transitionReview(selectedReview.review_id, target, justification.trim(), reviewerName.trim()));
+      setNextState('');
+      setJustification('');
+      loadReviews();
+    } catch (err: unknown) {
+      setTransitionError(err instanceof Error ? err.message : 'Could not update the review.');
+    }
+  };
 
   const loadReviews = async () => {
     setLoading(true);
@@ -297,6 +319,67 @@ export const AuditHistory: React.FC = () => {
               >
                 Download JSON
               </a>
+            </div>
+
+            {/* Reviewer Lifecycle */}
+            <div style={{ marginTop: '16px' }} id="review-lifecycle">
+              <h4 style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--color-text-secondary)', marginBottom: '6px' }}>
+                REVIEW STATE: <span id="review-state-value">{selectedReview.review_state}</span>
+              </h4>
+              {selectedReview.allowed_transitions?.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <select
+                    id="review-next-state"
+                    aria-label="Next review state"
+                    value={nextState || selectedReview.allowed_transitions[0]}
+                    onChange={(e) => setNextState(e.target.value)}
+                  >
+                    {selectedReview.allowed_transitions.map((state: string) => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                  <input
+                    id="review-reviewer"
+                    aria-label="Reviewer name"
+                    placeholder="Reviewer name (not verified)"
+                    value={reviewerName}
+                    onChange={(e) => setReviewerName(e.target.value)}
+                  />
+                  <textarea
+                    id="review-justification"
+                    aria-label="Justification"
+                    placeholder="Justification (required)"
+                    rows={2}
+                    value={justification}
+                    onChange={(e) => setJustification(e.target.value)}
+                  />
+                  <button type="button" className="btn btn-secondary" id="review-transition-submit" onClick={handleTransition}>
+                    Update Review State
+                  </button>
+                  {transitionError && (
+                    <div className="alert alert-error" role="alert">
+                      <span>{transitionError}</span>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)' }}>This review is complete.</p>
+              )}
+              {selectedReview.state_history?.length > 0 && (
+                <ul style={{ fontSize: '0.78rem', marginTop: '8px', paddingLeft: '18px' }}>
+                  {selectedReview.state_history.map((h: any, i: number) => (
+                    <li key={i}>
+                      {h.created_at?.slice(0, 19).replace('T', ' ')}: {h.from_state} to {h.to_state}
+                      {h.reviewer ? ` by ${h.reviewer}` : ''}: {h.justification}
+                    </li>
+                  ))}
+                </ul>
+              )}
+              {selectedReview.integrity_hash && (
+                <p style={{ fontSize: '0.72rem', marginTop: '8px', color: 'var(--color-text-secondary)', wordBreak: 'break-all' }}>
+                  SHA-256 integrity hash (not a digital signature): {selectedReview.integrity_hash}
+                </p>
+              )}
             </div>
 
             {/* Submitted Copy */}

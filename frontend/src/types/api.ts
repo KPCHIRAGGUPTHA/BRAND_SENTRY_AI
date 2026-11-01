@@ -3,6 +3,9 @@ export interface HealthResponse {
   service: string;
   version: string;
   environment: string;
+  readiness?: 'warming' | 'ready' | string;
+  uptime_seconds?: number;
+  build?: string;
 }
 
 export interface GuidelineUploadResponse {
@@ -164,7 +167,25 @@ export interface ImageOCRResponse {
   width: number;
   height: number;
   blocks: OCRTextBlock[];
+  visual_checks?: VisualChecks | null;
   warning?: string | null;
+}
+
+export interface VisualChecks {
+  dominant_colors: { hex: string; share: number }[];
+  content_margins_px: { left: number; top: number; right: number; bottom: number } | null;
+  lowest_text_contrast: number | null;
+  smallest_text_px: number | null;
+  smallest_text_approx_pt: number | null;
+  note: string;
+}
+
+export interface PolicyVersionDiff {
+  from_version: string;
+  to_version: string;
+  added: string[];
+  removed: string[];
+  unchanged_count: number;
 }
 
 export interface ImageReviewSubmitRequest {

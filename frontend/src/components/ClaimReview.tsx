@@ -56,7 +56,7 @@ export const ClaimReview: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
 
-  const { status, checkHealth, isChecking } = useBackendConnection();
+  const { status, data, checkHealth, isChecking } = useBackendConnection();
 
   const loadDocuments = async () => {
     try {
@@ -73,13 +73,15 @@ export const ClaimReview: React.FC = () => {
 
   useEffect(() => {
     loadDocuments();
+    window.addEventListener('guidelines-changed', loadDocuments);
+    return () => window.removeEventListener('guidelines-changed', loadDocuments);
   }, []);
 
   useEffect(() => {
     if (status === 'connected' && documents.length === 0) {
       loadDocuments();
     }
-  }, [status, documents.length]);
+  }, [status, documents.length, data?.readiness]);
 
   // Handle Text Submission
   const handleTextSubmit = async (e?: React.FormEvent) => {
@@ -490,6 +492,35 @@ export const ClaimReview: React.FC = () => {
                   )}
                 </div>
 
+                {ocrResult?.visual_checks && (
+                  <div id="image-measurements" style={{ fontSize: '0.8rem', marginBottom: '8px' }}>
+                    <div>
+                      <strong>Dominant colors:</strong>{' '}
+                      {ocrResult.visual_checks.dominant_colors
+                        .map((c) => `${c.hex} (${Math.round(c.share * 100)}%)`)
+                        .join(', ')}
+                    </div>
+                    {ocrResult.visual_checks.content_margins_px && (
+                      <div>
+                        <strong>Content margins:</strong> left {ocrResult.visual_checks.content_margins_px.left}px, top{' '}
+                        {ocrResult.visual_checks.content_margins_px.top}px, right{' '}
+                        {ocrResult.visual_checks.content_margins_px.right}px, bottom{' '}
+                        {ocrResult.visual_checks.content_margins_px.bottom}px
+                      </div>
+                    )}
+                    {ocrResult.visual_checks.smallest_text_px !== null && (
+                      <div>
+                        <strong>Lowest text contrast:</strong> {ocrResult.visual_checks.lowest_text_contrast}:1.{' '}
+                        <strong>Smallest text:</strong> {ocrResult.visual_checks.smallest_text_px}px (about{' '}
+                        {ocrResult.visual_checks.smallest_text_approx_pt}pt)
+                      </div>
+                    )}
+                    <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                      {ocrResult.visual_checks.note}
+                    </div>
+                  </div>
+                )}
+
                 <textarea
                   id="corrected-ocr-text"
                   rows={6}
@@ -863,6 +894,12 @@ export const ClaimReview: React.FC = () => {
                                 <span style={{ color: 'var(--color-text-secondary)' }}>Phrase: &ldquo;{iss.claim_phrase}&rdquo;</span>
                               </div>
                               <p style={{ margin: '4px 0', color: 'var(--color-text-primary)' }}>{iss.explanation}</p>
+                              {iss.suggested_correction && iss.category !== 'CONDITION_OMISSION' && (
+                                <p style={{ margin: '4px 0', color: 'var(--color-text-primary)' }}>
+                                  <strong>Suggested rewrite (draft, requires human review):</strong>{' '}
+                                  &ldquo;{iss.suggested_correction}&rdquo;
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>

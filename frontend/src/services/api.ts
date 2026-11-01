@@ -4,6 +4,7 @@ import {
   GuidelineSearchResponse,
   DocumentListResponse,
   ReviewResponse,
+  PolicyVersionDiff,
 } from '../types/api';
 
 /**
@@ -168,6 +169,49 @@ export async function uploadGuideline(file: File): Promise<GuidelineUploadRespon
 
   invalidateDocumentsCache();
   return await safeParseJson<GuidelineUploadResponse>(response, 'Guideline upload');
+}
+
+async function readErrorDetail(response: Response, fallback: string): Promise<string> {
+  try {
+    const body = await response.json();
+    return typeof body.detail === 'string' ? body.detail : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+export async function fetchPolicyVersionDiff(fromId: string, toId: string): Promise<PolicyVersionDiff> {
+  const response = await fetch(`${API_BASE_URL}/api/guidelines/versions/${fromId}/diff/${toId}`);
+  if (!response.ok) {
+    throw new Error(await readErrorDetail(response, `Could not compare versions (HTTP ${response.status}).`));
+  }
+  return await safeParseJson<PolicyVersionDiff>(response, 'Version comparison');
+}
+
+export async function transitionReview(
+  reviewId: string,
+  toState: string,
+  justification: string,
+  reviewer: string
+): Promise<any> {
+  const response = await fetch(`${API_BASE_URL}/api/reviews/${reviewId}/transition`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ to_state: toState, justification, reviewer: reviewer || null }),
+  });
+  if (!response.ok) {
+    throw new Error(await readErrorDetail(response, `Could not update the review (HTTP ${response.status}).`));
+  }
+  return await response.json();
+}
+
+export async function loadSampleGuideline(): Promise<GuidelineUploadResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/guidelines/load-sample`, { method: 'POST' });
+  if (!response.ok) {
+    throw new Error(`Could not load the sample guideline (HTTP ${response.status}). Please try again.`);
+  }
+  invalidateDocumentsCache();
+  return await safeParseJson<GuidelineUploadResponse>(response, 'Load sample guideline');
 }
 
 export async function searchGuidelines(

@@ -18,6 +18,15 @@ from backend.app.services.document_registry import document_registry
 
 logger = logging.getLogger(__name__)
 
+# Reviewer lifecycle. Every move requires a written justification, which is stored with the review.
+REVIEW_TRANSITIONS = {
+    "DRAFT": ("UNDER_REVIEW",),
+    "UNDER_REVIEW": ("FLAGGED", "APPROVED"),
+    "FLAGGED": ("LEGAL_ESCALATED", "UNDER_REVIEW"),
+    "LEGAL_ESCALATED": ("APPROVED", "FLAGGED"),
+    "APPROVED": (),
+}
+
 
 class AuditService:
     """
@@ -61,6 +70,22 @@ class AuditService:
                     content_hash TEXT NOT NULL,
                     ocr_raw_text TEXT,
                     ocr_corrected_text TEXT
+                )
+                """
+            )
+            columns = {row[1] for row in conn.execute("PRAGMA table_info(reviews)")}
+            if "review_state" not in columns:
+                conn.execute("ALTER TABLE reviews ADD COLUMN review_state TEXT NOT NULL DEFAULT 'DRAFT'")
+            conn.execute(
+                """
+                CREATE TABLE IF NOT EXISTS review_state_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    review_id TEXT NOT NULL,
+                    from_state TEXT NOT NULL,
+                    to_state TEXT NOT NULL,
+                    justification TEXT NOT NULL,
+                    reviewer TEXT,
+                    created_at TEXT NOT NULL
                 )
                 """
             )
@@ -171,7 +196,68 @@ class AuditService:
                 "contradicted": data["contradicted_count"],
                 "insufficient_evidence": data["insufficient_count"],
             }
+            data["integrity_hash"] = self._integrity_hash(data)
+            cur.execute(
+                "SELECT from_state, to_state, justification, reviewer, created_at "
+                "FROM review_state_history WHERE review_id = ? ORDER BY id",
+                (review_id,),
+            )
+            data["state_history"] = [dict(r) for r in cur.fetchall()]
+            data["allowed_transitions"] = sorted(self._allowed_transitions(data))
             return data
+
+    @staticmethod
+    def _integrity_hash(review: Dict[str, Any]) -> str:
+        """SHA-256 of the reviewed content and verdicts. Detects changes; it is not a digital signature."""
+        canonical = json.dumps(
+            {key: review.get(key) for key in (
+                "review_id", "created_at", "submitted_content", "claims", "policy_versions", "content_hash",
+            )},
+            sort_keys=True,
+            ensure_ascii=False,
+        )
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    @staticmethod
+    def _allowed_transitions(review: Dict[str, Any]) -> set:
+        allowed = set(REVIEW_TRANSITIONS.get(review["review_state"], ()))
+        # A review with contradicted claims must pass through legal before approval
+        if review["review_state"] == "UNDER_REVIEW" and review["contradicted_count"] > 0:
+            allowed.discard("APPROVED")
+        return allowed
+
+    def transition_review(
+        self,
+        review_id: str,
+        to_state: str,
+        justification: str,
+        reviewer: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """Moves a review to its next state and records why. Returns None if the review does not exist."""
+        review = self.get_review(review_id)
+        if not review:
+            return None
+        if to_state not in review["allowed_transitions"]:
+            raise ValueError(
+                f"Cannot move a review from {review['review_state']} to {to_state}. "
+                f"Allowed: {', '.join(review['allowed_transitions']) or 'none'}."
+            )
+        with self._get_connection() as conn:
+            conn.execute("UPDATE reviews SET review_state = ? WHERE review_id = ?", (to_state, review_id))
+            conn.execute(
+                "INSERT INTO review_state_history "
+                "(review_id, from_state, to_state, justification, reviewer, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+                (
+                    review_id,
+                    review["review_state"],
+                    to_state,
+                    justification,
+                    reviewer,
+                    datetime.now(timezone.utc).isoformat(),
+                ),
+            )
+            conn.commit()
+        return self.get_review(review_id)
 
     def list_reviews(
         self,
@@ -335,6 +421,8 @@ class AuditService:
         )
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 
+        from xml.sax.saxutils import escape
+
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(
             buffer,
@@ -413,8 +501,8 @@ class AuditService:
                 Paragraph(review.get("retrieval_mode", "hybrid").title(), body_style),
             ],
             [
-                Paragraph("<b>Content Hash:</b>", body_style),
-                Paragraph(review.get("content_hash", "")[:16] + "…", body_style),
+                Paragraph("<b>Review State:</b>", body_style),
+                Paragraph(review.get("review_state", "DRAFT"), body_style),
                 Paragraph("<b>Policy Versions:</b>", body_style),
                 Paragraph(policy_display, body_style),
             ],
@@ -430,6 +518,19 @@ class AuditService:
             ])
         )
         elements.append(meta_table)
+        elements.append(Spacer(1, 8))
+        elements.append(Paragraph(
+            f"<b>SHA-256 integrity hash:</b> {review['integrity_hash']}<br/>"
+            "This hash detects changes to the reviewed content and verdicts. It is not a digital signature "
+            "and does not prove who produced this report.",
+            body_style,
+        ))
+        for entry in review.get("state_history", []):
+            elements.append(Paragraph(
+                f"{entry['created_at'][:19].replace('T', ' ')}: {entry['from_state']} to {entry['to_state']} "
+                f"by {escape(entry.get('reviewer') or 'unnamed reviewer')}: {escape(entry['justification'])}",
+                body_style,
+            ))
         elements.append(Spacer(1, 15))
 
         # Summary Metrics (total 480 pt)

@@ -419,6 +419,9 @@ class VerdictEngine:
                 claim_text=claim_text,
                 retrieved_passages=retrieved_passages,
             )
+            if self._is_unsafe_to_rewrite(claim_text):
+                for issue in cv.semantic_drift.issues:
+                    issue.suggested_correction = None
             # A drift rewrite is only offered for a violation, never for a claim that is unsafe to
             # rewrite, and never by appending a condition that would imply the claim is permitted.
             if (
@@ -886,19 +889,6 @@ class VerdictEngine:
                 suggested_correction=None,
             )
 
-        # 6. Check for policy directive / compliance restatement (Task 2)
-        if _is_policy_directive(claim_text):
-            if best_candidate["score"] >= 2:
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_SUPPORTED,
-                    explanation=f"Directly restates and conforms to guideline policy requirement from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                )
-
         # 7. Check for compliant negative disclaimers (Task 2)
         if claim_is_negated:
             if re.search(r'\b(must\s+not|do\s+not|cannot|never|prohibited|clearly\s+disclosed|fees|must\s+be\s+specific|zero\s+impact|completely\s+secure|cures?)\b', best_clean, re.IGNORECASE):
@@ -944,13 +934,15 @@ class VerdictEngine:
         px_match = re.search(r'\b(\d+)\s*px\b', claim_text, re.IGNORECASE)
         if px_match and re.search(r'\b(clear|margin|buffer)\b', claim_text, re.IGNORECASE):
             px_val = int(px_match.group(1))
-            if re.search(r'\bat\s+least\s+20px\s+clear\s+buffer\s+margin\b', best_clean, re.IGNORECASE):
-                if px_val < 20:
+            min_px = re.search(r'\bat\s+least\s+(\d+)\s*px\b', best_clean, re.IGNORECASE)
+            if min_px:
+                required_px = int(min_px.group(1))
+                if px_val < required_px:
                     return ClaimVerdict(
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_CONTRADICTED,
-                        explanation=f"Emblem margin of {px_val}px violates mandatory minimum threshold of 20px from '{doc_name}': \"{quote}\".",
+                        explanation=f"Emblem margin of {px_val}px violates mandatory minimum threshold of {required_px}px from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "margin"),
                         rule_category=CATEGORY_ORG_VIOLATION,
@@ -960,22 +952,24 @@ class VerdictEngine:
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_SUPPORTED,
-                        explanation=f"Emblem margin of {px_val}px satisfies minimum 20px buffer threshold from '{doc_name}': \"{quote}\".",
+                        explanation=f"Emblem margin of {px_val}px satisfies minimum {required_px}px buffer threshold from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=None,
                         rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
                     )
 
         discount_match = re.search(r'\b(\d+)%\s*(?:off|discount|markdown)\b|\b(?:discount|markdown|off)\s+[\w\s]{0,10}?\b(\d+)%\b', claim_text, re.IGNORECASE)
-        if discount_match and re.search(r'cannot\s+exceed\s+50%', best_clean, re.IGNORECASE):
+        discount_cap = re.search(r'cannot\s+exceed\s+(\d+)%', best_clean, re.IGNORECASE)
+        if discount_match and discount_cap:
             disc_val = int(discount_match.group(1) or discount_match.group(2))
-            if disc_val > 50:
+            cap_val = int(discount_cap.group(1))
+            if disc_val > cap_val:
                 if re.search(r'\b(only\s+after|requires?|without)\b', claim_text, re.IGNORECASE) and re.search(r'\bwritten\s+compliance\s+officer\s+authorization\s+is\s+finalized\b', claim_text, re.IGNORECASE):
                     return ClaimVerdict(
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_SUPPORTED,
-                        explanation=f"Correctly states condition that discounts exceeding 50% require prior compliance authorization from '{doc_name}': \"{quote}\".",
+                        explanation=f"Correctly states condition that discounts exceeding {cap_val}% require prior compliance authorization from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=None,
                         rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
@@ -984,22 +978,20 @@ class VerdictEngine:
                     claim_id=claim_id,
                     claim_text=claim_text,
                     verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Discount of {disc_val}% exceeds mandatory 50% cap without authorized compliance signoff from '{doc_name}': \"{quote}\".",
+                    explanation=f"Discount of {disc_val}% exceeds mandatory {cap_val}% cap without authorized compliance signoff from '{doc_name}': \"{quote}\".",
                     evidence=[ev_item],
                     suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "discount cap"),
                     rule_category=CATEGORY_ORG_VIOLATION,
                 )
-            elif disc_val <= 50:
-                if best_p.get("document_id") == "doc-finance":
-                    return ClaimVerdict(
-                        claim_id=claim_id,
-                        claim_text=claim_text,
-                        verdict=VERDICT_SUPPORTED,
-                        explanation=f"Discount of {disc_val}% conforms to mandatory cap stating discounts cannot exceed 50% from '{doc_name}': \"{quote}\".",
-                        evidence=[ev_item],
-                        suggested_correction=None,
-                        rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                    )
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_SUPPORTED,
+                explanation=f"Discount of {disc_val}% conforms to mandatory cap stating discounts cannot exceed {cap_val}% from '{doc_name}': \"{quote}\".",
+                evidence=[ev_item],
+                suggested_correction=None,
+                rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
+            )
 
         # 10. Temporal contradiction (e.g. five years ago, expired)
         if re.search(r'\b(five\s+years\s+ago|seven\s+years\s+ago|expired\s+in\s+\d{4}|in\s+a\s+2016\b|completed\s+seven\s+years\s+ago|never\s+updated|expired\s+in\s+2022)\b', claim_text, re.IGNORECASE):
@@ -1120,32 +1112,7 @@ class VerdictEngine:
                     rule_category=CATEGORY_ORG_VIOLATION,
                 )
 
-        # 15. Unapproved medical cures
-        if re.search(r'\b(proves?\s+100%\s+cure|cure\s+rate|eradicates?\s+(\w+\s+)?(?:diabetes|cancer|hypertension|disease|illness|influenza)|cures?\s+(\w+\s+)?(?:diabetes|cancer|hypertension|disease|illness)|eliminates?\s+(?:psoriasis|chronic))\b', claim_text, re.IGNORECASE) and not claim_is_negated:
-            if re.search(r'\b(must\s+not\s+claim\s+that\s+a\s+product\s+cures|health\s+and\s+medical)\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Contradicts medical claims policy from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_ORG_VIOLATION,
-                )
-
-        # 16. Bare "zero risk" and "carbon neutral"
-        if re.fullmatch(r'zero\s+risk', claim_text.strip(), re.IGNORECASE):
-            if re.search(r'\b(zero\s+risk|no\s+risks)\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_CONTRADICTED,
-                    explanation=f"Contradicts policy restricting 'zero risk' claims from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "zero risk"),
-                    rule_category=CATEGORY_ORG_VIOLATION,
-                )
-
+        # 16. Bare "carbon neutral"
         if re.fullmatch(r'carbon\s+neutral', claim_text.strip(), re.IGNORECASE):
             return ClaimVerdict(
                 claim_id=claim_id,
@@ -1158,18 +1125,6 @@ class VerdictEngine:
 
         # 17. Exception fulfillment: commercial return window / refund period with written legal signoff
         claim_has_return_exception = bool(re.search(r'\b(written\s+(?:approval|signoff|authorization)|legal\s+(?:team|counsel)\s+has\s+provided\s+written\s+signoff)\b', claim_text, re.IGNORECASE)) and bool(re.search(r'\b(return\s+window|refund\s+period)\b', claim_text, re.IGNORECASE))
-        if claim_has_return_exception:
-            if re.search(r'\bunless\s+the\s+Legal\s+team\s+has\s+provided\s+written\s+approval\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_SUPPORTED,
-                    explanation=f"Meets guideline exception condition from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                )
-
         # 18. Double negative compliance and violation
         if re.search(r'\b(never\s+fails?\s+to\s+(?:clearly\s+disclose|retain)|never\s+neglect\s+to\s+verify|not\s+the\s+case\s+that\s+our\s+promotional\s+materials\s+fail\s+to\s+clearly\s+disclose)\b', claim_text, re.IGNORECASE):
             return ClaimVerdict(
@@ -1181,17 +1136,6 @@ class VerdictEngine:
                 suggested_correction=None,
                 rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
             )
-        if re.search(r'\bno\s+promotional\s+campaign\s+is\s+ever\s+launched\s+that\s+does\s+not\s+omit\b', claim_text, re.IGNORECASE):
-            return ClaimVerdict(
-                claim_id=claim_id,
-                claim_text=claim_text,
-                verdict=VERDICT_CONTRADICTED,
-                explanation=f"Admits failure to include mandatory disclosures, contradicting guideline from '{doc_name}': \"{quote}\".",
-                evidence=[ev_item],
-                suggested_correction=None,
-                rule_category=CATEGORY_ORG_VIOLATION,
-            )
-
         # 19. Exact technical and regulatory specification match
         if claim_spec_codes and passage_spec_codes and (claim_spec_codes & passage_spec_codes):
             if re.search(r'\b(omits?|omitting|lacks?|without|missing|fails?\s+to|does\s+not\s+(?:include|state|display))\b', claim_text, re.IGNORECASE):
@@ -1475,6 +1419,15 @@ class VerdictEngine:
                         match_pos = m.start()
                         match_len = m.end() - m.start()
                         break
+
+        # A phrase like '100% impenetrable' is judged by the security rule, so quote that rule.
+        if match_pos == -1 and target_phrase and re.search(r'secur|hack|impenetrable|vulnerab', target_phrase, re.IGNORECASE):
+            m = re.search(r'\b(?:completely\s+secure|impossible\s+to\s+hack|secur\w*|hack\w*)', passage_text, re.IGNORECASE)
+            prohibited = re.search(r'[“"\'](?:completely\s+secure|impossible\s+to\s+hack)[”"\']', passage_text, re.IGNORECASE)
+            m = prohibited or m
+            if m:
+                match_pos = m.start()
+                match_len = m.end() - m.start()
 
         if match_pos == -1 and claim_text:
             keywords = _extract_substantive_keywords(claim_text)

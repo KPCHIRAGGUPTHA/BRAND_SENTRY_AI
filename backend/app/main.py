@@ -2,15 +2,18 @@
 BrandSentry AI — FastAPI Main Application Entry Point
 """
 import logging
+import os
 import threading
+import time
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.core.config import settings
-from backend.app.api.guidelines import router as guidelines_router
+from backend.app.api.guidelines import ingest_sample_guideline, router as guidelines_router
 from backend.app.api.review import router as review_router
 from backend.app.api.reviews import router as reviews_router
 from backend.app.retrieval.embeddings import embedding_service
+from backend.app.retrieval.vector_store import vector_store_service
 
 logger = logging.getLogger(__name__)
 
@@ -41,18 +44,28 @@ app.include_router(review_router, prefix="/api/review", tags=["Review"])
 app.include_router(reviews_router, prefix="/api/reviews", tags=["Reviews Audit"])
 
 
-def _warm_embedding_model() -> None:
+_started_at = time.monotonic()
+_readiness = {"state": "ready"}
+
+
+def _prepare_backend() -> None:
+    """Loads the model, then the sample guideline if nothing is indexed, so a restart is usable."""
     try:
         embedding_service.generate_embeddings(["warm-up"])
+        if settings.AUTO_LOAD_SAMPLE_GUIDELINE and vector_store_service.count() == 0:
+            ingest_sample_guideline()
     except Exception as exc:
-        logger.warning("Embedding warm-up failed; it will load on first use: %s", exc)
+        logger.warning("Backend warm-up failed; loading will happen on first use: %s", exc)
+    finally:
+        _readiness["state"] = "ready"
 
 
 @app.on_event("startup")
 def warm_up_in_background() -> None:
-    """Loads the model after a cold start so the first upload does not pay for it."""
+    """Runs in a thread so /health answers immediately during a cold start."""
     if settings.APP_ENV == "production":
-        threading.Thread(target=_warm_embedding_model, daemon=True).start()
+        _readiness["state"] = "warming"
+        threading.Thread(target=_prepare_backend, daemon=True).start()
 
 
 @app.get("/health", tags=["System"])
@@ -63,6 +76,9 @@ async def health_check():
         "service": settings.PROJECT_NAME,
         "version": settings.VERSION,
         "environment": settings.APP_ENV,
+        "readiness": _readiness["state"],
+        "uptime_seconds": round(time.monotonic() - _started_at),
+        "build": os.getenv("RENDER_GIT_COMMIT", "local")[:7],
     }
 
 
