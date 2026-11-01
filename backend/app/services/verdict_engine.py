@@ -934,13 +934,15 @@ class VerdictEngine:
         px_match = re.search(r'\b(\d+)\s*px\b', claim_text, re.IGNORECASE)
         if px_match and re.search(r'\b(clear|margin|buffer)\b', claim_text, re.IGNORECASE):
             px_val = int(px_match.group(1))
-            if re.search(r'\bat\s+least\s+20px\s+clear\s+buffer\s+margin\b', best_clean, re.IGNORECASE):
-                if px_val < 20:
+            min_px = re.search(r'\bat\s+least\s+(\d+)\s*px\b', best_clean, re.IGNORECASE)
+            if min_px:
+                required_px = int(min_px.group(1))
+                if px_val < required_px:
                     return ClaimVerdict(
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_CONTRADICTED,
-                        explanation=f"Emblem margin of {px_val}px violates mandatory minimum threshold of 20px from '{doc_name}': \"{quote}\".",
+                        explanation=f"Emblem margin of {px_val}px violates mandatory minimum threshold of {required_px}px from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, "margin"),
                         rule_category=CATEGORY_ORG_VIOLATION,
@@ -950,7 +952,7 @@ class VerdictEngine:
                         claim_id=claim_id,
                         claim_text=claim_text,
                         verdict=VERDICT_SUPPORTED,
-                        explanation=f"Emblem margin of {px_val}px satisfies minimum 20px buffer threshold from '{doc_name}': \"{quote}\".",
+                        explanation=f"Emblem margin of {px_val}px satisfies minimum {required_px}px buffer threshold from '{doc_name}': \"{quote}\".",
                         evidence=[ev_item],
                         suggested_correction=None,
                         rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
