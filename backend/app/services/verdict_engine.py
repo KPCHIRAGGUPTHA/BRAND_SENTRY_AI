@@ -1136,18 +1136,6 @@ class VerdictEngine:
 
         # 17. Exception fulfillment: commercial return window / refund period with written legal signoff
         claim_has_return_exception = bool(re.search(r'\b(written\s+(?:approval|signoff|authorization)|legal\s+(?:team|counsel)\s+has\s+provided\s+written\s+signoff)\b', claim_text, re.IGNORECASE)) and bool(re.search(r'\b(return\s+window|refund\s+period)\b', claim_text, re.IGNORECASE))
-        if claim_has_return_exception:
-            if re.search(r'\bunless\s+the\s+Legal\s+team\s+has\s+provided\s+written\s+approval\b', best_clean, re.IGNORECASE):
-                return ClaimVerdict(
-                    claim_id=claim_id,
-                    claim_text=claim_text,
-                    verdict=VERDICT_SUPPORTED,
-                    explanation=f"Meets guideline exception condition from '{doc_name}': \"{quote}\".",
-                    evidence=[ev_item],
-                    suggested_correction=None,
-                    rule_category=CATEGORY_EVIDENCE_COMPLIANCE,
-                )
-
         # 18. Double negative compliance and violation
         if re.search(r'\b(never\s+fails?\s+to\s+(?:clearly\s+disclose|retain)|never\s+neglect\s+to\s+verify|not\s+the\s+case\s+that\s+our\s+promotional\s+materials\s+fail\s+to\s+clearly\s+disclose)\b', claim_text, re.IGNORECASE):
             return ClaimVerdict(
