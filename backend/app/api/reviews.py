@@ -6,6 +6,7 @@ and exporting immutable reports in JSON, CSV, and PDF formats.
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Query, Response, status
 from fastapi.responses import JSONResponse, Response
+from pydantic import BaseModel, Field
 
 from backend.app.services.audit_service import audit_service
 
@@ -45,6 +46,35 @@ async def get_review(review_id: str):
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Review audit record with ID '{review_id}' was not found.",
+        )
+    return review
+
+
+class ReviewTransitionRequest(BaseModel):
+    to_state: str
+    justification: str = Field(min_length=1)
+    reviewer: Optional[str] = None
+
+
+@router.post(
+    "/{review_id}/transition",
+    summary="Move a review to its next lifecycle state; a written justification is mandatory",
+)
+async def transition_review(review_id: str, request: ReviewTransitionRequest):
+    justification = request.justification.strip()
+    if not justification:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="A written justification is required.",
+        )
+    try:
+        review = audit_service.transition_review(review_id, request.to_state, justification, request.reviewer)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(exc))
+    if not review:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Review with ID '{review_id}' was not found.",
         )
     return review
 

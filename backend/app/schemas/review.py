@@ -1,7 +1,7 @@
 """
 Pydantic Schemas for Phase 3 — Marketing Content Review & Compliance Verdicts.
 """
-from typing import List, Optional, Any
+from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, Field, field_validator
 
 
@@ -249,6 +249,10 @@ class ImageOCRResponse(BaseModel):
     width: int
     height: int
     blocks: List[OCRTextBlock] = Field(default_factory=list)
+    visual_checks: Optional[Dict[str, Any]] = Field(
+        default=None,
+        description="Pixel measurements for a reviewer. They do not identify a logo or change a verdict.",
+    )
     warning: Optional[str] = None
 
 

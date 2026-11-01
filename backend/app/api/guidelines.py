@@ -416,6 +416,49 @@ async def get_policy_version(version_id: str):
     return ver
 
 
+def _guideline_sentences(version: dict) -> list:
+    document = document_registry.get_document(version["document_id"])
+    with open(document["stored_path"], "rb") as f:
+        extracted = DocumentExtractor.extract_text(version["filename"], f.read())
+    text = " ".join(" ".join(page.text.split()) for page in extracted.pages)
+    return [s.strip() for s in re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+
+
+@router.get(
+    "/versions/{from_version_id}/diff/{to_version_id}",
+    summary="Compare two guideline versions sentence by sentence",
+)
+async def diff_policy_versions(from_version_id: str, to_version_id: str):
+    versions = []
+    for version_id in (from_version_id, to_version_id):
+        version = document_registry.get_policy_version(version_id)
+        if not version:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail=f"Policy version '{version_id}' not found.",
+            )
+        versions.append(version)
+    try:
+        before = _guideline_sentences(versions[0])
+        after = _guideline_sentences(versions[1])
+    except (OSError, TypeError) as exc:
+        logger.warning("Could not read stored guideline for diff: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The stored guideline file for this version is no longer available.",
+        )
+    before_set, after_set = set(before), set(after)
+    return {
+        "from_version": versions[0]["version_label"],
+        "to_version": versions[1]["version_label"],
+        "from_hash": versions[0]["content_hash"],
+        "to_hash": versions[1]["content_hash"],
+        "added": [s for s in after if s not in before_set],
+        "removed": [s for s in before if s not in after_set],
+        "unchanged_count": sum(1 for s in after if s in before_set),
+    }
+
+
 @router.post(
     "/versions/{version_id}/activate",
     summary="Activate a specific policy version for compliance review scoping",

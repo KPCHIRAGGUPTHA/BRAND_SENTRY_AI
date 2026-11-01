@@ -492,6 +492,35 @@ export const ClaimReview: React.FC = () => {
                   )}
                 </div>
 
+                {ocrResult?.visual_checks && (
+                  <div id="image-measurements" style={{ fontSize: '0.8rem', marginBottom: '8px' }}>
+                    <div>
+                      <strong>Dominant colors:</strong>{' '}
+                      {ocrResult.visual_checks.dominant_colors
+                        .map((c) => `${c.hex} (${Math.round(c.share * 100)}%)`)
+                        .join(', ')}
+                    </div>
+                    {ocrResult.visual_checks.content_margins_px && (
+                      <div>
+                        <strong>Content margins:</strong> left {ocrResult.visual_checks.content_margins_px.left}px, top{' '}
+                        {ocrResult.visual_checks.content_margins_px.top}px, right{' '}
+                        {ocrResult.visual_checks.content_margins_px.right}px, bottom{' '}
+                        {ocrResult.visual_checks.content_margins_px.bottom}px
+                      </div>
+                    )}
+                    {ocrResult.visual_checks.smallest_text_px !== null && (
+                      <div>
+                        <strong>Lowest text contrast:</strong> {ocrResult.visual_checks.lowest_text_contrast}:1.{' '}
+                        <strong>Smallest text:</strong> {ocrResult.visual_checks.smallest_text_px}px (about{' '}
+                        {ocrResult.visual_checks.smallest_text_approx_pt}pt)
+                      </div>
+                    )}
+                    <div style={{ color: 'var(--color-text-secondary)', marginTop: '2px' }}>
+                      {ocrResult.visual_checks.note}
+                    </div>
+                  </div>
+                )}
+
                 <textarea
                   id="corrected-ocr-text"
                   rows={6}

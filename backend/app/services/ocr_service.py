@@ -11,6 +11,7 @@ from typing import Dict, Any, List, Optional
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 from backend.app.core.config import settings
+from backend.app.services import visual_checks
 
 logger = logging.getLogger(__name__)
 
@@ -138,6 +139,7 @@ class OCRService:
         """
         img = self.validate_and_load_image(image_bytes)
         width, height = img.size
+        measurements = visual_checks.measure(img)
 
         # Convert palette/transparency to RGB for OCR processing
         if img.mode not in ("RGB", "L"):
@@ -153,6 +155,7 @@ class OCRService:
                 "width": width,
                 "height": height,
                 "blocks": [],
+                "visual_checks": measurements,
                 "warning": (
                     "Tesseract OCR executable is not available on this server environment. "
                     "Please enter or paste the marketing copy text manually."
@@ -220,6 +223,7 @@ class OCRService:
                 "width": width,
                 "height": height,
                 "blocks": blocks,
+                "visual_checks": visual_checks.measure(img, blocks),
                 "warning": warning,
             }
 
@@ -232,6 +236,7 @@ class OCRService:
                 "width": width,
                 "height": height,
                 "blocks": [],
+                "visual_checks": measurements,
                 "warning": f"OCR processing encountered an internal error: {str(exc)}",
             }
 
