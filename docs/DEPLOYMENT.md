@@ -169,6 +169,18 @@ Replace `$API` / `$WEB` with your URLs (Render: `https://brandsentry-api.onrende
 
 ---
 
+## Keeping the free instance awake
+
+Add **`https://brandsentry-api.onrender.com/health`** to an external uptime pinger (for example UptimeRobot) with a
+**GET every 10 minutes**. Render's free instances sleep after about 15 minutes without traffic, so 10 minutes leaves
+room for one missed ping. One always-on free service uses about 720 of the 750 free instance hours per month
+(check this if the workspace has other free services). Do not ping the static site; it does not sleep.
+
+On a cold start the backend answers `/health` immediately with `"readiness": "warming"`, loads the model, indexes the
+bundled sample guideline if nothing is indexed, then reports `"ready"`. `build` shows the deployed commit.
+
+---
+
 ## H. Known limitations
 
 - Free-tier Render: cold starts (~45s observed, longer under load; the UI shows "waking" for about five minutes) and ephemeral storage (uploads, vectors and audits are lost on

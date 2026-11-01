@@ -3,8 +3,8 @@
 [![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
 [![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi)](https://brandsentry-api.onrender.com/docs)
 [![Health Check](https://img.shields.io/badge/Backend-%2Fhealth-10B981?style=for-the-badge)](https://brandsentry-api.onrender.com/health)
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-379%20Passed-success?style=for-the-badge&logo=pytest)](docs/FINAL_SUBMISSION_REPORT.md)
-[![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-15%20Passed-success?style=for-the-badge&logo=vitest)](docs/TEST_REPORT.md)
+[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-409%20Passed-success?style=for-the-badge&logo=pytest)](docs/FINAL_SUBMISSION_REPORT.md)
+[![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-18%20Passed-success?style=for-the-badge&logo=vitest)](docs/TEST_REPORT.md)
 
 ---
 
@@ -176,7 +176,7 @@ npm run dev
 
 ### 4. Demo walkthrough
 1. Open the frontend and wait for the backend status indicator to show connected.
-2. **Guidelines** → upload `BrandSentry_Sample_Marketing_Compliance_Guidelines.txt` (indexes as 3 chunks).
+2. **Guidelines** → click **Load Sample Marketing Compliance Guidelines** (production servers load it automatically after a restart).
 3. **Claim Review** → paste `Our product is 100% safe for everyone. Our office is open on weekdays.` → **Review Compliance**.
 4. Expected: claim 1 `CONTRADICTED`, citing *"Marketing materials must not describe a product as “100% safe”."* with a draft correction marked for human review; claim 2 `INSUFFICIENT_EVIDENCE` (the guideline does not cover office hours).
 5. **Audit History** → export the review as JSON, CSV, or PDF.
@@ -185,7 +185,7 @@ npm run dev
 
 ## 🧪 Automated Testing & Verification
 
-### Run Backend Test Suite (379 Tests Passing)
+### Run Backend Test Suite (409 Tests Passing)
 ```bash
 python -m pytest -q
 ```
@@ -198,7 +198,7 @@ Covers:
 - Semantic drift categories and uncertainty guardrails (`test_semantic_drift.py`)
 - ChromaDB vector store, distance metrics, and embeddings (`test_vector_store.py`)
 
-### Run Frontend Test Suite (15 Tests Passing)
+### Run Frontend Test Suite (18 Tests Passing)
 ```bash
 cd frontend
 npm test
@@ -244,6 +244,7 @@ python backend/evaluation/evaluate_retrieval.py
 - [Hybrid Retrieval Architecture](docs/HYBRID_RETRIEVAL_ARCHITECTURE.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Final Submission Report](docs/FINAL_SUBMISSION_REPORT.md)
+- [Round 3 Report Claims Audit](docs/CLAIMS_AUDIT.md)
 
 ---
 
