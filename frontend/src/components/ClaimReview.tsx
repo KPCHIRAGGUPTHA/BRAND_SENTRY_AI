@@ -56,7 +56,7 @@ export const ClaimReview: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
 
-  const { status, checkHealth, isChecking } = useBackendConnection();
+  const { status, data, checkHealth, isChecking } = useBackendConnection();
 
   const loadDocuments = async () => {
     try {
@@ -73,13 +73,15 @@ export const ClaimReview: React.FC = () => {
 
   useEffect(() => {
     loadDocuments();
+    window.addEventListener('guidelines-changed', loadDocuments);
+    return () => window.removeEventListener('guidelines-changed', loadDocuments);
   }, []);
 
   useEffect(() => {
     if (status === 'connected' && documents.length === 0) {
       loadDocuments();
     }
-  }, [status, documents.length]);
+  }, [status, documents.length, data?.readiness]);
 
   // Handle Text Submission
   const handleTextSubmit = async (e?: React.FormEvent) => {
@@ -863,6 +865,12 @@ export const ClaimReview: React.FC = () => {
                                 <span style={{ color: 'var(--color-text-secondary)' }}>Phrase: &ldquo;{iss.claim_phrase}&rdquo;</span>
                               </div>
                               <p style={{ margin: '4px 0', color: 'var(--color-text-primary)' }}>{iss.explanation}</p>
+                              {iss.suggested_correction && iss.category !== 'CONDITION_OMISSION' && (
+                                <p style={{ margin: '4px 0', color: 'var(--color-text-primary)' }}>
+                                  <strong>Suggested rewrite (draft, requires human review):</strong>{' '}
+                                  &ldquo;{iss.suggested_correction}&rdquo;
+                                </p>
+                              )}
                             </div>
                           ))}
                         </div>

@@ -5,9 +5,11 @@ Handles file uploads, text extraction, chunking, indexing, and semantic passage 
 import hashlib
 import os
 import re
+import threading
 import time
 import uuid
 import logging
+from pathlib import Path
 from typing import Optional
 import anyio
 from fastapi import APIRouter, UploadFile, File, HTTPException, status
@@ -173,6 +175,40 @@ def _process_upload_sync(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Document indexing failed: {str(exc)}",
         )
+
+
+SAMPLE_GUIDELINE_PATH = (
+    Path(__file__).resolve().parents[1] / "resources" / "BrandSentry_Marketing_Compliance_Guidelines_2026.txt"
+)
+_sample_guideline_lock = threading.Lock()
+
+
+def ingest_sample_guideline() -> GuidelineUploadResponse:
+    """Indexes the bundled sample guideline. Does nothing if it is already indexed."""
+    with _sample_guideline_lock:
+        content = SAMPLE_GUIDELINE_PATH.read_bytes()
+        content_hash = hashlib.sha256(content).hexdigest()
+        existing = document_registry.get_document_by_content_hash(content_hash)
+        if existing and existing.get("status") == "indexed":
+            return GuidelineUploadResponse(
+                document_id=existing["document_id"],
+                filename=existing["filename"],
+                status="indexed",
+                page_count=existing.get("page_count"),
+                extracted_characters=existing.get("character_count", 0),
+                chunk_count=existing.get("chunk_count", 0),
+                message="Sample guideline is already loaded.",
+            )
+        return _process_upload_sync(content, SAMPLE_GUIDELINE_PATH.name, content_hash)
+
+
+@router.post(
+    "/load-sample",
+    response_model=GuidelineUploadResponse,
+    summary="Load the bundled sample guideline (no duplicate if it is already loaded)",
+)
+async def load_sample_guideline():
+    return await anyio.to_thread.run_sync(ingest_sample_guideline)
 
 
 @router.post(

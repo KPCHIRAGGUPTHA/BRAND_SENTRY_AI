@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import {
   uploadGuideline,
+  loadSampleGuideline,
   searchGuidelines,
   fetchGuidelines,
   fetchPolicyVersions,
@@ -42,7 +43,7 @@ export const GuidelineExplorer: React.FC = () => {
   const [loadingDocs, setLoadingDocs] = useState<boolean>(false);
   const [selectedDocId, setSelectedDocId] = useState<string>('');
 
-  const { status } = useBackendConnection();
+  const { status, data } = useBackendConnection();
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -84,7 +85,7 @@ export const GuidelineExplorer: React.FC = () => {
     if (status === 'connected' && documents.length === 0) {
       loadDocuments();
     }
-  }, [status, documents.length]);
+  }, [status, documents.length, data?.readiness]);
 
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 B';
@@ -149,6 +150,7 @@ export const GuidelineExplorer: React.FC = () => {
         fileInputRef.current.value = '';
       }
       await loadDocuments();
+      window.dispatchEvent(new Event('guidelines-changed'));
       setSelectedDocId(result.document_id);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -156,6 +158,24 @@ export const GuidelineExplorer: React.FC = () => {
       } else {
         setUploadError('Failed to upload and index document.');
       }
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleLoadSample = async () => {
+    if (uploading) return;
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
+    try {
+      const result = await loadSampleGuideline();
+      setUploadSuccess(`${result.message} "${result.filename}" is ready for review.`);
+      await loadDocuments();
+      window.dispatchEvent(new Event('guidelines-changed'));
+      setSelectedDocId(result.document_id);
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Could not load the sample guideline.');
     } finally {
       setUploading(false);
     }
@@ -205,6 +225,18 @@ export const GuidelineExplorer: React.FC = () => {
             PDF &bull; TXT
           </span>
         </div>
+
+        <button
+          type="button"
+          className="btn btn-secondary"
+          id="load-sample-guideline"
+          onClick={handleLoadSample}
+          disabled={uploading}
+          style={{ marginBottom: '12px' }}
+        >
+          <FileCheck size={14} />
+          <span>Load Sample Marketing Compliance Guidelines</span>
+        </button>
 
         <form onSubmit={handleUpload}>
           <label

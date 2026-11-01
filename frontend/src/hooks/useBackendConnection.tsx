@@ -47,6 +47,8 @@ const DEFAULT_CONFIG: Required<BackendConnectionConfig> = {
   fetchFn: fetchHealth,
 };
 
+const WARMING_POLL_INTERVAL_MS = 5000;
+
 const BackendConnectionContext = createContext<BackendConnectionState | null>(null);
 
 export function computeBackoffDelay(
@@ -156,8 +158,11 @@ export const BackendConnectionProvider: React.FC<{
         retryCountRef.current = 0;
         setLastChecked(new Date().toLocaleTimeString());
 
-        // Schedule next relaxed heartbeat check
-        scheduleNextCheck(config.connectedPollIntervalMs, 'heartbeat');
+        // Check again soon while the server is still loading; otherwise a relaxed heartbeat
+        scheduleNextCheck(
+          result.readiness === 'warming' ? WARMING_POLL_INTERVAL_MS : config.connectedPollIntervalMs,
+          'heartbeat'
+        );
       } catch (err: unknown) {
         if (!isMountedRef.current) return;
 

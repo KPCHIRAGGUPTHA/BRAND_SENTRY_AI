@@ -3,6 +3,9 @@ export interface HealthResponse {
   service: string;
   version: string;
   environment: string;
+  readiness?: 'warming' | 'ready' | string;
+  uptime_seconds?: number;
+  build?: string;
 }
 
 export interface GuidelineUploadResponse {

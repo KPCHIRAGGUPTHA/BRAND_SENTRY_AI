@@ -46,6 +46,7 @@ class BrandSentryPage:
     # Guideline Upload and Explorer Section
     GUIDELINES_SECTION = (By.ID, "guidelines")
     GUIDELINE_FILE_INPUT = (By.ID, "guideline-file-input")
+    LOAD_SAMPLE_BUTTON = (By.ID, "load-sample-guideline")
     UPLOAD_DROPZONE = (By.CSS_SELECTOR, "label.upload-dropzone")
     UPLOAD_BUTTON = (By.XPATH, "//button[contains(., 'Upload & Index') or contains(., 'Extracting & Indexing...')]")
     UPLOAD_SUCCESS_ALERT = (By.CSS_SELECTOR, "#guidelines .alert-success")

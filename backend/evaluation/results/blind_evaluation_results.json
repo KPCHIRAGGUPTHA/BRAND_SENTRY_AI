@@ -732,9 +732,9 @@
       "hybrid_pred": "CONTRADICTED",
       "dense_rule": true,
       "hybrid_rule": true,
-      "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase '100% impenetrable'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim\". Note: Statutory/regulatory warning (RULE-UNIV-ABS-001) also applies as an informational reference.",
+      "hybrid_explanation": "Explicit organization guideline violation: Claim matches prohibited phrase '100% impenetrable'. Contradiction grounded in selected guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\". Note: Statutory/regulatory warning (RULE-UNIV-ABS-001) also applies as an informational reference.",
       "hybrid_evidence": [
-        "8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim"
+        "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
       ]
     },
     {

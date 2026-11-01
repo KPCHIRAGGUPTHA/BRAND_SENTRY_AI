@@ -419,6 +419,9 @@ class VerdictEngine:
                 claim_text=claim_text,
                 retrieved_passages=retrieved_passages,
             )
+            if self._is_unsafe_to_rewrite(claim_text):
+                for issue in cv.semantic_drift.issues:
+                    issue.suggested_correction = None
             # A drift rewrite is only offered for a violation, never for a claim that is unsafe to
             # rewrite, and never by appending a condition that would imply the claim is permitted.
             if (
@@ -1475,6 +1478,15 @@ class VerdictEngine:
                         match_pos = m.start()
                         match_len = m.end() - m.start()
                         break
+
+        # A phrase like '100% impenetrable' is judged by the security rule, so quote that rule.
+        if match_pos == -1 and target_phrase and re.search(r'secur|hack|impenetrable|vulnerab', target_phrase, re.IGNORECASE):
+            m = re.search(r'\b(?:completely\s+secure|impossible\s+to\s+hack|secur\w*|hack\w*)', passage_text, re.IGNORECASE)
+            prohibited = re.search(r'[“"\'](?:completely\s+secure|impossible\s+to\s+hack)[”"\']', passage_text, re.IGNORECASE)
+            m = prohibited or m
+            if m:
+                match_pos = m.start()
+                match_len = m.end() - m.start()
 
         if match_pos == -1 and claim_text:
             keywords = _extract_substantive_keywords(claim_text)

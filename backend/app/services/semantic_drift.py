@@ -221,11 +221,15 @@ class SemanticDriftDetector:
         source_qualified = None
         source_matched_text = None
         for pat, _ in _QUALIFIED_CERTAINTY_PATTERNS:
-            m = pat.search(passage)
-            if m:
+            for m in pat.finditer(passage):
+                # A passage can cover many topics; only qualifying language on the claim's topic counts
+                if not self._sentence_overlaps_claim(claim, passage, m.start(), m.end()):
+                    continue
                 source_qualified = m.group(0)
                 # Find full sentence or clause for source context
                 source_matched_text = self._extract_context_window(passage, m.start(), m.end())
+                break
+            if source_qualified:
                 break
 
         if not source_qualified:
@@ -246,6 +250,13 @@ class SemanticDriftDetector:
                 claim,
                 flags=re.IGNORECASE,
             ).strip()
+            # Modal verbs take the base form: 'may improves' becomes 'may improve'
+            correction = re.sub(
+                r'\b(may|might|could)\s+([a-z]{3,}?)(?:e?s)\b',
+                lambda v: f"{v.group(1)} {v.group(2)}{'e' if v.group(0).endswith('ves') else ''}",
+                correction,
+                flags=re.IGNORECASE,
+            )
 
             issues.append(
                 SemanticDriftIssue(
@@ -375,10 +386,7 @@ class SemanticDriftDetector:
             for m in pat.finditer(passage):
                 condition_text = m.group(0).strip()
                 # A passage can cover many topics; only a condition on the claim's own topic counts
-                sentence_start = max(passage.rfind(". ", 0, m.start()) + 1, 0)
-                sentence_end = passage.find(". ", m.end())
-                sentence = passage[sentence_start: sentence_end if sentence_end != -1 else len(passage)]
-                if not self._has_topic_overlap(claim, sentence):
+                if not self._sentence_overlaps_claim(claim, passage, m.start(), m.end()):
                     continue
                 # If key condition words do not appear in the claim
                 words = [w.lower() for w in re.findall(r'\b[a-zA-Z]{4,}\b', condition_text)
@@ -541,6 +549,13 @@ class SemanticDriftDetector:
     # -----------------------------------------------------------------------
     # Helper Utilities
     # -----------------------------------------------------------------------
+
+    def _sentence_overlaps_claim(self, claim: str, passage: str, start: int, end: int) -> bool:
+        """Checks the claim's topic against only the sentence containing a match."""
+        sentence_start = max(passage.rfind(". ", 0, start) + 1, 0)
+        sentence_end = passage.find(". ", end)
+        sentence = passage[sentence_start: sentence_end if sentence_end != -1 else len(passage)]
+        return self._has_topic_overlap(claim, sentence)
 
     def _has_topic_overlap(self, claim: str, passage: str) -> bool:
         """Checks if there are at least two substantive non-stopword tokens in common."""

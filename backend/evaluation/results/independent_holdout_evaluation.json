@@ -6171,7 +6171,7 @@
         "dense_rule": true,
         "hybrid_rule": true,
         "hybrid_evidence": [
-          "8. DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used. Security and privacy statements must accurately reflect verified controls and documented practices. Do not claim"
+          "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
         ],
         "notes": "Guideline prohibits claims that customer data is 'completely secure' or 'impossible to hack'."
       },

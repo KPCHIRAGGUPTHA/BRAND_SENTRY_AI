@@ -170,6 +170,15 @@ export async function uploadGuideline(file: File): Promise<GuidelineUploadRespon
   return await safeParseJson<GuidelineUploadResponse>(response, 'Guideline upload');
 }
 
+export async function loadSampleGuideline(): Promise<GuidelineUploadResponse> {
+  const response = await fetch(`${API_BASE_URL}/api/guidelines/load-sample`, { method: 'POST' });
+  if (!response.ok) {
+    throw new Error(`Could not load the sample guideline (HTTP ${response.status}). Please try again.`);
+  }
+  invalidateDocumentsCache();
+  return await safeParseJson<GuidelineUploadResponse>(response, 'Load sample guideline');
+}
+
 export async function searchGuidelines(
   query: string,
   documentId?: string,
