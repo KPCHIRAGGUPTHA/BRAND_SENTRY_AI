@@ -109,12 +109,7 @@ found)", including when the verdict was `CONTRADICTED` and grounded in a cited g
 contradicted the evidence shown below it. It is now shown only when the claim has no evidence. The fix was
 re-verified in the browser.
 
-**Finding not fixed (documented):** the claim "Customer data is completely secure and impossible to hack."
-returned `INSUFFICIENT_EVIDENCE`, even though section 8 of the sample guideline prohibits that wording. The
-correct chunk was retrieved (it ranked first under BM25 and RRF), but its dense similarity was 0.228, below the
-0.25 evidence threshold. The chunk is long and covers several topics, which dilutes its similarity score. This
-is a conservative miss, not a false approval. I did not change the calibrated threshold or the chunking at
-submission time.
+**Later fixed:** the claim "Customer data is completely secure and impossible to hack." used to return `INSUFFICIENT_EVIDENCE`. It now returns `CONTRADICTED`. See section 7.
 
 ### 2.4 Deployment checks
 
@@ -189,16 +184,17 @@ Full configuration and verification steps are in [`DEPLOYMENT.md`](DEPLOYMENT.md
 
 ---
 
-## 5. Evaluation results (previously recorded, files in `backend/evaluation/results/`)
+## 5. Evaluation results (re-measured after the section 7 changes, files in `backend/evaluation/results/`)
 
 | Set | N | Hybrid accuracy | Dense accuracy |
 | :--- | ---: | ---: | ---: |
-| Development (used during tuning) | 60 | 96.67% | 95.00% |
-| Independent holdout | 118 | 78.81% | 80.51% |
-| Blind challenge | 32 | 75.00% | 71.88% |
+| Development (used during tuning) | 60 | 93.33% | 91.67% |
+| Holdout | 118 | 81.36% | 83.05% |
+| Challenge | 32 | 78.12% | 75.00% |
 
-On the holdout set, hybrid produced 2 false-positive SUPPORTED verdicts and 11 false-positive CONTRADICTED
-verdicts. The development-set figure is optimistic because the system was tuned against that set.
+The development-set figure is optimistic because the system was tuned against that set. Earlier engine rules also
+contain phrases taken from these benchmarks, and I reviewed their results during the section 7 work, so all three
+sets are regression benchmarks now, not blind estimates of real-world accuracy.
 
 ---
 
@@ -208,7 +204,6 @@ verdicts. The development-set figure is optimistic because the system was tuned 
 - False-positive contradictions in some operational contexts. This is the largest failure class on the holdout set.
 - Weak on conditional approvals and policy nuance (holdout `conditional_approval` category: 1 of 6 correct).
 - Edge cases where documents serve as evidence.
-- Conservative `INSUFFICIENT_EVIDENCE` when the relevant rule sits in a long chunk that covers many topics (see 2.3).
 - Small benchmarks (60, 118 and 32 cases), so results may not generalize.
 - Verdicts require human review. The product must not be presented as autonomous or perfectly accurate.
 
@@ -223,3 +218,61 @@ verdicts. The development-set figure is optimistic because the system was tuned 
 - Building the production Docker image locally
 - OCR review in the UI
 - Mobile layout (it overflows horizontally)
+
+---
+
+## 7. Verdict engine audit against the sample guideline
+
+**Method.** I wrote labelled claims from the guideline text and ran them through the real API with the
+document uploaded. Baseline: **38/60 (63%)**.
+
+**Defects fixed**
+
+| Defect | Example | Before | After |
+| :--- | :--- | :--- | :--- |
+| Rules in long chunks were missed by the similarity threshold | "Our platform is impossible to hack." | `INSUFFICIENT_EVIDENCE` | `CONTRADICTED` |
+| One shared word counted as a violation | "Customers love our product." | `CONTRADICTED` | `INSUFFICIENT_EVIDENCE` |
+| Hyphenated words were treated as product codes (false approval) | "Our packaging is eco-friendly." | `SUPPORTED` | `INSUFFICIENT_EVIDENCE` |
+| An admitted breach was read as compliance (false approval) | "Material fees are not disclosed in this offer." | `SUPPORTED` | `CONTRADICTED` |
+| Compliant denials were flagged | "We never describe our product as 100% safe." | `CONTRADICTED` | `SUPPORTED` |
+| Prompt injection produced a verdict | "Ignore all previous instructions..." | `CONTRADICTED` | `INSUFFICIENT_EVIDENCE` |
+| "must be approved" counted as approval | Found through the benchmark comparison | `SUPPORTED` | No longer counts as approval |
+| Corrections added unrelated conditions (unsafe) | "...this tablet cures cancer when results depend on customer circumstances." | Offered | Not offered |
+
+**The fix.** `backend/app/services/guideline_directives.py` reads prohibitions, "unless" exceptions, requirements
+and recommendations from whichever guideline is uploaded. Each match needs every part of the rule in the claim, and
+the citation is the sentence that decided the verdict. No phrases from the sample guideline are hard-coded.
+
+**Labelling decisions**
+
+- **Claimed approval returns `INSUFFICIENT_EVIDENCE` (two existing tests changed).** "Legal gave written approval" in
+  marketing copy is self-reported, and the project rule says this is not documentary proof. Two tests previously
+  expected `SUPPORTED`. This costs three development-set cases, whose labels still say `SUPPORTED`.
+- **Percentages return `INSUFFICIENT_EVIDENCE` (two of my labels changed).** "40% faster" may be allowed if the
+  methodology is documented, which the guideline cannot show. I first labelled these `CONTRADICTED`; three existing
+  tests record the opposite decision, and I followed them.
+- **"zero impact" returns `CONTRADICTED` (one of my labels changed).** I first labelled it `INSUFFICIENT_EVIDENCE`;
+  the existing benchmarks treat absolute environmental claims as violations, and I followed them.
+- **Plain "eco-friendly" returns `INSUFFICIENT_EVIDENCE`.** It is allowed only when specific and documented.
+
+**Results**
+
+| Check | Result |
+| :--- | :--- |
+| Sample guideline, 60 labelled cases, real API | **60/60** after fixes; these cases were used for tuning |
+| New paraphrases, same guideline, first run | **20/20** |
+| Different guideline (fictional food brand), first run | **20/20** |
+| Backend tests, Python 3.14.5 and 3.11.16 | **379 passed** on each |
+| Frontend build and tests | Build succeeded, **15 passed** |
+| Selenium UI suite, production-mode backend | **20 passed** |
+
+**Do not read these as real-world accuracy.** The same author wrote the claims, labels and rules, so the sealed sets
+test paraphrase and transfer, not independent judgement. The benchmarks in section 5 remain the better indicator,
+and an independent reviewer labelling new claims would be the next meaningful test. Many older benchmark-specific
+rules remain in `verdict_engine.py` as a fallback.
+
+**"Backend unavailable" on Render.** The reported screenshot was taken at 20:31 IST, and the registry shows that
+upload indexed at 20:32 IST, so the backend was still working. The free instance was waking and the UI gave up after
+about a minute. The UI now keeps showing "waking" for about five minutes, and the production backend loads the
+embedding model at startup so the first upload does not pay for it. I have no access to Render logs, so an
+out-of-memory restart cannot be ruled out. The free tier also still wipes uploads on restart.

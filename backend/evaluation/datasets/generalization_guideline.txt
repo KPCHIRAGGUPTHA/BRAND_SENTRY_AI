@@ -1,0 +1,16 @@
+NORTHWIND FOODS — ADVERTISING STANDARDS Document ID: NWF-AD-07 Version: 2.1
+Important: This is a fictional policy created for software evaluation.
+
+1. NUTRITION CLAIMS Advertising must not describe a food as "guilt free". Do not claim that a snack aids weight loss unless a registered dietitian has reviewed the claim. Nutrition labels must be accurate and match the current recipe.
+
+2. ORIGIN CLAIMS Ingredients must not be described as "locally sourced" unless supplier invoices confirm the origin. Do not state that a product is made in a specific country unless customs records confirm it.
+
+3. CHILDREN Advertising must not target children under twelve. Promotions must clearly separate advertising from entertainment content.
+
+4. PRICES AND OFFERS Promotional prices must be available for the full advertised period. Do not advertise a limited offer when the offer is permanent. All delivery charges must be clearly disclosed.
+
+5. ALLERGENS Advertising must not state that a product is "allergen free". Allergen warnings must be displayed on all packaging.
+
+6. REVIEWS Customer reviews must be genuine and must not be purchased. Do not present paid endorsements as independent reviews.
+
+END OF POLICY

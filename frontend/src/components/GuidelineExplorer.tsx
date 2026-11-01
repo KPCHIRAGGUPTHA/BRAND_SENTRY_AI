@@ -277,7 +277,7 @@ export const GuidelineExplorer: React.FC = () => {
                   {uploading ? (
                     <>
                       <RefreshCw size={14} className="spinning" />
-                      <span>Extracting & Indexing...</span>
+                      <span title="The first upload after the server has been idle can take a minute or two.">Extracting & Indexing...</span>
                     </>
                   ) : (
                     <>

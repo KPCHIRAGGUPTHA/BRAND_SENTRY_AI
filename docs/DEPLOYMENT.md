@@ -171,7 +171,7 @@ Replace `$API` / `$WEB` with your URLs (Render: `https://brandsentry-api.onrende
 
 ## H. Known limitations
 
-- Free-tier Render: cold starts (~45s observed) and ephemeral storage (uploads, vectors and audits are lost on
+- Free-tier Render: cold starts (~45s observed, longer under load; the UI shows "waking" for about five minutes) and ephemeral storage (uploads, vectors and audits are lost on
   restart/redeploy).
 - Single-instance design (SQLite + local Chroma).
 - Optional reranker downloads from Hugging Face at first use; without network access it silently falls back

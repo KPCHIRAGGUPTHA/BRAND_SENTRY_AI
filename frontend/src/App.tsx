@@ -100,7 +100,7 @@ export const App: React.FC = () => {
                     Deterministic hybrid compliance runtime configuration and persistence.
                   </p>
                 </div>
-                <span className="badge badge-success">Production Verified</span>
+                <span className="badge badge-success">Configuration</span>
               </div>
 
               <div className="meta-list">
@@ -122,7 +122,7 @@ export const App: React.FC = () => {
                 </div>
                 <div className="meta-row">
                   <span className="meta-label">Backend Service</span>
-                  <span className="meta-value">FastAPI + Uvicorn ASGI (200 Unit &amp; Integration Tests)</span>
+                  <span className="meta-value">FastAPI + Uvicorn ASGI</span>
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ export const App: React.FC = () => {
                   End-to-End Compliance Pipeline
                 </h3>
                 <p className="card-description">
-                  Systematic architecture ensuring zero ungrounded compliance claims or hallucinations.
+                  Every citation is taken from retrieved guideline text. Verdicts assist a human reviewer and need confirmation before publication.
                 </p>
               </div>
               <span className="badge badge-success">Improvements 1, 2 &amp; 3 Operational</span>

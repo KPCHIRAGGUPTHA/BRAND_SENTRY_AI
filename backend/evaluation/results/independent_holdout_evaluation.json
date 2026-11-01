@@ -4,13 +4,13 @@
     "count": 60,
     "dense_metrics": {
       "total": 60,
-      "correct": 57,
-      "accuracy": 0.95,
+      "correct": 55,
+      "accuracy": 0.9167,
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 20,
+          "SUPPORTED": 18,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 2
+          "INSUFFICIENT_EVIDENCE": 4
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
@@ -25,12 +25,12 @@
       },
       "per_class": {
         "SUPPORTED": {
-          "tp": 20,
+          "tp": 18,
           "fp": 0,
-          "fn": 2,
+          "fn": 4,
           "precision": 1.0,
-          "recall": 0.9091,
-          "f1": 0.9524
+          "recall": 0.8182,
+          "f1": 0.9
         },
         "CONTRADICTED": {
           "tp": 25,
@@ -42,11 +42,11 @@
         },
         "INSUFFICIENT_EVIDENCE": {
           "tp": 12,
-          "fp": 3,
+          "fp": 5,
           "fn": 0,
-          "precision": 0.8,
+          "precision": 0.7059,
           "recall": 1.0,
-          "f1": 0.8889
+          "f1": 0.8276
         }
       },
       "false_positive_support": 0,
@@ -59,8 +59,8 @@
         },
         "exception": {
           "total": 6,
-          "correct": 6,
-          "accuracy": 1.0
+          "correct": 3,
+          "accuracy": 0.5
         },
         "missing_evidence": {
           "total": 6,
@@ -74,8 +74,8 @@
         },
         "numerical_threshold": {
           "total": 6,
-          "correct": 5,
-          "accuracy": 0.8333
+          "correct": 6,
+          "accuracy": 1.0
         },
         "prohibited_phrase": {
           "total": 6,
@@ -106,13 +106,13 @@
     },
     "hybrid_metrics": {
       "total": 60,
-      "correct": 58,
-      "accuracy": 0.9667,
+      "correct": 56,
+      "accuracy": 0.9333,
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 20,
+          "SUPPORTED": 18,
           "CONTRADICTED": 0,
-          "INSUFFICIENT_EVIDENCE": 2
+          "INSUFFICIENT_EVIDENCE": 4
         },
         "CONTRADICTED": {
           "SUPPORTED": 0,
@@ -127,12 +127,12 @@
       },
       "per_class": {
         "SUPPORTED": {
-          "tp": 20,
+          "tp": 18,
           "fp": 0,
-          "fn": 2,
+          "fn": 4,
           "precision": 1.0,
-          "recall": 0.9091,
-          "f1": 0.9524
+          "recall": 0.8182,
+          "f1": 0.9
         },
         "CONTRADICTED": {
           "tp": 26,
@@ -144,11 +144,11 @@
         },
         "INSUFFICIENT_EVIDENCE": {
           "tp": 12,
-          "fp": 2,
+          "fp": 4,
           "fn": 0,
-          "precision": 0.8571,
+          "precision": 0.75,
           "recall": 1.0,
-          "f1": 0.9231
+          "f1": 0.8571
         }
       },
       "false_positive_support": 0,
@@ -161,8 +161,8 @@
         },
         "exception": {
           "total": 6,
-          "correct": 6,
-          "accuracy": 1.0
+          "correct": 3,
+          "accuracy": 0.5
         },
         "missing_evidence": {
           "total": 6,
@@ -176,8 +176,8 @@
         },
         "numerical_threshold": {
           "total": 6,
-          "correct": 5,
-          "accuracy": 0.8333
+          "correct": 6,
+          "accuracy": 1.0
         },
         "prohibited_phrase": {
           "total": 6,
@@ -208,31 +208,95 @@
     },
     "hybrid_failures": [
       {
-        "id": "eval-num-16",
-        "query": "Achieved a 99.999% uptime benchmark with audited third-party proof.",
-        "category": "numerical_threshold",
+        "id": "eval-exc-25",
+        "query": "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
+        "category": "exception",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
         "dense_pred": "INSUFFICIENT_EVIDENCE",
         "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
-          "chunk-brand-performance",
-          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
-          "chunk-brand-security",
-          "chunk-brand-pricing"
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
         ],
         "h_chunks": [
-          "chunk-brand-performance",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-evidence",
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
           "chunk-brand-health",
-          "chunk-brand-safety"
+          "chunk-brand-security",
+          "chunk-brand-environmental"
         ],
         "dense_rule": false,
         "hybrid_rule": false,
-        "hybrid_evidence": [],
-        "notes": "Performance benchmark supported by reproducible evidence.",
+        "hybrid_evidence": [
+          "GUARANTEES AND ABSOLUTE CLAIMS: Marketing materials must not use the phrase '100% guaranteed' unless the Legal team has provided written approval."
+        ],
+        "notes": "Exception clause: written legal approval permits guarantee phrase.",
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
+      },
+      {
+        "id": "eval-exc-26",
+        "query": "Historical pricing records verify this is the lowest price ever offered.",
+        "category": "exception",
+        "document_scope": "doc-brand",
+        "expected": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "d_chunks": [
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes"
+        ],
+        "h_chunks": [
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance",
+          "chunk-brand-security"
+        ],
+        "dense_rule": false,
+        "hybrid_rule": false,
+        "hybrid_evidence": [
+          "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim."
+        ],
+        "notes": "Exception clause: historical pricing records substantiate lowest price.",
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
+      },
+      {
+        "id": "eval-exc-27",
+        "query": "Carbon neutral status has been documented, certified, and approved by the sustainability board.",
+        "category": "exception",
+        "document_scope": "doc-brand",
+        "expected": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "d_chunks": [
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-security"
+        ],
+        "h_chunks": [
+          "chunk-brand-environmental",
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees"
+        ],
+        "dense_rule": false,
+        "hybrid_rule": false,
+        "hybrid_evidence": [
+          "Do not claim a product is carbon neutral unless the basis for that claim is documented and approved."
+        ],
+        "notes": "Exception clause: approved carbon neutral documentation.",
         "root_cause": "POLICY_NUANCE",
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
@@ -268,35 +332,6 @@
     ],
     "dense_failures": [
       {
-        "id": "eval-num-16",
-        "query": "Achieved a 99.999% uptime benchmark with audited third-party proof.",
-        "category": "numerical_threshold",
-        "document_scope": "doc-brand",
-        "expected": "SUPPORTED",
-        "dense_pred": "INSUFFICIENT_EVIDENCE",
-        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
-        "d_chunks": [
-          "chunk-brand-performance",
-          "chunk-brand-evidence",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-security",
-          "chunk-brand-pricing"
-        ],
-        "h_chunks": [
-          "chunk-brand-performance",
-          "chunk-brand-review-outcomes",
-          "chunk-brand-evidence",
-          "chunk-brand-health",
-          "chunk-brand-safety"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [],
-        "notes": "Performance benchmark supported by reproducible evidence.",
-        "root_cause": "POLICY_NUANCE",
-        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
-      },
-      {
         "id": "eval-proh-19",
         "query": "We are officially voted number 1 in the world for customer care.",
         "category": "prohibited_phrase",
@@ -324,6 +359,99 @@
           "Unsubstantiated claims such as number 1 in the world are prohibited."
         ],
         "notes": "Unsubstantiated global number 1 claim.",
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
+      },
+      {
+        "id": "eval-exc-25",
+        "query": "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
+        "category": "exception",
+        "document_scope": "doc-brand",
+        "expected": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "d_chunks": [
+          "chunk-brand-guarantees",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-health",
+          "chunk-brand-testimonials",
+          "chunk-brand-safety"
+        ],
+        "h_chunks": [
+          "chunk-brand-guarantees",
+          "chunk-brand-safety",
+          "chunk-brand-health",
+          "chunk-brand-security",
+          "chunk-brand-environmental"
+        ],
+        "dense_rule": false,
+        "hybrid_rule": false,
+        "hybrid_evidence": [
+          "GUARANTEES AND ABSOLUTE CLAIMS: Marketing materials must not use the phrase '100% guaranteed' unless the Legal team has provided written approval."
+        ],
+        "notes": "Exception clause: written legal approval permits guarantee phrase.",
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
+      },
+      {
+        "id": "eval-exc-26",
+        "query": "Historical pricing records verify this is the lowest price ever offered.",
+        "category": "exception",
+        "document_scope": "doc-brand",
+        "expected": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "d_chunks": [
+          "chunk-brand-pricing",
+          "chunk-brand-performance",
+          "chunk-brand-evidence",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes"
+        ],
+        "h_chunks": [
+          "chunk-brand-pricing",
+          "chunk-brand-evidence",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-performance",
+          "chunk-brand-security"
+        ],
+        "dense_rule": false,
+        "hybrid_rule": false,
+        "hybrid_evidence": [
+          "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim."
+        ],
+        "notes": "Exception clause: historical pricing records substantiate lowest price.",
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
+      },
+      {
+        "id": "eval-exc-27",
+        "query": "Carbon neutral status has been documented, certified, and approved by the sustainability board.",
+        "category": "exception",
+        "document_scope": "doc-brand",
+        "expected": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "d_chunks": [
+          "chunk-brand-environmental",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-safety",
+          "chunk-brand-evidence",
+          "chunk-brand-security"
+        ],
+        "h_chunks": [
+          "chunk-brand-environmental",
+          "chunk-brand-safety",
+          "chunk-brand-security",
+          "chunk-brand-review-outcomes",
+          "chunk-brand-guarantees"
+        ],
+        "dense_rule": false,
+        "hybrid_rule": false,
+        "hybrid_evidence": [
+          "Do not claim a product is carbon neutral unless the basis for that claim is documented and approved."
+        ],
+        "notes": "Exception clause: approved carbon neutral documentation.",
         "root_cause": "POLICY_NUANCE",
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
@@ -795,8 +923,8 @@
         "category": "numerical_threshold",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "INSUFFICIENT_EVIDENCE",
-        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
+        "dense_pred": "SUPPORTED",
+        "hybrid_pred": "SUPPORTED",
         "d_chunks": [
           "chunk-brand-performance",
           "chunk-brand-evidence",
@@ -813,7 +941,9 @@
         ],
         "dense_rule": false,
         "hybrid_rule": false,
-        "hybrid_evidence": [],
+        "hybrid_evidence": [
+          "Do not state a specific percentage improvement unless the underlying measurement and methodology are documented."
+        ],
         "notes": "Performance benchmark supported by reproducible evidence."
       },
       {
@@ -1047,8 +1177,8 @@
         "category": "exception",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-guarantees",
           "chunk-brand-review-outcomes",
@@ -1076,8 +1206,8 @@
         "category": "exception",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-performance",
@@ -1105,8 +1235,8 @@
         "category": "exception",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-review-outcomes",
@@ -1882,7 +2012,7 @@
         "dense_rule": false,
         "hybrid_rule": false,
         "hybrid_evidence": [
-          "GUARANTEES AND ABSOLUTE CLAIMS: Marketing materials must not use the phrase '100% guaranteed' unless the Legal team has provided written approval."
+          "Do not imply that a product has no risks unless the claim has been substantiated and approved by Legal."
         ],
         "notes": "Touches guarantees, safety, and security policies simultaneously."
       },
@@ -2038,17 +2168,17 @@
     "count": 118,
     "dense_metrics": {
       "total": 118,
-      "correct": 95,
-      "accuracy": 0.8051,
+      "correct": 98,
+      "accuracy": 0.8305,
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 25,
-          "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 4
+          "SUPPORTED": 27,
+          "CONTRADICTED": 1,
+          "INSUFFICIENT_EVIDENCE": 5
         },
         "CONTRADICTED": {
-          "SUPPORTED": 2,
-          "CONTRADICTED": 46,
+          "SUPPORTED": 1,
+          "CONTRADICTED": 47,
           "INSUFFICIENT_EVIDENCE": 7
         },
         "INSUFFICIENT_EVIDENCE": {
@@ -2059,32 +2189,32 @@
       },
       "per_class": {
         "SUPPORTED": {
-          "tp": 25,
-          "fp": 2,
-          "fn": 8,
-          "precision": 0.9259,
-          "recall": 0.7576,
-          "f1": 0.8333
+          "tp": 27,
+          "fp": 1,
+          "fn": 6,
+          "precision": 0.9643,
+          "recall": 0.8182,
+          "f1": 0.8852
         },
         "CONTRADICTED": {
-          "tp": 46,
-          "fp": 10,
-          "fn": 9,
-          "precision": 0.8214,
-          "recall": 0.8364,
-          "f1": 0.8288
+          "tp": 47,
+          "fp": 7,
+          "fn": 8,
+          "precision": 0.8704,
+          "recall": 0.8545,
+          "f1": 0.8624
         },
         "INSUFFICIENT_EVIDENCE": {
           "tp": 24,
-          "fp": 11,
+          "fp": 12,
           "fn": 6,
-          "precision": 0.6857,
+          "precision": 0.6667,
           "recall": 0.8,
-          "f1": 0.7385
+          "f1": 0.7273
         }
       },
-      "false_positive_support": 2,
-      "false_positive_contradiction": 10,
+      "false_positive_support": 1,
+      "false_positive_contradiction": 7,
       "category_accuracy": {
         "approximate_numerical": {
           "total": 6,
@@ -2118,13 +2248,13 @@
         },
         "double_negatives": {
           "total": 6,
-          "correct": 4,
-          "accuracy": 0.6667
+          "correct": 5,
+          "accuracy": 0.8333
         },
         "environmental_claims": {
           "total": 6,
-          "correct": 5,
-          "accuracy": 0.8333
+          "correct": 6,
+          "accuracy": 1.0
         },
         "exact_regulatory_ids": {
           "total": 6,
@@ -2153,8 +2283,8 @@
         },
         "negation_disclaimers": {
           "total": 8,
-          "correct": 6,
-          "accuracy": 0.75
+          "correct": 7,
+          "accuracy": 0.875
         },
         "numerical_thresholds": {
           "total": 6,
@@ -2190,17 +2320,17 @@
     },
     "hybrid_metrics": {
       "total": 118,
-      "correct": 93,
-      "accuracy": 0.7881,
+      "correct": 96,
+      "accuracy": 0.8136,
       "confusion_matrix": {
         "SUPPORTED": {
-          "SUPPORTED": 25,
-          "CONTRADICTED": 4,
-          "INSUFFICIENT_EVIDENCE": 4
+          "SUPPORTED": 27,
+          "CONTRADICTED": 1,
+          "INSUFFICIENT_EVIDENCE": 5
         },
         "CONTRADICTED": {
-          "SUPPORTED": 2,
-          "CONTRADICTED": 45,
+          "SUPPORTED": 1,
+          "CONTRADICTED": 46,
           "INSUFFICIENT_EVIDENCE": 8
         },
         "INSUFFICIENT_EVIDENCE": {
@@ -2211,32 +2341,32 @@
       },
       "per_class": {
         "SUPPORTED": {
-          "tp": 25,
-          "fp": 2,
-          "fn": 8,
-          "precision": 0.9259,
-          "recall": 0.7576,
-          "f1": 0.8333
+          "tp": 27,
+          "fp": 1,
+          "fn": 6,
+          "precision": 0.9643,
+          "recall": 0.8182,
+          "f1": 0.8852
         },
         "CONTRADICTED": {
-          "tp": 45,
-          "fp": 11,
-          "fn": 10,
-          "precision": 0.8036,
-          "recall": 0.8182,
-          "f1": 0.8108
+          "tp": 46,
+          "fp": 8,
+          "fn": 9,
+          "precision": 0.8519,
+          "recall": 0.8364,
+          "f1": 0.844
         },
         "INSUFFICIENT_EVIDENCE": {
           "tp": 23,
-          "fp": 12,
+          "fp": 13,
           "fn": 7,
-          "precision": 0.6571,
+          "precision": 0.6389,
           "recall": 0.7667,
-          "f1": 0.7077
+          "f1": 0.697
         }
       },
-      "false_positive_support": 2,
-      "false_positive_contradiction": 11,
+      "false_positive_support": 1,
+      "false_positive_contradiction": 8,
       "category_accuracy": {
         "approximate_numerical": {
           "total": 6,
@@ -2270,13 +2400,13 @@
         },
         "double_negatives": {
           "total": 6,
-          "correct": 4,
-          "accuracy": 0.6667
+          "correct": 5,
+          "accuracy": 0.8333
         },
         "environmental_claims": {
           "total": 6,
-          "correct": 5,
-          "accuracy": 0.8333
+          "correct": 6,
+          "accuracy": 1.0
         },
         "exact_regulatory_ids": {
           "total": 6,
@@ -2305,8 +2435,8 @@
         },
         "negation_disclaimers": {
           "total": 8,
-          "correct": 6,
-          "accuracy": 0.75
+          "correct": 7,
+          "accuracy": 0.875
         },
         "numerical_thresholds": {
           "total": 6,
@@ -2371,37 +2501,6 @@
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
-        "id": "holdout-neg-008",
-        "query": "We never describe any clearance promotion as our lowest price ever without archival pricing verification.",
-        "category": "negation_disclaimers",
-        "document_scope": "doc-brand",
-        "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-pricing",
-          "chunk-brand-guarantees",
-          "chunk-brand-evidence",
-          "chunk-brand-security",
-          "chunk-brand-performance"
-        ],
-        "h_chunks": [
-          "chunk-brand-pricing",
-          "chunk-brand-guarantees",
-          "chunk-brand-evidence",
-          "chunk-brand-safety",
-          "chunk-brand-performance"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim."
-        ],
-        "notes": "Negative phrasing stating strict adherence to historical pricing substantiation rule.",
-        "root_cause": "NEGATION_OR_DOUBLE_NEGATIVE_ERROR",
-        "diagnosis": "Negation or double negative in compliant disclaimer improperly triggered contradiction."
-      },
-      {
         "id": "holdout-dbl-011",
         "query": "We do not distribute products without ensuring customer data is not left unencrypted at rest.",
         "category": "double_negatives",
@@ -2421,37 +2520,6 @@
         "notes": "Double negation asserting data is encrypted at rest, compliant with data protection architecture.",
         "root_cause": "POLICY_NUANCE",
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
-      },
-      {
-        "id": "holdout-dbl-012",
-        "query": "No promotional campaign is ever launched that does not omit mandatory legal risk disclosures.",
-        "category": "double_negatives",
-        "document_scope": "doc-brand",
-        "expected": "CONTRADICTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
-        "d_chunks": [
-          "chunk-brand-safety",
-          "chunk-brand-guarantees",
-          "chunk-brand-health",
-          "chunk-brand-security",
-          "chunk-brand-pricing"
-        ],
-        "h_chunks": [
-          "chunk-brand-safety",
-          "chunk-brand-guarantees",
-          "chunk-brand-pricing",
-          "chunk-brand-security",
-          "chunk-brand-evidence"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "Do not imply that a product has no risks unless the claim has been substantiated and approved by Legal."
-        ],
-        "notes": "Double negative resolving to admitting campaigns omit mandatory disclosures, violating policy.",
-        "root_cause": "FALSE_POSITIVE_SUPPORT",
-        "diagnosis": "Engine affirmed compliance for a statement containing prohibited guarantees or unbacked claims."
       },
       {
         "id": "holdout-cnd-021",
@@ -2544,8 +2612,8 @@
         "category": "conditional_approval",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
@@ -2566,8 +2634,8 @@
           "Do not claim a product is carbon neutral unless the basis for that claim is documented and approved."
         ],
         "notes": "Affirmative restatement of policy requirement that carbon neutral claims require documented approval.",
-        "root_cause": "FALSE_POSITIVE_CONTRADICTION",
-        "diagnosis": "Engine fired policy prohibition on claim that adhered to guidelines."
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
         "id": "holdout-cnd-025",
@@ -2933,37 +3001,6 @@
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
-        "id": "holdout-env-084",
-        "query": "We avoid broad environmental claims and restrict ecological statements to assessed product features.",
-        "category": "environmental_claims",
-        "document_scope": "doc-brand",
-        "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-environmental",
-          "chunk-brand-health",
-          "chunk-brand-safety",
-          "chunk-brand-evidence",
-          "chunk-brand-performance"
-        ],
-        "h_chunks": [
-          "chunk-brand-environmental",
-          "chunk-brand-safety",
-          "chunk-brand-health",
-          "chunk-brand-security",
-          "chunk-brand-evidence"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "Avoid broad environmental claims when only a limited product feature has been assessed."
-        ],
-        "notes": "Direct alignment with environmental guideline policy command: 'Avoid broad environmental claims'.",
-        "root_cause": "FALSE_POSITIVE_CONTRADICTION",
-        "diagnosis": "Engine fired policy prohibition on claim that adhered to guidelines."
-      },
-      {
         "id": "holdout-fin-091",
         "query": "Our high-yield certificate guarantees double-digit returns within thirty calendar days.",
         "category": "financial_guarantees",
@@ -3084,37 +3121,6 @@
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
-        "id": "holdout-neg-008",
-        "query": "We never describe any clearance promotion as our lowest price ever without archival pricing verification.",
-        "category": "negation_disclaimers",
-        "document_scope": "doc-brand",
-        "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-pricing",
-          "chunk-brand-guarantees",
-          "chunk-brand-evidence",
-          "chunk-brand-security",
-          "chunk-brand-performance"
-        ],
-        "h_chunks": [
-          "chunk-brand-pricing",
-          "chunk-brand-guarantees",
-          "chunk-brand-evidence",
-          "chunk-brand-safety",
-          "chunk-brand-performance"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim."
-        ],
-        "notes": "Negative phrasing stating strict adherence to historical pricing substantiation rule.",
-        "root_cause": "NEGATION_OR_DOUBLE_NEGATIVE_ERROR",
-        "diagnosis": "Negation or double negative in compliant disclaimer improperly triggered contradiction."
-      },
-      {
         "id": "holdout-dbl-011",
         "query": "We do not distribute products without ensuring customer data is not left unencrypted at rest.",
         "category": "double_negatives",
@@ -3134,37 +3140,6 @@
         "notes": "Double negation asserting data is encrypted at rest, compliant with data protection architecture.",
         "root_cause": "POLICY_NUANCE",
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
-      },
-      {
-        "id": "holdout-dbl-012",
-        "query": "No promotional campaign is ever launched that does not omit mandatory legal risk disclosures.",
-        "category": "double_negatives",
-        "document_scope": "doc-brand",
-        "expected": "CONTRADICTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
-        "d_chunks": [
-          "chunk-brand-safety",
-          "chunk-brand-guarantees",
-          "chunk-brand-health",
-          "chunk-brand-security",
-          "chunk-brand-pricing"
-        ],
-        "h_chunks": [
-          "chunk-brand-safety",
-          "chunk-brand-guarantees",
-          "chunk-brand-pricing",
-          "chunk-brand-security",
-          "chunk-brand-evidence"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "Do not imply that a product has no risks unless the claim has been substantiated and approved by Legal."
-        ],
-        "notes": "Double negative resolving to admitting campaigns omit mandatory disclosures, violating policy.",
-        "root_cause": "FALSE_POSITIVE_SUPPORT",
-        "diagnosis": "Engine affirmed compliance for a statement containing prohibited guarantees or unbacked claims."
       },
       {
         "id": "holdout-cnd-021",
@@ -3226,8 +3201,8 @@
         "category": "conditional_approval",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
@@ -3248,8 +3223,8 @@
           "Do not claim a product is carbon neutral unless the basis for that claim is documented and approved."
         ],
         "notes": "Affirmative restatement of policy requirement that carbon neutral claims require documented approval.",
-        "root_cause": "FALSE_POSITIVE_CONTRADICTION",
-        "diagnosis": "Engine fired policy prohibition on claim that adhered to guidelines."
+        "root_cause": "POLICY_NUANCE",
+        "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
         "id": "holdout-cnd-025",
@@ -3586,37 +3561,6 @@
         "diagnosis": "Candidate passages were retrieved but policy rule/conformance logic was not triggered."
       },
       {
-        "id": "holdout-env-084",
-        "query": "We avoid broad environmental claims and restrict ecological statements to assessed product features.",
-        "category": "environmental_claims",
-        "document_scope": "doc-brand",
-        "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
-        "d_chunks": [
-          "chunk-brand-environmental",
-          "chunk-brand-health",
-          "chunk-brand-safety",
-          "chunk-brand-evidence",
-          "chunk-brand-performance"
-        ],
-        "h_chunks": [
-          "chunk-brand-environmental",
-          "chunk-brand-safety",
-          "chunk-brand-health",
-          "chunk-brand-security",
-          "chunk-brand-evidence"
-        ],
-        "dense_rule": false,
-        "hybrid_rule": false,
-        "hybrid_evidence": [
-          "Avoid broad environmental claims when only a limited product feature has been assessed."
-        ],
-        "notes": "Direct alignment with environmental guideline policy command: 'Avoid broad environmental claims'.",
-        "root_cause": "FALSE_POSITIVE_CONTRADICTION",
-        "diagnosis": "Engine fired policy prohibition on claim that adhered to guidelines."
-      },
-      {
         "id": "holdout-fin-091",
         "query": "Our high-yield certificate guarantees double-digit returns within thirty calendar days.",
         "category": "financial_guarantees",
@@ -3914,8 +3858,8 @@
         "category": "negation_disclaimers",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
+        "dense_pred": "SUPPORTED",
+        "hybrid_pred": "SUPPORTED",
         "d_chunks": [
           "chunk-brand-pricing",
           "chunk-brand-guarantees",
@@ -4020,8 +3964,8 @@
         "category": "double_negatives",
         "document_scope": "doc-brand",
         "expected": "CONTRADICTED",
-        "dense_pred": "SUPPORTED",
-        "hybrid_pred": "SUPPORTED",
+        "dense_pred": "CONTRADICTED",
+        "hybrid_pred": "CONTRADICTED",
         "d_chunks": [
           "chunk-brand-safety",
           "chunk-brand-guarantees",
@@ -4360,8 +4304,8 @@
         "category": "conditional_approval",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
+        "dense_pred": "INSUFFICIENT_EVIDENCE",
+        "hybrid_pred": "INSUFFICIENT_EVIDENCE",
         "d_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-security",
@@ -4466,7 +4410,7 @@
         "dense_rule": false,
         "hybrid_rule": false,
         "hybrid_evidence": [
-          "Claims using words such as 'always', 'never', or 'zero risk' must be supported by documented evidence and approved before publication."
+          "Do not imply that a product has no risks unless the claim has been substantiated and approved by Legal."
         ],
         "notes": "Self-attestation of internal VP approval cannot exempt a prohibited 'zero risk' guarantee; universal risk stands."
       },
@@ -4629,7 +4573,9 @@
         ],
         "dense_rule": false,
         "hybrid_rule": false,
-        "hybrid_evidence": [],
+        "hybrid_evidence": [
+          "Do not claim a product is carbon neutral unless the basis for that claim is documented and approved."
+        ],
         "notes": "Carbon neutral claims require documented and approved basis; self-reported manager notes without documentation are insufficient."
       },
       {
@@ -4910,7 +4856,9 @@
         ],
         "dense_rule": false,
         "hybrid_rule": false,
-        "hybrid_evidence": [],
+        "hybrid_evidence": [
+          "A discount must not be described as 'the lowest price ever' unless historical pricing records substantiate the claim."
+        ],
         "notes": "Claim cites private internal spreadsheets not provided in the evaluation guidelines corpus."
       },
       {
@@ -5974,8 +5922,8 @@
         "category": "environmental_claims",
         "document_scope": "doc-brand",
         "expected": "SUPPORTED",
-        "dense_pred": "CONTRADICTED",
-        "hybrid_pred": "CONTRADICTED",
+        "dense_pred": "SUPPORTED",
+        "hybrid_pred": "SUPPORTED",
         "d_chunks": [
           "chunk-brand-environmental",
           "chunk-brand-health",
@@ -6080,7 +6028,7 @@
         "dense_rule": false,
         "hybrid_rule": false,
         "hybrid_evidence": [
-          "Claims using words such as 'always', 'never', or 'zero risk' must be supported by documented evidence and approved before publication."
+          "Do not imply that a product has no risks unless the claim has been substantiated and approved by Legal."
         ],
         "notes": "Policy prohibits claims using 'zero risk' and promising guaranteed outcomes when results depend on conditions."
       },

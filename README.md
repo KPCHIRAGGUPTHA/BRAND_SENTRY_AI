@@ -3,7 +3,7 @@
 [![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
 [![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi)](https://brandsentry-api.onrender.com/docs)
 [![Health Check](https://img.shields.io/badge/Backend-%2Fhealth-10B981?style=for-the-badge)](https://brandsentry-api.onrender.com/health)
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-270%20Passed-success?style=for-the-badge&logo=pytest)](docs/FINAL_SUBMISSION_REPORT.md)
+[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-379%20Passed-success?style=for-the-badge&logo=pytest)](docs/FINAL_SUBMISSION_REPORT.md)
 [![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-15%20Passed-success?style=for-the-badge&logo=vitest)](docs/TEST_REPORT.md)
 
 ---
@@ -45,7 +45,7 @@ BrandSentry AI is deployed in production on Render:
 - **Sparse Lexical Search (BM25Okapi)**: Tokenized keyword inverted index indexing identical guideline passages, preserving chunk IDs, document IDs, source filenames, and page numbers with JSON persistence.
 - **Reciprocal Rank Fusion (RRF)**: Fuses dense semantic search (`all-MiniLM-L6-v2` via ChromaDB) with BM25 lexical scores using the formula $RRF(d) = \sum \frac{1}{k + rank(d)}$ ($k=60$), combined with string deduplication to eliminate redundant evidence citations.
 - **Empirical Evaluation Benchmark**: 60 meticulously labelled ground-truth scenarios across 10 failure categories (Exact Phrase, Semantic Paraphrase, Numerical Thresholds, Prohibited Phrases, Exceptions, Negation, Temporal, Scope, Missing Evidence, Similar Passages).
-  - **Verdict accuracy (Stage 3.5, measured)**: development set 96.67% hybrid (58/60, the set used during tuning); independent holdout 78.81% hybrid / 80.51% dense (N=118); blind challenge set 75.00% hybrid / 71.88% dense (N=32).
+  - **Verdict accuracy (measured)**: development set 93.33% hybrid (N=60, used during tuning); holdout 81.36% hybrid / 83.05% dense (N=118); challenge set 78.12% hybrid / 75.00% dense (N=32). The holdout and challenge sets have also informed engineering, so treat them as regression benchmarks rather than blind estimates.
   - **Latency**: Hybrid yields ~5ms retrieval on standard CPU infrastructure.
   - Complete report: [`docs/RETRIEVAL_EVALUATION.md`](docs/RETRIEVAL_EVALUATION.md).
 
@@ -185,7 +185,7 @@ npm run dev
 
 ## 🧪 Automated Testing & Verification
 
-### Run Backend Test Suite (270 Tests Passing)
+### Run Backend Test Suite (379 Tests Passing)
 ```bash
 python -m pytest -q
 ```
@@ -226,8 +226,8 @@ python backend/evaluation/evaluate_retrieval.py
 3. **Pure CPU Inference**:
    The ONNX embedding model and BM25 index run entirely on CPU without GPU acceleration, providing maximum deployment portability without recurring GPU costs.
 4. **Compliance reasoning is not perfect**:
-   Holdout accuracy is ~79–81%. Known failure modes: false-positive contradictions in some operational contexts, conditional-approval/policy-nuance cases, documentary-evidence edge cases, and conservative `INSUFFICIENT_EVIDENCE` when the relevant rule sits in a long multi-topic chunk (e.g. "customer data is completely secure" against the bundled sample guideline). Every verdict needs human review before publication.
-5. **Small evaluation corpus**: benchmarks are 60 / 118 / 32 cases; results may not generalize to other guideline sets.
+   Holdout accuracy is about 81%. Known failure modes: false-positive contradictions in some operational contexts, conditional-approval and policy-nuance cases, and documentary-evidence edge cases. Claims that say an exception was met (for example, "Legal approved this") return `INSUFFICIENT_EVIDENCE` because self-reported approval is not proof. Every verdict needs human review before publication.
+5. **Small evaluation corpus**: benchmarks are 60 / 118 / 32 cases, plus 100 cases written by the same engineering team across the bundled sample and a second guideline; results may not generalize to other guideline sets.
 6. **Mobile layout**: the workspace is usable but overflows horizontally on phone-width screens.
 7. **No authentication or rate limiting** on the public API.
 

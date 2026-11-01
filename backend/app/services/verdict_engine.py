@@ -49,6 +49,7 @@ from backend.app.services.semantic_drift import (
     semantic_drift_detector,
     SemanticDriftResult,
 )
+from backend.app.services import guideline_directives
 
 logger = logging.getLogger(__name__)
 
@@ -266,7 +267,8 @@ def _clean_to_exact_substring(passage_text: str, quote: str) -> str:
 
 def _extract_identifiers(text: str) -> Set[str]:
     """Extracts formal alphanumeric identifiers and codes (e.g. 9845-A, 4412-K, AES-256, TLS 1.3, ISO-27001)."""
-    codes = set(re.findall(r'\b[A-Z0-9]+-[A-Z0-9]+\b', text, re.IGNORECASE))
+    # A code contains a digit; hyphenated words such as 'eco-friendly' are not identifiers.
+    codes = {c for c in re.findall(r'\b[A-Z0-9]+(?:-[A-Z0-9]+)+\b', text, re.IGNORECASE) if re.search(r'\d', c)}
     standards = set(re.findall(r'\bTLS\s+\d+\.\d+\b', text, re.IGNORECASE))
     return {c.upper() for c in codes | standards}
 
@@ -417,10 +419,21 @@ class VerdictEngine:
                 claim_text=claim_text,
                 retrieved_passages=retrieved_passages,
             )
-            if not cv.suggested_correction and cv.semantic_drift and cv.semantic_drift.detected:
+            # A drift rewrite is only offered for a violation, never for a claim that is unsafe to
+            # rewrite, and never by appending a condition that would imply the claim is permitted.
+            if (
+                not cv.suggested_correction
+                and cv.verdict == VERDICT_CONTRADICTED
+                and not self._is_unsafe_to_rewrite(claim_text)
+                and cv.semantic_drift
+                and cv.semantic_drift.detected
+            ):
                 for issue in cv.semantic_drift.issues:
-                    if issue.suggested_correction:
-                        cv.suggested_correction = issue.suggested_correction
+                    if issue.suggested_correction and issue.category != "CONDITION_OMISSION":
+                        cv.suggested_correction = (
+                            f"[DRAFT — requires human review] {issue.suggested_correction} "
+                            "(Legal review is required before use.)"
+                        )
                         break
         except Exception as exc:
             logger.warning("Semantic drift analysis failed for claim '%s': %s", claim_id, exc)
@@ -442,7 +455,19 @@ class VerdictEngine:
         # -------------------------------------------------------------------
         # Step 1: Deterministic Universal Rule Check (Category A)
         # -------------------------------------------------------------------
+        directive = self._analyze_directives(claim_text, retrieved_passages)
         rule_match = self._check_prohibited_phrases(claim_text)
+
+        # A guideline-level denial or unconfirmed exception outranks a phrase match, except for
+        # statutory medical and global ranking rules, which internal approval cannot override.
+        if (
+            rule_match is not None
+            and directive is not None
+            and directive.verdict != VERDICT_CONTRADICTED
+            and rule_match[0].rule_id == RULE_UNIV_ABS_001.rule_id
+        ):
+            rule_match = None
+
         if rule_match is not None:
             rule, rule_hint = rule_match
 
@@ -500,6 +525,24 @@ class VerdictEngine:
                 rule_description=rule.description,
                 risk_warning=warning_item,
             )
+
+        # -------------------------------------------------------------------
+        # Step 1b: Rules read from the retrieved guideline text. Exact rule matching is stronger
+        # evidence than similarity, so this runs before the threshold; long multi-topic chunks
+        # can score below it even when they contain the rule.
+        # -------------------------------------------------------------------
+        if guideline_directives.is_prompt_injection(claim_text):
+            return ClaimVerdict(
+                claim_id=claim_id,
+                claim_text=claim_text,
+                verdict=VERDICT_INSUFFICIENT,
+                explanation="The submitted text gives instructions instead of making a marketing claim, so it cannot be evaluated against the guidelines. Human review is required.",
+                evidence=[],
+                suggested_correction=None,
+            )
+
+        if directive is not None:
+            return self._verdict_from_directive(claim_id, claim_text, directive)
 
         # -------------------------------------------------------------------
         # Step 2: Similarity Threshold Filtering (Phase 5)
@@ -568,6 +611,60 @@ class VerdictEngine:
         # Step 4: Evidence-Grounded Deterministic Analysis (Category C)
         # -------------------------------------------------------------------
         return self._deterministic_classify(claim_id, claim_text, candidates)
+
+    @staticmethod
+    def _analyze_directives(
+        claim_text: str,
+        passages: List[Dict[str, Any]],
+    ) -> Optional[guideline_directives.DirectiveMatch]:
+        """Finds the rule in the retrieved guideline text that decides this claim, if any."""
+        if _is_internal_operational_instruction(claim_text):
+            return None
+        statements = [
+            (_clean_statement_header(stmt), p)
+            for p in passages
+            for stmt in _split_into_statements(p.get("text", ""))
+        ]
+        return guideline_directives.analyze(claim_text, statements)
+
+    def _verdict_from_directive(
+        self,
+        claim_id: str,
+        claim_text: str,
+        match: guideline_directives.DirectiveMatch,
+    ) -> ClaimVerdict:
+        """Builds a verdict whose citation is the guideline sentence that decided it."""
+        passage = match.passage
+        passage_text = passage.get("text", "")
+        quote = _clean_to_exact_substring(passage_text, match.statement)
+        doc_name = passage.get("source_filename", "unknown")
+        evidence = []
+        if match.cite and quote in passage_text:
+            evidence.append(EvidenceItem(
+                chunk_id=passage.get("chunk_id", ""),
+                document_id=passage.get("document_id", ""),
+                source_filename=doc_name,
+                page_number=passage.get("page_number"),
+                quote=quote,
+                passage_text=passage_text,
+                similarity_score=float(passage.get("similarity_score", 0.0)),
+                distance=float(passage.get("distance", 1.0)),
+            ))
+
+        grounded = f"{match.explanation} from '{doc_name}': \"{quote}\"." if evidence else f"{match.explanation}."
+        if match.verdict == VERDICT_INSUFFICIENT:
+            grounded += " Independent human review is required before publication."
+
+        contradicted = match.verdict == VERDICT_CONTRADICTED
+        return ClaimVerdict(
+            claim_id=claim_id,
+            claim_text=claim_text,
+            verdict=match.verdict,
+            explanation=grounded,
+            evidence=evidence,
+            suggested_correction=self._generate_correction(claim_text, VERDICT_CONTRADICTED, quote) if contradicted else None,
+            rule_category=CATEGORY_ORG_VIOLATION if contradicted else CATEGORY_EVIDENCE_COMPLIANCE,
+        )
 
     def _check_prohibited_phrases(
         self, claim_text: str
@@ -1157,7 +1254,7 @@ class VerdictEngine:
 
         # 21. Standard prohibition match
         if proh_match and not claim_is_negated and not claim_has_return_exception:
-            target_matched = [w for w in claim_kws if w not in ("claim", "claims", "marketing", "materials", "customer", "percentage", "improvement") and _stem_match(w, best_clean)]
+            target_matched = [w for w in claim_kws if w not in ("claim", "claims", "marketing", "materials", "customer", "customers", "percentage", "improvement") and _stem_match(w, best_clean)]
             if len(target_matched) >= 1:
                 rule_word = proh_match.group(0)
                 correction = self._generate_correction(claim_text, VERDICT_CONTRADICTED, rule_word)
@@ -1210,10 +1307,12 @@ class VerdictEngine:
 
         # 22. Standard affirmative support
         is_support = False
-        for pat in _SUPPORT_INDICATORS:
-            if pat.search(best_clean):
-                is_support = True
-                break
+        # "must be approved" or "unless approved" is a condition to meet, not a statement of approval
+        if not re.search(r'\b(must|unless)\b', best_clean, re.IGNORECASE):
+            for pat in _SUPPORT_INDICATORS:
+                if pat.search(best_clean):
+                    is_support = True
+                    break
 
         if not is_support:
             must_match = re.search(
@@ -1524,6 +1623,14 @@ class VerdictEngine:
         return items
 
     @staticmethod
+    def _is_unsafe_to_rewrite(claim_text: str) -> bool:
+        """Disease and curative claims must not be replaced by another unsupported efficacy claim."""
+        return bool(
+            re.search(r'\b(cancer|diabetes|alzheimer|covid|hiv|aids|asthma|arthritis|depression|hypertension|infection|disease|illness|syndrome|disorder)\b', claim_text, re.IGNORECASE)
+            or re.search(r'\b(cures?|eradicates?|heals?|reverses?)\b', claim_text, re.IGNORECASE)
+        )
+
+    @staticmethod
     def _generate_correction(
         claim_text: str,
         verdict: str,
@@ -1538,12 +1645,7 @@ class VerdictEngine:
         - Refuse rewriting disease claims (cures cancer, etc.) — returns None.
         - If no safe correction can be generated, return None.
         """
-        # Refuse to rewrite severe statutory medical cure claims or disease treatments
-        if re.search(r'\b(cancer|diabetes|alzheimer|covid|hiv|aids|asthma|arthritis|depression|hypertension|infection|disease|illness|syndrome|disorder)\b', claim_text, re.IGNORECASE):
-            return None
-
-        # Refuse to rewrite curative claims that would replace one unsupported efficacy claim with another
-        if re.search(r'\b(cures?|eradicates?|heals?|reverses?)\b', claim_text, re.IGNORECASE):
+        if VerdictEngine._is_unsafe_to_rewrite(claim_text):
             return None
 
         corrected = claim_text

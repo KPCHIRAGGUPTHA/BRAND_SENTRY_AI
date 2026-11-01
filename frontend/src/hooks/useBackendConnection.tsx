@@ -37,11 +37,13 @@ export interface BackendConnectionConfig {
 }
 
 const DEFAULT_CONFIG: Required<BackendConnectionConfig> = {
-  maxWakingRetries: 5,
+  // A free-tier backend can take over a minute to wake and is slower still while it indexes,
+  // so keep reporting "waking" for about five minutes before calling it unavailable.
+  maxWakingRetries: 12,
   initialRetryDelayMs: 1000,
   maxRetryDelayMs: 15000,
   connectedPollIntervalMs: 60000,
-  healthTimeoutMs: 10000,
+  healthTimeoutMs: 20000,
   fetchFn: fetchHealth,
 };
 

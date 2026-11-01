@@ -119,15 +119,15 @@ def mock_guideline_passages() -> List[Dict[str, Any]]:
 # ===========================================================================
 
 def test_exception_fulfillment_supported(mock_guideline_passages):
-    """Claims satisfying explicit guideline exception clauses must be SUPPORTED."""
+    """Claims asserting a guideline exception are self-reported, so a reviewer must confirm them."""
     # Written signoff exception
     v1 = verdict_engine.classify(
         "test-exc-1",
         "Legal counsel has provided written signoff approving our 100% guaranteed return window.",
         [mock_guideline_passages[0]],
     )
-    assert v1.verdict == VERDICT_SUPPORTED
-    assert v1.compliance_verdict == VERDICT_SUPPORTED
+    assert v1.verdict == VERDICT_INSUFFICIENT
+    assert v1.compliance_verdict == VERDICT_INSUFFICIENT
     assert len(v1.evidence) > 0
     assert "written approval" in v1.evidence[0].quote
 
@@ -137,7 +137,7 @@ def test_exception_fulfillment_supported(mock_guideline_passages):
         "Historical pricing records verify this is the lowest price ever offered.",
         [mock_guideline_passages[1]],
     )
-    assert v2.verdict == VERDICT_SUPPORTED
+    assert v2.verdict == VERDICT_INSUFFICIENT
     assert len(v2.evidence) > 0
     assert "lowest price ever" in v2.evidence[0].quote
 

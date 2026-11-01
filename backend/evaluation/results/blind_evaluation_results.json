@@ -3,12 +3,12 @@
   "total_cases": 32,
   "dense_metrics": {
     "total": 32,
-    "correct": 23,
-    "accuracy": 0.7188,
+    "correct": 24,
+    "accuracy": 0.75,
     "confusion_matrix": {
       "SUPPORTED": {
-        "SUPPORTED": 8,
-        "CONTRADICTED": 1,
+        "SUPPORTED": 9,
+        "CONTRADICTED": 0,
         "INSUFFICIENT_EVIDENCE": 1
       },
       "CONTRADICTED": {
@@ -24,20 +24,20 @@
     },
     "per_class": {
       "SUPPORTED": {
-        "tp": 8,
+        "tp": 9,
         "fp": 1,
-        "fn": 2,
-        "precision": 0.8889,
-        "recall": 0.8,
-        "f1": 0.8421
+        "fn": 1,
+        "precision": 0.9,
+        "recall": 0.9,
+        "f1": 0.9
       },
       "CONTRADICTED": {
         "tp": 10,
-        "fp": 5,
+        "fp": 4,
         "fn": 2,
-        "precision": 0.6667,
+        "precision": 0.7143,
         "recall": 0.8333,
-        "f1": 0.7407
+        "f1": 0.7692
       },
       "INSUFFICIENT_EVIDENCE": {
         "tp": 5,
@@ -50,8 +50,8 @@
     },
     "false_positive_support": 1,
     "false_positive_support_rate": 0.0312,
-    "false_positive_contradiction": 5,
-    "false_positive_contradiction_rate": 0.1562,
+    "false_positive_contradiction": 4,
+    "false_positive_contradiction_rate": 0.125,
     "category_accuracy": {
       "approximate_numerical": {
         "total": 1,
@@ -75,8 +75,8 @@
       },
       "environmental_claims": {
         "total": 2,
-        "correct": 1,
-        "accuracy": 0.5
+        "correct": 2,
+        "accuracy": 1.0
       },
       "exact_identifiers": {
         "total": 4,
@@ -172,12 +172,12 @@
   },
   "hybrid_metrics": {
     "total": 32,
-    "correct": 24,
-    "accuracy": 0.75,
+    "correct": 25,
+    "accuracy": 0.7812,
     "confusion_matrix": {
       "SUPPORTED": {
-        "SUPPORTED": 8,
-        "CONTRADICTED": 1,
+        "SUPPORTED": 9,
+        "CONTRADICTED": 0,
         "INSUFFICIENT_EVIDENCE": 1
       },
       "CONTRADICTED": {
@@ -193,20 +193,20 @@
     },
     "per_class": {
       "SUPPORTED": {
-        "tp": 8,
+        "tp": 9,
         "fp": 1,
-        "fn": 2,
-        "precision": 0.8889,
-        "recall": 0.8,
-        "f1": 0.8421
+        "fn": 1,
+        "precision": 0.9,
+        "recall": 0.9,
+        "f1": 0.9
       },
       "CONTRADICTED": {
         "tp": 10,
-        "fp": 4,
+        "fp": 3,
         "fn": 2,
-        "precision": 0.7143,
+        "precision": 0.7692,
         "recall": 0.8333,
-        "f1": 0.7692
+        "f1": 0.8
       },
       "INSUFFICIENT_EVIDENCE": {
         "tp": 6,
@@ -219,8 +219,8 @@
     },
     "false_positive_support": 1,
     "false_positive_support_rate": 0.0312,
-    "false_positive_contradiction": 4,
-    "false_positive_contradiction_rate": 0.125,
+    "false_positive_contradiction": 3,
+    "false_positive_contradiction_rate": 0.0938,
     "category_accuracy": {
       "approximate_numerical": {
         "total": 1,
@@ -244,8 +244,8 @@
       },
       "environmental_claims": {
         "total": 2,
-        "correct": 1,
-        "accuracy": 0.5
+        "correct": 2,
+        "accuracy": 1.0
       },
       "exact_identifiers": {
         "total": 4,
@@ -401,21 +401,6 @@
       ]
     },
     {
-      "id": "blind-env-24",
-      "query": "Avoid broad environmental claims and restrict ecological statements to assessed product features.",
-      "category": "environmental_claims",
-      "document_scope": "doc-brand",
-      "expected": "SUPPORTED",
-      "dense_pred": "CONTRADICTED",
-      "hybrid_pred": "CONTRADICTED",
-      "dense_rule": false,
-      "hybrid_rule": false,
-      "hybrid_explanation": "General guideline recommendation matched ('Avoid') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Avoid broad environmental claims when only a limited product feature has been assessed.\". The guideline advises against this claim phrasing. Human review is recommended to confirm applicability.",
-      "hybrid_evidence": [
-        "Avoid broad environmental claims when only a limited product feature has been assessed."
-      ]
-    },
-    {
       "id": "blind-fin-26",
       "query": "Our high-yield savings program guarantees double-digit returns within thirty calendar days.",
       "category": "financial_guarantees",
@@ -539,7 +524,7 @@
       "hybrid_pred": "CONTRADICTED",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "Contradicts policy against absolute claims from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
+      "hybrid_explanation": "Claim conflicts with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
       "hybrid_evidence": [
         "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
       ]
@@ -554,7 +539,7 @@
       "hybrid_pred": "SUPPORTED",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "Compliant disclaimer aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
+      "hybrid_explanation": "Compliant statement aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used.\".",
       "hybrid_evidence": [
         "DATA, PRIVACY, AND SECURITY CLAIMS: Claims that customer data is 'completely secure' or 'impossible to hack' must not be used."
       ]
@@ -597,7 +582,7 @@
       "hybrid_pred": "SUPPORTED",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "Directly restates and conforms to guideline policy requirement from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances.\".",
+      "hybrid_explanation": "Compliant statement aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances.\".",
       "hybrid_evidence": [
         "Marketing materials must not promise guaranteed outcomes when results depend on customer circumstances."
       ]
@@ -612,7 +597,7 @@
       "hybrid_pred": "SUPPORTED",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "Compliant disclaimer aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\".",
+      "hybrid_explanation": "Compliant statement aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process.\".",
       "hybrid_evidence": [
         "HEALTH AND MEDICAL CLAIMS: Marketing materials must not claim that a product cures, treats, or prevents a disease unless the claim has been reviewed and approved through the applicable medical and regulatory process."
       ]
@@ -801,11 +786,11 @@
       "category": "environmental_claims",
       "document_scope": "doc-brand",
       "expected": "SUPPORTED",
-      "dense_pred": "CONTRADICTED",
-      "hybrid_pred": "CONTRADICTED",
+      "dense_pred": "SUPPORTED",
+      "hybrid_pred": "SUPPORTED",
       "dense_rule": false,
       "hybrid_rule": false,
-      "hybrid_explanation": "General guideline recommendation matched ('Avoid') in guideline 'BrandSentry_Marketing_Compliance_2026.pdf': \"Avoid broad environmental claims when only a limited product feature has been assessed.\". The guideline advises against this claim phrasing. Human review is recommended to confirm applicability.",
+      "hybrid_explanation": "Compliant statement aligned with guideline rule from 'BrandSentry_Marketing_Compliance_2026.pdf': \"Avoid broad environmental claims when only a limited product feature has been assessed.\".",
       "hybrid_evidence": [
         "Avoid broad environmental claims when only a limited product feature has been assessed."
       ]

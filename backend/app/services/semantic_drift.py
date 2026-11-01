@@ -374,6 +374,12 @@ class SemanticDriftDetector:
         for pat, _ in _CONDITION_PATTERNS:
             for m in pat.finditer(passage):
                 condition_text = m.group(0).strip()
+                # A passage can cover many topics; only a condition on the claim's own topic counts
+                sentence_start = max(passage.rfind(". ", 0, m.start()) + 1, 0)
+                sentence_end = passage.find(". ", m.end())
+                sentence = passage[sentence_start: sentence_end if sentence_end != -1 else len(passage)]
+                if not self._has_topic_overlap(claim, sentence):
+                    continue
                 # If key condition words do not appear in the claim
                 words = [w.lower() for w in re.findall(r'\b[a-zA-Z]{4,}\b', condition_text)
                          if w.lower() not in {"when", "that", "this", "with", "from", "have", "been"}]
