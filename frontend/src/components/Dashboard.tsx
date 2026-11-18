@@ -102,7 +102,7 @@ export const Dashboard: React.FC = () => {
             {stats ? stats.total_reviews : 0}
           </div>
           <div style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginTop: '4px' }}>
-            {stats ? `${stats.text_reviews} Text • ${stats.image_reviews} Image` : 'Loading...'}
+            {stats ? `${stats.text_reviews_count ?? 0} Text • ${stats.image_reviews_count ?? 0} Image` : 'Loading...'}
           </div>
         </div>
 
@@ -122,7 +122,7 @@ export const Dashboard: React.FC = () => {
             <ShieldCheck size={16} style={{ color: '#1B6A3B' }} />
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1B6A3B', marginTop: '6px' }}>
-            {stats ? stats.supported_claims : 0}
+            {stats ? stats.total_supported : 0}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#2B834D', marginTop: '4px' }}>
             Affirmatively verified by evidence
@@ -145,7 +145,7 @@ export const Dashboard: React.FC = () => {
             <ShieldAlert size={16} style={{ color: '#A91B2E' }} />
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#A91B2E', marginTop: '6px' }}>
-            {stats ? stats.contradicted_claims : 0}
+            {stats ? stats.total_contradicted : 0}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#BD2130', marginTop: '4px' }}>
             Violates policy or absolute rules
@@ -168,7 +168,7 @@ export const Dashboard: React.FC = () => {
             <HelpCircle size={16} style={{ color: '#B7791F' }} />
           </div>
           <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#B7791F', marginTop: '6px' }}>
-            {stats ? stats.insufficient_claims : 0}
+            {stats ? stats.total_insufficient : 0}
           </div>
           <div style={{ fontSize: '0.75rem', color: '#975A16', marginTop: '4px' }}>
             Requires manual legal review

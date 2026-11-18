@@ -18,13 +18,14 @@ describe('Round 3 Frontend Components', () => {
   it('renders Dashboard with live stats and recent reviews', async () => {
     vi.spyOn(api, 'fetchDashboardStats').mockResolvedValue({
       total_reviews: 42,
-      text_reviews: 30,
-      image_reviews: 12,
-      total_claims_evaluated: 120,
-      supported_claims: 65,
-      contradicted_claims: 35,
-      insufficient_claims: 20,
-      unique_guidelines_used: 3,
+      text_reviews_count: 30,
+      image_reviews_count: 12,
+      total_claims_reviewed: 120,
+      total_supported: 65,
+      total_contradicted: 35,
+      total_insufficient: 20,
+      indexed_guidelines_count: 3,
+      policy_versions_count: 1,
     });
 
     vi.spyOn(api, 'fetchReviewHistory').mockResolvedValue({

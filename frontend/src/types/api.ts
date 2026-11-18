@@ -217,11 +217,12 @@ export interface AuditReviewListResponse {
 
 export interface DashboardStats {
   total_reviews: number;
-  text_reviews: number;
-  image_reviews: number;
-  total_claims_evaluated: number;
-  supported_claims: number;
-  contradicted_claims: number;
-  insufficient_claims: number;
-  unique_guidelines_used: number;
+  total_claims_reviewed: number;
+  total_supported: number;
+  total_contradicted: number;
+  total_insufficient: number;
+  text_reviews_count: number;
+  image_reviews_count: number;
+  indexed_guidelines_count: number;
+  policy_versions_count: number;
 }
