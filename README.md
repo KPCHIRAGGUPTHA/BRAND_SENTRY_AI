@@ -8,6 +8,8 @@
 
 ---
 
+> **Next: ShreshtiAI.** This retrieval and cite-or-abstain verdict engine now powers the rule-check agent of [ShreshtiAI](https://github.com/KPCHIRAGGUPTHA/shreshtiai), an agentic GST and MSME compliance assistant for micro enterprises (GAVS Hackathon, theme: MSME Finance and Compliance). See ShreshtiAI's [`docs/ENGINE_REUSE.md`](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/docs/ENGINE_REUSE.md) for what is reused.
+
 ## Overview
 
 BrandSentry AI is an **AI-powered, evidence-grounded, human-in-the-loop compliance review assistant**. Upload regulatory or brand guideline documents (PDF/TXT), paste marketing copy (or an image for OCR), and BrandSentry extracts each claim, retrieves matching guideline passages, and returns a `SUPPORTED`, `CONTRADICTED`, or `INSUFFICIENT_EVIDENCE` verdict with verbatim citations, an explanation, and — where safe — a draft correction marked for human review.
