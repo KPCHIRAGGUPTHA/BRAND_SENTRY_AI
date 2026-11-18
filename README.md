@@ -1,3 +1,8 @@
+> ## 🏁 GAVS Hackathon (Tech4Bharat) judges: start here
+> **This repo is the engine. The submission is ShreshtiAI, an agentic GST and MSME compliance assistant for micro enterprises** (theme: MSME Finance and Compliance, problem 3.1).
+>
+> 👉 **[github.com/KPCHIRAGGUPTHA/shreshtiai](https://github.com/KPCHIRAGGUPTHA/shreshtiai)**: idea, architecture, pitch deck ([PDF](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/submission/ShreshtiAI_GAVS_Hackathon.pdf)), tested GST code, and [what is reused from this repo](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/docs/ENGINE_REUSE.md).
+
 # BrandSentry AI — Brand Compliance Intelligence Platform
 
 [![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
