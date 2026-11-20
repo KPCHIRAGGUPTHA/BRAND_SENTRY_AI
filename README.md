@@ -1,262 +1,121 @@
-> ## 🏁 GAVS Hackathon (Tech4Bharat) judges: start here
-> **This repo is the engine. The submission is ShreshtiAI, an agentic GST and MSME compliance assistant for micro enterprises** (theme: MSME Finance and Compliance, problem 3.1).
->
-> 👉 **[github.com/KPCHIRAGGUPTHA/shreshtiai](https://github.com/KPCHIRAGGUPTHA/shreshtiai)**: idea, architecture, pitch deck ([PDF](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/submission/ShreshtiAI_GAVS_Hackathon.pdf)), tested GST code, and [what is reused from this repo](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/docs/ENGINE_REUSE.md).
+# ShreshtiAI — the digital munim for India's micro enterprises
 
-# BrandSentry AI — Brand Compliance Intelligence Platform
+**Check before you file. Get paid on time.**
 
-[![Live App](https://img.shields.io/badge/Live%20Demo-brandsentry--web.onrender.com-blue?style=for-the-badge&logo=render)](https://brandsentry-web.onrender.com)
-[![API Docs](https://img.shields.io/badge/API%20Docs-FastAPI%20Swagger-009688?style=for-the-badge&logo=fastapi)](https://brandsentry-api.onrender.com/docs)
-[![Health Check](https://img.shields.io/badge/Backend-%2Fhealth-10B981?style=for-the-badge)](https://brandsentry-api.onrender.com/health)
-[![Backend Tests](https://img.shields.io/badge/Backend%20Tests-409%20Passed-success?style=for-the-badge&logo=pytest)](docs/FINAL_SUBMISSION_REPORT.md)
-[![Frontend Tests](https://img.shields.io/badge/Frontend%20Tests-18%20Passed-success?style=for-the-badge&logo=vitest)](docs/TEST_REPORT.md)
+ShreshtiAI is an agentic AI compliance assistant for micro enterprises. An owner sends photos of invoices, bills and government notices on WhatsApp or the web. A team of AI agents reads them, checks them against GST, income-tax and MSMED Act rules, flags every error and deadline **with the exact rule section cited**, and produces the corrected invoice, return summary, notice reply or payment reminder, which goes out only after the owner approves it with one tap.
+
+> **GAVS Hackathon** · Theme: MSME Finance and Compliance · Problem 3.1: *Micro enterprises lose time and profit to compliance paperwork*
+> **Status:** idea round. The retrieval engine is reused from my deployed project [BrandSentry AI](BRANDSENTRY.md), whose full code is in this repository. The first deterministic GST rules are in this repo with tests. The full agent prototype is planned for the prototype round.
+
+![ShreshtiAI architecture](shreshtiai/assets/architecture.png)
 
 ---
 
-> **Next: ShreshtiAI.** This retrieval and cite-or-abstain verdict engine now powers the rule-check agent of [ShreshtiAI](https://github.com/KPCHIRAGGUPTHA/shreshtiai), an agentic GST and MSME compliance assistant for micro enterprises (GAVS Hackathon, theme: MSME Finance and Compliance). See ShreshtiAI's [`docs/ENGINE_REUSE.md`](https://github.com/KPCHIRAGGUPTHA/shreshtiai/blob/main/docs/ENGINE_REUSE.md) for what is reused.
+## What's in this repository
 
-## Overview
+| Path | What it is |
+| --- | --- |
+| [`shreshtiai/`](shreshtiai/) | **The GAVS Hackathon submission:** docs, pitch deck, and the tested GST rules (`shreshti/`, `tests/`) |
+| [`shreshtiai/submission/`](shreshtiai/submission/) | Pitch deck ([PDF](shreshtiai/submission/ShreshtiAI_GAVS_Hackathon.pdf), [PowerPoint](shreshtiai/submission/ShreshtiAI_GAVS_Hackathon.pptx)) and the submitted text |
+| [`backend/`](backend/), [`frontend/`](frontend/) | BrandSentry AI, the deployed retrieval and cite-or-abstain verdict engine that ShreshtiAI's rule-check agent reuses ([details](BRANDSENTRY.md)) |
 
-BrandSentry AI is an **AI-powered, evidence-grounded, human-in-the-loop compliance review assistant**. Upload regulatory or brand guideline documents (PDF/TXT), paste marketing copy (or an image for OCR), and BrandSentry extracts each claim, retrieves matching guideline passages, and returns a `SUPPORTED`, `CONTRADICTED`, or `INSUFFICIENT_EVIDENCE` verdict with verbatim citations, an explanation, and — where safe — a draft correction marked for human review.
+The same ShreshtiAI files are also published on their own at [github.com/KPCHIRAGGUPTHA/shreshtiai](https://github.com/KPCHIRAGGUPTHA/shreshtiai).
 
-It is a review aid, not an autonomous approver: verdicts are only as good as the uploaded guidelines and measured accuracy is well below 100% (see *Known Limitations* below).
+## The problem
 
-### Core capabilities
-- Per-claim extraction with negation/disclaimer handling and prompt-injection boundaries
-- Hybrid retrieval: ChromaDB dense (`all-MiniLM-L6-v2`) + BM25, fused with Reciprocal Rank Fusion (k=60); optional cross-encoder reranking
-- Deterministic, evidence-grounded verdicts (`verdict == compliance_verdict`), citations validated against retrieved text, document/policy-version scoping
-- Universal risk warnings (e.g. absolute claims) kept separate from organization-specific violations
-- Conservative `INSUFFICIENT_EVIDENCE` when guidelines do not address a claim
-- Policy versioning, persistent review audit trail, JSON/CSV/PDF export, image OCR review
+| Fact | Figure |
+| --- | --- |
+| Udyam-registered MSMEs | 9.16 crore (31 Jul 2026), 99.3% micro |
+| Compliance obligations, single-state manufacturing MSME | 1,450+ a year |
+| Annual cost of those obligations | ₹13–17 lakh |
+| GST late fee | ₹50/day per return (₹20 nil), plus 18% p.a. interest |
+| Delayed-payment claims still pending for micro and small suppliers | ₹20,979 crore (Aug 2026) |
 
----
+Recent rule changes removed the chance to fix mistakes later. From the July 2025 tax period GSTR-3B liability is locked to GSTR-1. Returns can't be filed more than 3 years late. And the Income-tax Act 2025 (in force from 1 April 2026) renumbered sections owners and tools still quote. Micro traders need a **checker before filing**, not just a filer after. Sources and detail: [`docs/PROBLEM_RESEARCH.md`](shreshtiai/docs/PROBLEM_RESEARCH.md).
 
-## 🌐 Live Production Deployment
+## How it works
 
-BrandSentry AI is deployed in production on Render:
+1. **Snap:** the owner sends invoices, bills or a notice as a photo, PDF or voice note.
+2. **Check:** agents extract the fields and check them against the rules, citing the section.
+3. **Remind:** the deadline agent knows the business's scheme (monthly, QRMP or composition) and warns before due dates, with the fee at stake.
+4. **Draft and approve:** the corrected invoice line, return summary, notice reply or MSMED payment reminder is drafted. Nothing is filed, sent or paid without the owner.
 
-| Service | Public Endpoint URL | Purpose / Notes |
-| :--- | :--- | :--- |
-| **Frontend Web Application** | [https://brandsentry-web.onrender.com](https://brandsentry-web.onrender.com) | Interactive React + Vite compliance workspace |
-| **Backend REST API** | [https://brandsentry-api.onrender.com](https://brandsentry-api.onrender.com) | FastAPI backend serving hybrid retrieval, review & audit |
-| **API Interactive Documentation** | [https://brandsentry-api.onrender.com/docs](https://brandsentry-api.onrender.com/docs) | Interactive OpenAPI / Swagger UI test interface |
-| **Backend Health Check** | [https://brandsentry-api.onrender.com/health](https://brandsentry-api.onrender.com/health) | Live service status (`status: "ok"`, uptime, version) |
+Every finding is **COMPLIANT**, **NON-COMPLIANT**, **OUTDATED** (a rate changed under GST 2.0, or a 1961-Act section replaced by the 2025 Act) or **NEEDS REVIEW**. The agent abstains rather than guesses.
 
-*Hosted on Render's free tier: the API sleeps when idle (first request can take ~45s) and storage is ephemeral, so re-upload guidelines after a restart. Full details: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).*
+## Built for Bharat
 
----
+The brief asks for solutions that work for people with low literacy, limited connectivity and low-cost phones. ShreshtiAI is designed for that:
 
-## 🚀 Round 3 Committed Improvements
+- **Voice-first:** owners speak and listen in Kannada or Hindi, with no forms to read.
+- **Any low-cost phone:** it runs over WhatsApp on an entry-level Android phone, with no app install.
+- **Patchy networks:** photos are compressed for 2G/3G, uploads are queued while offline, and reminders fall back to SMS where there's no data.
+- **Assisted use:** a trader-association volunteer or the owner's CA can operate it on the owner's behalf.
 
-### 1. Hybrid Retrieval & Measurable Evaluation
-- **Sparse Lexical Search (BM25Okapi)**: Tokenized keyword inverted index indexing identical guideline passages, preserving chunk IDs, document IDs, source filenames, and page numbers with JSON persistence.
-- **Reciprocal Rank Fusion (RRF)**: Fuses dense semantic search (`all-MiniLM-L6-v2` via ChromaDB) with BM25 lexical scores using the formula $RRF(d) = \sum \frac{1}{k + rank(d)}$ ($k=60$), combined with string deduplication to eliminate redundant evidence citations.
-- **Empirical Evaluation Benchmark**: 60 meticulously labelled ground-truth scenarios across 10 failure categories (Exact Phrase, Semantic Paraphrase, Numerical Thresholds, Prohibited Phrases, Exceptions, Negation, Temporal, Scope, Missing Evidence, Similar Passages).
-  - **Verdict accuracy (measured)**: development set 93.33% hybrid (N=60, used during tuning); holdout 81.36% hybrid / 83.05% dense (N=118); challenge set 78.12% hybrid / 75.00% dense (N=32). The holdout and challenge sets have also informed engineering, so treat them as regression benchmarks rather than blind estimates.
-  - **Latency**: Hybrid yields ~5ms retrieval on standard CPU infrastructure.
-  - Complete report: [`docs/RETRIEVAL_EVALUATION.md`](docs/RETRIEVAL_EVALUATION.md).
+## The agents
 
-### 2. Policy Governance & Auditable Reviews
-- **Immutable Policy Versioning**: Added `policy_versions` table in SQLite (`data/documents.db`) with unique version UUIDs, stable policy IDs, human-readable labels (`v1.0`, `v2.0`...), and cryptographic SHA-256 hashes. Multiple versions of the same policy coexist without destructive overwrites.
-- **Persistent Review Auditing**: Dedicated SQLite store (`data/reviews.db`) recording review session UUID, source (`text` or `image`), exact policy version IDs used, aggregate counts, and complete JSON claims array with quotes, page numbers, and drift results.
-- **Multi-Format Report Export**: One-click direct downloads for official compliance records:
-  - **JSON**: Machine-readable audit payload.
-  - **CSV**: Tabular breakdown of claim-by-claim verdicts, quotes, and suggested corrections.
-  - **PDF**: Professional styled multi-page PDF generated via ReportLab with executive summary, metadata badges, verdict tables, evidence citations, and legal disclaimers.
+| Agent | Job |
+| --- | --- |
+| Orchestrator (on Lyzr AI, the hackathon's AI partner) | Plans goals like "close this quarter", keeps per-business memory, routes risky steps to approval |
+| Intake | OCR + LLM extraction of GSTIN, HSN, rates, tax amounts, dates, with confidence per field |
+| Rule-check | Deterministic checks first, then hybrid BM25 + vector retrieval over versioned official texts. Cite or abstain |
+| Deadline | Due dates for monthly / QRMP / composition filers; late fee and interest at stake |
+| Drafting | Corrected invoices, notice replies, MSMED 15/45-day reminders, in English, Kannada or Hindi |
 
-### 3. Multimodal Visual Brand Compliance
-- **OCR Service**: Integrates Tesseract OCR and Pillow image validation supporting PNG, JPEG, and WebP promotional creatives up to 10MB and 8000px dimensions.
-- **Traceable Text Extraction**: Preprocessing via grayscale and autocontrast, word-level confidence scoring ($0.0 - 100.0\%$), and bounding boxes.
-- **Human-in-the-Loop Review**: Marketers inspect extracted OCR text, view confidence metrics, and edit/correct typographical misrecognitions directly in the UI before compliance review.
-- **Pipeline Reuse**: User-verified copy is evaluated through the exact same claim extraction, hybrid retrieval, and evidence-grounded verdict engine, with audit records marked as `review_source="image"`.
+Design detail: [`docs/ARCHITECTURE.md`](shreshtiai/docs/ARCHITECTURE.md).
 
----
+## What already works
 
-## 🔄 Technical Architecture
+**Deterministic GST rules (this repo), with no LLM involved:**
 
-```mermaid
-flowchart TD
-    subgraph Client ["Frontend (React 18 + TypeScript + Vite)"]
-        UI_Dash["Dashboard (Live Analytics & Stats)"]
-        UI_Review["Review Workspace (Text & Image OCR Tabs)"]
-        UI_Gov["Policy Library & Version History"]
-        UI_Audit["Audit Trail & Report Export Center"]
-    end
-
-    subgraph API ["FastAPI ASGI Backend"]
-        R_Health["/health"]
-        R_Guide["/api/guidelines (Upload, Search, Versions)"]
-        R_Review["/api/review (Text, Image OCR, Image Submit)"]
-        R_Audit["/api/reviews (History, Stats, PDF/CSV/JSON Export)"]
-    end
-
-    subgraph Engines ["Core Processing Engines"]
-        OCR["OCR Service (Tesseract + Pillow)"]
-        ClaimExt["Deterministic Claim Extractor"]
-        Hybrid["Hybrid Retriever (Dense ChromaDB + BM25Okapi via RRF)"]
-        Verdict["Verdict Engine (SUPPORTED / CONTRADICTED / INSUFFICIENT)"]
-        Drift["Semantic Drift & Exaggeration Detector"]
-    end
-
-    subgraph Persistence ["Persistent Storage Layer"]
-        DB_Docs[("data/documents.db (SQLite Registry & Versions)")]
-        DB_Reviews[("data/reviews.db (SQLite Audit History)")]
-        Vol_Chroma[("data/chroma/ (ChromaDB Vector Store)")]
-        Vol_BM25[("data/bm25/bm25_chunks.json (BM25 Chunks)")]
-    end
-
-    UI_Review -->|Upload Graphic| R_Review
-    R_Review --> OCR --> UI_Review
-    UI_Review -->|Submit Text / Image Copy| R_Review
-    R_Review --> ClaimExt --> Hybrid
-    Hybrid --> Verdict --> Drift --> DB_Reviews
-    DB_Docs --> R_Guide
-    DB_Reviews --> R_Audit
-    R_Audit -->|PDF / CSV / JSON Download| UI_Audit
-```
-
----
-
-## 🛠️ Technology Stack
-
-### Backend Stack
-* **Language & Runtime**: Python 3.11 in the production Docker image; local test suite run on 3.14.5
-* **API Framework**: FastAPI 0.115+ with Pydantic v2 schemas
-* **Server**: Uvicorn ASGI
-* **Vector Store**: ChromaDB with persistent on-disk storage
-* **Dense Embeddings**: `all-MiniLM-L6-v2` via ONNX Runtime CPU inference (384 dimensions)
-* **Lexical Retrieval**: `rank-bm25` (BM25Okapi)
-* **Document Extraction**: PyMuPDF 2.0 (`fitz`)
-* **OCR Engine**: Tesseract OCR + `pytesseract` + Pillow (PIL)
-* **PDF Report Generation**: ReportLab
-* **Metadata & Auditing**: SQLite (`data/documents.db`, `data/reviews.db`)
-
-### Frontend Stack
-* **Framework**: React 18.3 with TypeScript
-* **Build Tool**: Vite 6
-* **Icons**: Lucide React
-* **Styling**: Vanilla CSS design system with curated HSL color tokens, dark mode accents, responsive grid, and accessible contrast
-
----
-
-## 💻 Local Setup & Development
-
-### Prerequisites
-* **Python**: 3.11 or higher
-* **Node.js**: v20 or higher
-* **Git**
-* **Tesseract OCR** (Optional for local OCR execution; backend container includes Tesseract automatically):
-  - Linux: `sudo apt-get install tesseract-ocr tesseract-ocr-eng`
-  - Windows: Install from [UB-Mannheim Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) (default path: `C:\Program Files\Tesseract-OCR\tesseract.exe`)
-
-### 1. Clone & Setup
 ```bash
-git clone https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI.git
-cd BRAND_SENTRY_AI
+cd shreshtiai
+pip install pytest
+python -m pytest -q        # 12 tests
 ```
 
-### 2. Backend Setup
-```bash
-# Create and activate virtual environment
-python -m venv backend/venv
-source backend/venv/bin/activate  # On Windows: .\backend\venv\Scripts\Activate.ps1
+- `shreshtiai/shreshti/rules/gstin.py` validates GSTIN format, state code and mod-36 checksum
+- `shreshtiai/shreshti/rules/tax_type.py` checks CGST + SGST vs IGST against the supplier state and place of supply, with special cases sent to NEEDS REVIEW
+- `shreshtiai/shreshti/rules/late_fee.py` calculates the GSTR-1/3B late fee with turnover caps, nil-return cap and 18% interest
 
-# Install dependencies
-pip install -r backend/requirements.txt
+Numbers and checksums are computed in code, never by a model.
 
-# Run backend development server
-uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
-```
-* Backend API: `http://127.0.0.1:8000`
-* Swagger Documentation: `http://127.0.0.1:8000/docs`
-* Health Check: `http://127.0.0.1:8000/health`
+**Retrieval and verdict engine (BrandSentry AI, deployed):** hybrid BM25 + dense retrieval with reranking, a cite-or-abstain verdict engine that rejects unverified evidence, versioned policy registry, OCR, audit log and evaluation harness. The live engine demo is at [brandsentry-web.onrender.com](https://brandsentry-web.onrender.com). It's on Render's free tier, so the first load can take about a minute. What gets reused and what changes: [`docs/ENGINE_REUSE.md`](shreshtiai/docs/ENGINE_REUSE.md).
 
-### 3. Frontend Setup
-```bash
-cd frontend
-npm install
-npm run dev
-```
-* Open `http://localhost:5173` in your browser.
+## Proof plan (prototype round)
+
+- **Head-to-head benchmark:** about 20 labelled synthetic invoices with known errors, ShreshtiAI's agents vs a single LLM prompt on the same model. It measures errors caught, false alarms and citation accuracy, and the dataset and method will be published here.
+- **No-sign-up demo:** role-based logins (Shop owner, Chartered accountant, Trader association) on a fictional shop, *Sri Lakshmi Traders, Birur*.
+- **Tamper-evident audit:** every approval is signed and hash-chained.
+
+Detail: [`docs/DEMO_AND_BENCHMARK_PLAN.md`](shreshtiai/docs/DEMO_AND_BENCHMARK_PLAN.md).
+
+## Who benefits
+
+- **Shop owner:** no avoidable fines, and paid on time.
+- **Chartered accountant:** pre-checked files, so one CA can serve far more small clients.
+- **Trader association:** members stay compliant and credit-ready.
+
+## Roadmap
+
+1. **Hackathon prototype:** invoice checker, deadline agent, notice explainer, MSMED reminder, in English and Kannada.
+2. **Community pilot:** 50–100 traders through associations, a WhatsApp bot, Hindi/Telugu/Tamil, a CA review queue, and Vyapar/Tally export.
+3. **Credit bridge (problem 3.2):** a consented compliance history matched to MUDRA, CGTMSE and PMEGP, and to GST Sahay / Account Aggregator lenders.
+
+See [`docs/ROADMAP.md`](shreshtiai/docs/ROADMAP.md).
+
+## Submission files
+
+- [`submission/ShreshtiAI_GAVS_Hackathon.pdf`](shreshtiai/submission/ShreshtiAI_GAVS_Hackathon.pdf) is the pitch deck ([PowerPoint version](shreshtiai/submission/ShreshtiAI_GAVS_Hackathon.pptx))
+- [`submission/SUBMISSION_TEXT.md`](shreshtiai/submission/SUBMISSION_TEXT.md) is the text submitted on HackCulture
+
+## Why the name
+
+A *shreshti* led the merchant guilds of the Arya Vysya trading tradition, and the *munim* kept a shop's accounts. ShreshtiAI rebuilds that trusted munim as an AI agent for every small trader.
+
+## Limits
+
+ShreshtiAI is a preparatory assistant. Legal responsibility for every filing stays with the authorised signatory, as with any filing tool. Rules change through notifications and circulars, so every answer carries a "rule as of" date and uncertain cases go to NEEDS REVIEW.
 
 ---
 
-### 4. Demo walkthrough
-1. Open the frontend and wait for the backend status indicator to show connected.
-2. **Guidelines** → click **Load Sample Marketing Compliance Guidelines** (production servers load it automatically after a restart).
-3. **Claim Review** → paste `Our product is 100% safe for everyone. Our office is open on weekdays.` → **Review Compliance**.
-4. Expected: claim 1 `CONTRADICTED`, citing *"Marketing materials must not describe a product as “100% safe”."* with a draft correction marked for human review; claim 2 `INSUFFICIENT_EVIDENCE` (the guideline does not cover office hours).
-5. **Audit History** → export the review as JSON, CSV, or PDF.
-
----
-
-## 🧪 Automated Testing & Verification
-
-### Run Backend Test Suite (409 Tests Passing)
-```bash
-python -m pytest -q
-```
-Covers:
-- Hybrid retrieval, BM25 indexing, and RRF fusion (`test_hybrid_retrieval.py`)
-- Policy versioning, review audit persistence, and PDF/CSV exports (`test_policy_governance.py`)
-- Image validation, format checks, and OCR extraction (`test_ocr_multimodal.py`)
-- Review pipeline, input validation, and scoping regression (`test_review_api.py`)
-- Verdict engine, deterministic rules, and evidence grounding (`test_verdict_engine.py`)
-- Semantic drift categories and uncertainty guardrails (`test_semantic_drift.py`)
-- ChromaDB vector store, distance metrics, and embeddings (`test_vector_store.py`)
-
-### Run Frontend Test Suite (18 Tests Passing)
-```bash
-cd frontend
-npm test
-```
-
-### Run Frontend Production Build
-```bash
-cd frontend
-npm run build
-```
-
-### Run Retrieval Evaluation Benchmark
-```bash
-python backend/evaluation/evaluate_retrieval.py
-```
-
----
-
-## ⚠️ Known Limitations & Deployment Notes
-
-1. **Free-Tier Render Ephemeral Storage**:
-   The deployed backend runs on Render's free web service tier. On the free tier, the container spins down after 15 minutes of inactivity. When it restarts, the local filesystem resets to the clean base Docker container image. In production, attach a persistent disk volume mounted at `/app/backend/data/` or configure S3 / Cloud Storage connectors.
-2. **Free-Tier Cold Starts**:
-   When spinning up from standby, the initial cold start can take 30–50 seconds to initialize the ASGI container and load embedding models into memory. The frontend includes non-blocking connection indicators and bounded retry logic.
-3. **Pure CPU Inference**:
-   The ONNX embedding model and BM25 index run entirely on CPU without GPU acceleration, providing maximum deployment portability without recurring GPU costs.
-4. **Compliance reasoning is not perfect**:
-   Holdout accuracy is about 81%. Known failure modes: false-positive contradictions in some operational contexts, conditional-approval and policy-nuance cases, and documentary-evidence edge cases. Claims that say an exception was met (for example, "Legal approved this") return `INSUFFICIENT_EVIDENCE` because self-reported approval is not proof. Every verdict needs human review before publication.
-5. **Small evaluation corpus**: benchmarks are 60 / 118 / 32 cases, plus 100 cases written by the same engineering team across the bundled sample and a second guideline; results may not generalize to other guideline sets.
-6. **Mobile layout**: the workspace is usable but overflows horizontally on phone-width screens.
-7. **No authentication or rate limiting** on the public API.
-
----
-
-## 📄 Documentation Sitemap
-
-- [System Architecture Specification](docs/ARCHITECTURE.md)
-- [Implementation Summary (Round 3 Improvements)](docs/IMPLEMENTATION_SUMMARY.md)
-- [Retrieval Benchmark & Measured Evaluation Report](docs/RETRIEVAL_EVALUATION.md)
-- [Feature Implementation & Verification Checklist](docs/FEATURE_CHECKLIST.md)
-- [Testing & Quality Assurance Report](docs/TEST_REPORT.md)
-- [Product & Engineering Roadmap](docs/ROADMAP.md)
-- [Hybrid Retrieval Architecture](docs/HYBRID_RETRIEVAL_ARCHITECTURE.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Final Submission Report](docs/FINAL_SUBMISSION_REPORT.md)
-- [Round 3 Report Claims Audit](docs/CLAIMS_AUDIT.md)
-
----
-
-## 🏆 Submission Information
-**Team:** We Code Coders  
-**Competition:** Round 3: The Final Round  
-**Repository:** [https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI.git](https://github.com/KPCHIRAGGUPTHA/BRAND_SENTRY_AI.git)  
-**Branch:** `main` (development history preserved on `round-3-final`)
+**K P Chirag Guptha** · M.Tech Integrated Software Engineering, VIT Vellore · [GitHub](https://github.com/KPCHIRAGGUPTHA) · [LinkedIn](https://www.linkedin.com/in/k-p-chirag-guptha)
