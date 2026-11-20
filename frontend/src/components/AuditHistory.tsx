@@ -161,9 +161,9 @@ export const AuditHistory: React.FC = () => {
                     {rev.content_preview}
                   </td>
                   <td style={{ padding: '10px 12px' }}>
-                    <span style={{ color: '#1B6A3B', fontWeight: 600 }}>{rev.supported} Supp</span> •{' '}
-                    <span style={{ color: '#A91B2E', fontWeight: 600 }}>{rev.contradicted} Cont</span> •{' '}
-                    <span style={{ color: '#B7791F', fontWeight: 600 }}>{rev.insufficient} Incon</span>
+                    <span style={{ color: '#34D399', fontWeight: 600 }}>{rev.supported} Supp</span> •{' '}
+                    <span style={{ color: '#FF7A6E', fontWeight: 600 }}>{rev.contradicted} Cont</span> •{' '}
+                    <span style={{ color: '#F5B544', fontWeight: 600 }}>{rev.insufficient} Incon</span>
                   </td>
                   <td style={{ padding: '10px 12px', color: 'var(--color-text-secondary)', fontSize: '0.78rem' }}>
                     {new Date(rev.created_at).toLocaleString()}
@@ -257,7 +257,7 @@ export const AuditHistory: React.FC = () => {
         >
           <div
             style={{
-              background: '#FFFFFF',
+              background: 'var(--color-surface)',
               borderRadius: 'var(--radius-lg)',
               maxWidth: '800px',
               width: '100%',
@@ -407,7 +407,7 @@ export const AuditHistory: React.FC = () => {
                   <h5 style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     RAW OCR OUTPUT
                   </h5>
-                  <div style={{ background: '#f5f5f5', padding: '8px', fontSize: '0.8rem', borderRadius: '4px' }}>
+                  <div style={{ background: 'var(--color-surface-muted)', padding: '8px', fontSize: '0.8rem', borderRadius: '4px' }}>
                     {selectedReview.ocr_raw_text || 'None'}
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export const AuditHistory: React.FC = () => {
                   <h5 style={{ fontSize: '0.78rem', color: 'var(--color-text-secondary)', marginBottom: '4px' }}>
                     USER-CORRECTED TEXT
                   </h5>
-                  <div style={{ background: '#f5f5f5', padding: '8px', fontSize: '0.8rem', borderRadius: '4px' }}>
+                  <div style={{ background: 'var(--color-surface-muted)', padding: '8px', fontSize: '0.8rem', borderRadius: '4px' }}>
                     {selectedReview.ocr_corrected_text || 'None'}
                   </div>
                 </div>

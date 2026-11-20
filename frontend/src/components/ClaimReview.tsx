@@ -31,6 +31,55 @@ import {
 } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
 
+type Tone = 'ok' | 'bad' | 'review';
+
+const verdictTone = (verdict: string): Tone =>
+  verdict === 'SUPPORTED' ? 'ok' : verdict === 'CONTRADICTED' ? 'bad' : 'review';
+
+const VERDICT_LABEL: Record<Tone, string> = {
+  ok: 'Compliant',
+  bad: 'Non-compliant',
+  review: 'Needs review',
+};
+
+/** Split the reviewed text into plain and marked segments, one mark per claim found verbatim. */
+const markUpText = (text: string, claims: ClaimVerdict[]) => {
+  const lower = text.toLowerCase();
+  const spans: { start: number; end: number; idx: number; tone: Tone }[] = [];
+  claims.forEach((claim, idx) => {
+    const needle = (claim.claim_text || '').trim().replace(/[.!]+$/, '').toLowerCase();
+    if (needle.length < 3) return;
+    let from = 0;
+    while (from <= lower.length) {
+      const at = lower.indexOf(needle, from);
+      if (at < 0) return;
+      const end = at + needle.length;
+      if (!spans.some((sp) => at < sp.end && end > sp.start)) {
+        spans.push({ start: at, end, idx, tone: verdictTone(claim.verdict) });
+        return;
+      }
+      from = at + 1;
+    }
+  });
+  spans.sort((a, b) => a.start - b.start);
+  const out: React.ReactNode[] = [];
+  let cursor = 0;
+  spans.forEach((sp) => {
+    if (sp.start > cursor) out.push(text.slice(cursor, sp.start));
+    out.push(
+      <span key={`m-${sp.idx}`} className={`sx-mark sx-mark-${sp.tone}`}>
+        {text.slice(sp.start, sp.end)}
+        <sup>{sp.idx + 1}</sup>
+      </span>
+    );
+    cursor = sp.end;
+  });
+  if (cursor < text.length) out.push(text.slice(cursor));
+  return out;
+};
+
+const shorten = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1).trimEnd()}\u2026` : t);
+
 export const ClaimReview: React.FC = () => {
   // Mode selection
   const [reviewMode, setReviewMode] = useState<'text' | 'image'>('text');
@@ -55,6 +104,7 @@ export const ClaimReview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
+  const [reviewedText, setReviewedText] = useState<string>('');
 
   const { status, data, checkHealth, isChecking } = useBackendConnection();
 
@@ -115,6 +165,7 @@ export const ClaimReview: React.FC = () => {
         }
       }
       const res = await reviewMarketingContent(trimmed, docIds, retrievalMode, verIds);
+      setReviewedText(trimmed);
       setReviewResult(res);
       setError(null);
     } catch (err: unknown) {
@@ -198,6 +249,7 @@ export const ClaimReview: React.FC = () => {
         policy_version_ids: verIds,
         retrieval_mode: retrievalMode,
       });
+      setReviewedText(trimmed);
       setReviewResult(res);
       setError(null);
     } catch (err: unknown) {
@@ -220,30 +272,20 @@ export const ClaimReview: React.FC = () => {
   };
 
   const getVerdictBadge = (verdict: string) => {
-    switch (verdict) {
-      case 'SUPPORTED':
-        return (
-          <span className="badge badge-success" style={{ gap: '4px', fontSize: '0.8rem', padding: '4px 10px' }}>
-            <ShieldCheck size={14} />
-            SUPPORTED
-          </span>
-        );
-      case 'CONTRADICTED':
-        return (
-          <span className="badge badge-error" style={{ gap: '4px', fontSize: '0.8rem', padding: '4px 10px' }}>
-            <ShieldAlert size={14} />
-            CONTRADICTED
-          </span>
-        );
-      case 'INSUFFICIENT_EVIDENCE':
-      default:
-        return (
-          <span className="badge badge-warning" style={{ gap: '4px', fontSize: '0.8rem', padding: '4px 10px' }}>
-            <HelpCircle size={14} />
-            INSUFFICIENT_EVIDENCE
-          </span>
-        );
-    }
+    const tone = verdictTone(verdict);
+    const Icon = tone === 'ok' ? ShieldCheck : tone === 'bad' ? ShieldAlert : HelpCircle;
+    return (
+      <span className={`sx-verdict sx-tone-${tone}`}>
+        <span className="sx-verdict-main">
+          <span className="sx-diamond" />
+          {VERDICT_LABEL[tone]}
+        </span>
+        <span className="sx-verdict-raw">
+          <Icon size={10} style={{ verticalAlign: '-1px', marginRight: '4px' }} />
+          {verdict === 'SUPPORTED' || verdict === 'CONTRADICTED' ? verdict : 'INSUFFICIENT_EVIDENCE'}
+        </span>
+      </span>
+    );
   };
 
   return (
@@ -344,7 +386,7 @@ export const ClaimReview: React.FC = () => {
                     padding: '6px 10px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border)',
-                    background: '#FFFFFF',
+                    background: 'var(--color-surface)',
                     fontSize: '0.84rem',
                   }}
                 >
@@ -379,7 +421,7 @@ export const ClaimReview: React.FC = () => {
                     padding: '6px 10px',
                     borderRadius: 'var(--radius-sm)',
                     border: '1px solid var(--color-border)',
-                    background: '#FFFFFF',
+                    background: 'var(--color-surface)',
                     fontSize: '0.84rem',
                   }}
                 >
@@ -449,7 +491,7 @@ export const ClaimReview: React.FC = () => {
           {imagePreview && (
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '18px', alignItems: 'start' }}>
               {/* Preview Thumbnail */}
-              <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '8px', background: '#FFFFFF' }}>
+              <div style={{ border: '1px solid var(--color-border)', borderRadius: 'var(--radius-sm)', padding: '8px', background: 'var(--color-surface)' }}>
                 <span style={{ fontSize: '0.78rem', fontWeight: 600, color: 'var(--color-text-secondary)', display: 'block', marginBottom: '6px' }}>
                   IMAGE PREVIEW
                 </span>
@@ -727,23 +769,104 @@ export const ClaimReview: React.FC = () => {
             )}
           </div>
 
+          {/* Verdict board: the reviewed text marked up, with one finding per claim */}
+          {reviewResult.claims.length > 0 && (() => {
+            const counts = { ok: 0, bad: 0, review: 0 } as Record<Tone, number>;
+            reviewResult.claims.forEach((c) => { counts[verdictTone(c.verdict)] += 1; });
+            const total = reviewResult.claims.length;
+            const overall: Tone = counts.bad > 0 ? 'bad' : counts.review > 0 ? 'review' : 'ok';
+            const headline =
+              overall === 'bad'
+                ? `${counts.bad} of ${total} ${total === 1 ? 'claim' : 'claims'} must be fixed`
+                : overall === 'review'
+                  ? `${counts.review} of ${total} need a human look`
+                  : `All ${total} ${total === 1 ? 'claim checks' : 'claims check'} out`;
+            const sourceText =
+              reviewedText ||
+              (reviewResult.review_source === 'image'
+                ? reviewResult.ocr_user_text || reviewResult.ocr_raw_text || reviewResult.content_preview
+                : reviewResult.content_preview) ||
+              '';
+            return (
+              <div className="sx-board" id="verdict-board">
+                <div className="sx-board-head">
+                  <div>
+                    <div className="sx-board-kicker">Verdict &middot; {total} {total === 1 ? 'claim' : 'claims'} checked &middot; cite or abstain</div>
+                    <div className={`sx-board-verdict sx-tone-${overall}`}>{headline}</div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'flex-end' }}>
+                    <div className="sx-meter" role="img" aria-label={`${counts.ok} compliant, ${counts.bad} non-compliant, ${counts.review} need review`}>
+                      <span style={{ width: `${(counts.ok / total) * 100}%`, background: 'var(--color-success)' }} />
+                      <span style={{ width: `${(counts.bad / total) * 100}%`, background: 'var(--color-error)' }} />
+                      <span style={{ width: `${(counts.review / total) * 100}%`, background: 'var(--color-review)' }} />
+                    </div>
+                    <div className="sx-board-kicker" style={{ letterSpacing: '0.08em' }}>
+                      <span style={{ color: 'var(--color-success)' }}>&#9670; {counts.ok}</span>{'  '}
+                      <span style={{ color: 'var(--color-error)' }}>&#9670; {counts.bad}</span>{'  '}
+                      <span style={{ color: 'var(--color-review)' }}>&#9670; {counts.review}</span>
+                    </div>
+                  </div>
+                </div>
+                <div className="sx-board-body">
+                  <div className="sx-doc">
+                    <div className="sx-doc-paper">
+                      <span className="sx-doc-label">
+                        {reviewResult.review_source === 'image' ? 'TEXT READ FROM IMAGE' : 'REVIEWED TEXT'}
+                      </span>
+                      {markUpText(sourceText, reviewResult.claims)}
+                    </div>
+                  </div>
+                  <div className="sx-findings">
+                    {reviewResult.claims.map((claim, idx) => {
+                      const tone = verdictTone(claim.verdict);
+                      const ev = claim.evidence[0];
+                      return (
+                        <a
+                          key={`finding-${claim.claim_id || idx}`}
+                          href={`#claim-verdict-card-${claim.claim_id}`}
+                          className={`sx-chip sx-tone-${tone}`}
+                          style={{ textDecoration: 'none', animationDelay: `${idx * 90}ms` }}
+                        >
+                          <span className="sx-diamond" />
+                          <span>
+                            <span className="sx-label">
+                              {idx + 1} &middot; {VERDICT_LABEL[tone].toUpperCase()}
+                            </span>
+                            <strong>&ldquo;{shorten(claim.claim_text, 90)}&rdquo;</strong>{' '}
+                            <span style={{ color: 'var(--color-text-secondary)' }}>{shorten(claim.explanation || '', 170)}</span>
+                            {ev && (
+                              <span style={{ display: 'block', marginTop: '4px', fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--color-text-secondary)' }}>
+                                &#8627; {ev.source_filename}
+                                {ev.page_number ? `, p.${ev.page_number}` : ''}
+                              </span>
+                            )}
+                          </span>
+                        </a>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
           {/* Individual Claims Section */}
           <div>
             <h4 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-deep-aubergine)', marginBottom: '14px' }}>
-              Extracted Claims &amp; Evidence Grounding ({reviewResult.claims.length})
+              Every claim, with its evidence ({reviewResult.claims.length})
             </h4>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {reviewResult.claims.map((claim: ClaimVerdict, idx: number) => (
                 <article
                   key={claim.claim_id || idx}
-                  className="card"
+                  className={`card sx-claim sx-tone-${verdictTone(claim.verdict)}`}
                   id={`claim-verdict-card-${claim.claim_id}`}
                   style={{
                     padding: '20px',
                     borderRadius: 'var(--radius-md)',
                     border: '1px solid var(--color-border)',
-                    background: '#FFFFFF',
+                    background: 'var(--color-surface)',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: '14px',
@@ -761,7 +884,7 @@ export const ClaimReview: React.FC = () => {
                       {claim.risk_warning ? (
                         <span
                           className="badge badge-warning"
-                          style={{ fontSize: '0.72rem', background: '#FEF3C7', color: '#92400E', border: '1px solid #F59E0B' }}
+                          style={{ fontSize: '0.72rem', background: 'rgba(245, 181, 68, 0.08)', color: '#F5B544', border: '1px solid rgba(245, 181, 68, 0.35)' }}
                           title={`Statutory warning: ${claim.risk_warning.description}`}
                         >
                           Universal Risk Warning
@@ -792,7 +915,8 @@ export const ClaimReview: React.FC = () => {
                     <h5 style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--color-text-secondary)', letterSpacing: '0.04em', marginBottom: '4px' }}>
                       Extracted Claim
                     </h5>
-                    <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--color-deep-aubergine)', margin: 0 }}>
+                    <p className="sx-claim-quote" style={{ margin: 0 }}>
+                      <span style={{ color: 'var(--color-text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', marginRight: '8px', verticalAlign: 'middle' }}>{idx + 1}</span>
                       &ldquo;{claim.claim_text}&rdquo;
                     </p>
                   </div>
@@ -802,8 +926,8 @@ export const ClaimReview: React.FC = () => {
                     <div
                       style={{
                         padding: '10px 12px',
-                        background: '#FFFBEB',
-                        border: '1px solid #FCD34D',
+                        background: 'rgba(245, 181, 68, 0.08)',
+                        border: '1px solid rgba(245, 181, 68, 0.35)',
                         borderRadius: 'var(--radius-sm)',
                         display: 'flex',
                         flexDirection: 'column',
@@ -811,22 +935,22 @@ export const ClaimReview: React.FC = () => {
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#B45309' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase', color: '#F5B544' }}>
                           Statutory Warning: {claim.risk_warning.rule_id}
                         </span>
-                        <span style={{ fontSize: '0.70rem', color: '#92400E', fontWeight: 600 }}>
+                        <span style={{ fontSize: '0.70rem', color: '#F5B544', fontWeight: 600 }}>
                           Severity: {claim.risk_warning.severity}
                         </span>
                       </div>
-                      <p style={{ fontSize: '0.84rem', color: '#78350F', margin: 0 }}>
+                      <p style={{ fontSize: '0.84rem', color: '#F5B544', margin: 0 }}>
                         {claim.risk_warning.explanation}
                       </p>
                       {claim.risk_warning.legal_basis && (
-                        <span style={{ fontSize: '0.75rem', color: '#92400E' }}>
+                        <span style={{ fontSize: '0.75rem', color: '#F5B544' }}>
                           <strong>Regulatory Basis:</strong> {claim.risk_warning.legal_basis}
                         </span>
                       )}
-                      <span style={{ fontSize: '0.75rem', color: '#6B7280', fontStyle: 'italic' }}>
+                      <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', fontStyle: 'italic' }}>
                         Guideline Compliance: {claim.compliance_verdict || claim.verdict}{' '}
                         {claim.evidence.length > 0
                           ? '(Grounded in the cited guideline evidence below)'
@@ -850,18 +974,18 @@ export const ClaimReview: React.FC = () => {
                     <div
                       style={{
                         padding: '12px 14px',
-                        background: '#FFFDF0',
-                        border: '1px solid #FFEAA7',
+                        background: 'rgba(245, 181, 68, 0.08)',
+                        border: '1px solid rgba(245, 181, 68, 0.35)',
                         borderRadius: 'var(--radius-sm)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '4px',
                       }}
                     >
-                      <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#B7791F' }}>
+                      <span style={{ fontSize: '0.78rem', fontWeight: 700, textTransform: 'uppercase', color: '#F5B544' }}>
                         Suggested Compliant Correction:
                       </span>
-                      <p style={{ fontSize: '0.88rem', color: '#744210', margin: 0, fontStyle: 'italic' }}>
+                      <p style={{ fontSize: '0.88rem', color: '#F5B544', margin: 0, fontStyle: 'italic' }}>
                         &ldquo;{claim.suggested_correction}&rdquo;
                       </p>
                     </div>
@@ -883,14 +1007,14 @@ export const ClaimReview: React.FC = () => {
                               key={issIdx}
                               style={{
                                 padding: '10px 12px',
-                                background: '#FFF8F6',
-                                border: '1px solid #FED7D7',
+                                background: 'rgba(255, 107, 94, 0.08)',
+                                border: '1px solid rgba(255, 107, 94, 0.3)',
                                 borderRadius: 'var(--radius-sm)',
                                 fontSize: '0.82rem',
                               }}
                             >
                               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                                <strong style={{ color: '#C53030' }}>{iss.category} ({iss.severity})</strong>
+                                <strong style={{ color: '#FF7A6E' }}>{iss.category} ({iss.severity})</strong>
                                 <span style={{ color: 'var(--color-text-secondary)' }}>Phrase: &ldquo;{iss.claim_phrase}&rdquo;</span>
                               </div>
                               <p style={{ margin: '4px 0', color: 'var(--color-text-primary)' }}>{iss.explanation}</p>
@@ -904,7 +1028,7 @@ export const ClaimReview: React.FC = () => {
                           ))}
                         </div>
                       ) : (
-                        <div style={{ padding: '8px 12px', background: '#F0F9F4', border: '1px solid #D2EEDD', borderRadius: 'var(--radius-sm)', fontSize: '0.82rem', color: '#1B6A3B' }}>
+                        <div style={{ padding: '8px 12px', background: 'rgba(52, 211, 153, 0.08)', border: '1px solid rgba(52, 211, 153, 0.28)', borderRadius: 'var(--radius-sm)', fontSize: '0.82rem', color: '#34D399' }}>
                           No material semantic drift detected in retrieved evidence.
                         </div>
                       )}

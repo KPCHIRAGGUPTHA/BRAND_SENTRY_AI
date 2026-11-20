@@ -109,22 +109,22 @@ export const Dashboard: React.FC = () => {
         {/* Supported Claims */}
         <div
           style={{
-            background: '#F0F9F4',
+            background: 'rgba(52, 211, 153, 0.08)',
             padding: '16px',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid #D2EEDD',
+            border: '1px solid rgba(52, 211, 153, 0.28)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#1B6A3B' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#34D399' }}>
               SUPPORTED CLAIMS
             </span>
-            <ShieldCheck size={16} style={{ color: '#1B6A3B' }} />
+            <ShieldCheck size={16} style={{ color: '#34D399' }} />
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#1B6A3B', marginTop: '6px' }}>
+          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#34D399', marginTop: '6px' }}>
             {stats ? stats.total_supported : 0}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#2B834D', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#34D399', marginTop: '4px' }}>
             Affirmatively verified by evidence
           </div>
         </div>
@@ -132,22 +132,22 @@ export const Dashboard: React.FC = () => {
         {/* Contradicted Claims */}
         <div
           style={{
-            background: '#FDF2F2',
+            background: 'rgba(255, 107, 94, 0.08)',
             padding: '16px',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid #F8D7DA',
+            border: '1px solid rgba(255, 107, 94, 0.3)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#A91B2E' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#FF7A6E' }}>
               CONTRADICTED CLAIMS
             </span>
-            <ShieldAlert size={16} style={{ color: '#A91B2E' }} />
+            <ShieldAlert size={16} style={{ color: '#FF7A6E' }} />
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#A91B2E', marginTop: '6px' }}>
+          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#FF7A6E', marginTop: '6px' }}>
             {stats ? stats.total_contradicted : 0}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#BD2130', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#FF7A6E', marginTop: '4px' }}>
             Violates policy or absolute rules
           </div>
         </div>
@@ -155,22 +155,22 @@ export const Dashboard: React.FC = () => {
         {/* Insufficient Evidence */}
         <div
           style={{
-            background: '#FFFDF0',
+            background: 'rgba(245, 181, 68, 0.08)',
             padding: '16px',
             borderRadius: 'var(--radius-md)',
-            border: '1px solid #FFEAA7',
+            border: '1px solid rgba(245, 181, 68, 0.35)',
           }}
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#B7791F' }}>
+            <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#F5B544' }}>
               INSUFFICIENT EVIDENCE
             </span>
-            <HelpCircle size={16} style={{ color: '#B7791F' }} />
+            <HelpCircle size={16} style={{ color: '#F5B544' }} />
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#B7791F', marginTop: '6px' }}>
+          <div style={{ fontSize: '1.8rem', fontWeight: 700, color: '#F5B544', marginTop: '6px' }}>
             {stats ? stats.total_insufficient : 0}
           </div>
-          <div style={{ fontSize: '0.75rem', color: '#975A16', marginTop: '4px' }}>
+          <div style={{ fontSize: '0.75rem', color: '#F5B544', marginTop: '4px' }}>
             Requires manual legal review
           </div>
         </div>
@@ -215,9 +215,9 @@ export const Dashboard: React.FC = () => {
                     </td>
                     <td style={{ padding: '10px 12px' }}>
                       <div style={{ display: 'flex', gap: '4px' }}>
-                        <span style={{ color: '#1B6A3B', fontWeight: 600 }}>{rev.supported}S</span> •{' '}
-                        <span style={{ color: '#A91B2E', fontWeight: 600 }}>{rev.contradicted}C</span> •{' '}
-                        <span style={{ color: '#B7791F', fontWeight: 600 }}>{rev.insufficient}I</span>
+                        <span style={{ color: '#34D399', fontWeight: 600 }}>{rev.supported}S</span> •{' '}
+                        <span style={{ color: '#FF7A6E', fontWeight: 600 }}>{rev.contradicted}C</span> •{' '}
+                        <span style={{ color: '#F5B544', fontWeight: 600 }}>{rev.insufficient}I</span>
                       </div>
                     </td>
                     <td style={{ padding: '10px 12px', color: 'var(--color-text-secondary)', fontSize: '0.78rem' }}>

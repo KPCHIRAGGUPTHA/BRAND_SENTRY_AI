@@ -136,7 +136,7 @@ export const HealthStatus: React.FC = () => {
               </div>
             )}
             <div style={{ marginTop: '6px', fontSize: '0.78rem', color: 'var(--color-text-secondary)' }}>
-              Local verification: <code style={{ fontFamily: 'var(--font-mono)', background: '#F4F6F8', padding: '2px 5px', borderRadius: '4px' }}>uvicorn backend.app.main:app --port 8000</code>
+              Local verification: <code style={{ fontFamily: 'var(--font-mono)', background: 'var(--color-surface-muted)', padding: '2px 5px', borderRadius: '4px' }}>uvicorn backend.app.main:app --port 8000</code>
             </div>
           </div>
         </div>

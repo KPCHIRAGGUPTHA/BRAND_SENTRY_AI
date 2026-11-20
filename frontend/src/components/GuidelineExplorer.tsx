@@ -576,10 +576,10 @@ export const GuidelineExplorer: React.FC = () => {
                 {versionDiff.added.length === 0 && versionDiff.removed.length === 0 && <p>No wording changes.</p>}
                 <ul style={{ paddingLeft: '18px', marginTop: '6px' }}>
                   {versionDiff.removed.map((sentence, i) => (
-                    <li key={`removed-${i}`} style={{ color: '#C53030' }}>Removed: {sentence}</li>
+                    <li key={`removed-${i}`} style={{ color: '#FF7A6E' }}>Removed: {sentence}</li>
                   ))}
                   {versionDiff.added.map((sentence, i) => (
-                    <li key={`added-${i}`} style={{ color: '#1B6A3B' }}>Added: {sentence}</li>
+                    <li key={`added-${i}`} style={{ color: '#34D399' }}>Added: {sentence}</li>
                   ))}
                 </ul>
               </div>

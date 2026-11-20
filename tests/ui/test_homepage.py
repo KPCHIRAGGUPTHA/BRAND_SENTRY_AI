@@ -21,7 +21,7 @@ def test_tc01_homepage_loads_successfully(driver, base_url):
     TC01 — Homepage loads successfully.
     Verify:
     - Frontend loads without fatal errors.
-    - BrandSentry AI primary heading is visible in Hero section.
+    - ShreshtiAI primary heading is visible in Hero section.
     - The compliance review form container (#review) is present.
     - The guideline upload interface (#guidelines) is present.
     """
@@ -30,11 +30,11 @@ def test_tc01_homepage_loads_successfully(driver, base_url):
 
     # Verify primary heading
     hero_title = page.get_visible_element(BrandSentryPage.HERO_TITLE)
-    assert "BrandSentry AI" in hero_title.text
+    assert "shreshtiai" in hero_title.text.lower()
 
     # Verify subtitle
     hero_subtitle = page.get_visible_element(BrandSentryPage.HERO_SUBTITLE)
-    assert "Brand Compliance Intelligence" in hero_subtitle.text
+    assert "check before you file" in hero_subtitle.text.lower()
 
     # Verify compliance review section presence
     assert page.is_element_present(BrandSentryPage.REVIEW_SECTION)
