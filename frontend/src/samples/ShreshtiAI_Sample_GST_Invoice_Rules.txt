@@ -1,0 +1,42 @@
+SHRESHTIAI — SAMPLE GST AND MSME INVOICE RULES
+Document ID: SHRESHTI-DEMO-GST-001  Version: 1.0
+Purpose: Demonstration rule set for checking invoices of micro enterprises.
+Important: This is a simplified sample for a software demonstration, not legal or tax advice. Rules change through notifications and circulars; always confirm with the current law or a chartered accountant.
+
+1. TAX TYPE: INTRA-STATE AND INTER-STATE SUPPLY
+Do not charge IGST on an intra-state supply.
+An intra-state supply must be charged CGST and SGST.
+A supply is intra-state when the location of the supplier and the place of supply are in the same state.
+An inter-state supply must be charged IGST.
+Legal basis: IGST Act 2017, sections 5, 7 and 8; CGST Act 2017, section 9.
+
+2. TAX INVOICE CONTENTS
+A tax invoice must show the GSTIN of the supplier.
+A tax invoice must show the GSTIN of a registered recipient.
+A tax invoice must show a consecutive serial number unique for the financial year.
+A tax invoice must show the date of issue.
+A tax invoice must show the place of supply for an inter-state supply.
+Legal basis: CGST Rules 2017, rule 46.
+
+3. COMPOSITION TAXPAYERS
+A composition taxpayer must not collect tax from the recipient on a supply.
+A composition taxpayer must issue a bill of supply instead of a tax invoice.
+A composition taxpayer is not entitled to input tax credit.
+Legal basis: CGST Act 2017, sections 10(4) and 31(3)(c).
+
+4. INPUT TAX CREDIT
+Do not claim input tax credit without a valid tax invoice.
+Do not claim input tax credit on goods used for personal consumption.
+Input tax credit must be supported by goods or services actually received.
+Legal basis: CGST Act 2017, sections 16(2) and 17(5).
+
+5. RETURNS, LATE FEES AND INTEREST
+A GSTR-3B return filed after the due date attracts a late fee of 50 rupees per day, or 20 rupees per day for a nil return, subject to the notified caps.
+Tax paid late must be paid with interest at 18 percent per year.
+Legal basis: CGST Act 2017, sections 47 and 50.
+
+6. PAYMENTS TO MICRO AND SMALL ENTERPRISES
+A buyer must not delay payment to a micro or small enterprise beyond 45 days from the day of acceptance.
+Where there is no written agreement, a buyer must pay a micro or small enterprise within 15 days.
+Delayed payment attracts compound interest at three times the bank rate notified by the Reserve Bank of India.
+Legal basis: MSMED Act 2006, sections 15 and 16.

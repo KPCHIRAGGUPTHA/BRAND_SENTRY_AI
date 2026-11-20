@@ -1,6 +1,7 @@
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
 import { API_BASE_URL } from '../services/api';
+import { DEMO_EVENTS } from '../samples/gstSample';
 
 export const Header: React.FC = () => {
   return (
@@ -33,6 +34,15 @@ export const Header: React.FC = () => {
           <a href="#status" className="nav-link">
             Status
           </a>
+          <button
+            type="button"
+            className="btn btn-primary tour-launch"
+            id="start-tour"
+            onClick={() => window.dispatchEvent(new Event(DEMO_EVENTS.startTour))}
+            style={{ padding: '5px 12px' }}
+          >
+            Tour
+          </button>
           <a
             href={`${API_BASE_URL}/docs`}
             target="_blank"

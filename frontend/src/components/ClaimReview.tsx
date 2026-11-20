@@ -30,6 +30,7 @@ import {
   ImageOCRResponse,
 } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
+import { SAMPLE_INVOICE_TEXT, DEMO_EVENTS, isGstRulesFile } from '../samples/gstSample';
 
 type Tone = 'ok' | 'bad' | 'review';
 
@@ -105,6 +106,7 @@ export const ClaimReview: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
   const [reviewedText, setReviewedText] = useState<string>('');
+  const [pendingGstScope, setPendingGstScope] = useState<boolean>(false);
 
   const { status, data, checkHealth, isChecking } = useBackendConnection();
 
@@ -150,6 +152,7 @@ export const ClaimReview: React.FC = () => {
         'Backend service is currently waking up from standby (Render cold start). Please wait a moment for the connection to establish before analyzing claims.'
       );
       checkHealth();
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.reviewDone, { detail: { ok: false } }));
       return;
     }
 
@@ -167,6 +170,7 @@ export const ClaimReview: React.FC = () => {
       const res = await reviewMarketingContent(trimmed, docIds, retrievalMode, verIds);
       setReviewedText(trimmed);
       setReviewResult(res);
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.reviewDone, { detail: { ok: true } }));
       setError(null);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -174,6 +178,7 @@ export const ClaimReview: React.FC = () => {
       } else {
         setError('An unexpected error occurred while reviewing marketing copy.');
       }
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.reviewDone, { detail: { ok: false } }));
       checkHealth();
     } finally {
       setLoading(false);
@@ -251,6 +256,7 @@ export const ClaimReview: React.FC = () => {
       });
       setReviewedText(trimmed);
       setReviewResult(res);
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.reviewDone, { detail: { ok: true } }));
       setError(null);
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -270,6 +276,42 @@ export const ClaimReview: React.FC = () => {
     );
     setError(null);
   };
+
+  const fillSampleInvoice = () => {
+    setReviewMode('text');
+    setContent(SAMPLE_INVOICE_TEXT);
+    setError(null);
+    setPendingGstScope(true);
+  };
+
+  // Once the GST rules appear in the scope list, scope the check to them.
+  useEffect(() => {
+    if (!pendingGstScope) return;
+    const version = policyVersions.find((v) => v.is_active && isGstRulesFile(v.filename));
+    const doc = documents.find((d) => isGstRulesFile(d.filename));
+    const value = policyVersions.length > 0 ? version?.version_id : doc?.document_id;
+    if (value) {
+      setSelectedDocId(value);
+      setPendingGstScope(false);
+    }
+  }, [pendingGstScope, policyVersions, documents]);
+
+  // The guided tour drives the page through these events.
+  const submitRef = React.useRef(handleTextSubmit);
+  submitRef.current = handleTextSubmit;
+  useEffect(() => {
+    const onFill = () => fillSampleInvoice();
+    const onRun = () => { void submitRef.current(); };
+    const onGstLoaded = () => { setPendingGstScope(true); loadDocuments(); };
+    window.addEventListener(DEMO_EVENTS.fillInvoice, onFill);
+    window.addEventListener(DEMO_EVENTS.runCheck, onRun);
+    window.addEventListener(DEMO_EVENTS.gstLoaded, onGstLoaded);
+    return () => {
+      window.removeEventListener(DEMO_EVENTS.fillInvoice, onFill);
+      window.removeEventListener(DEMO_EVENTS.runCheck, onRun);
+      window.removeEventListener(DEMO_EVENTS.gstLoaded, onGstLoaded);
+    };
+  }, []);
 
   const getVerdictBadge = (verdict: string) => {
     const tone = verdictTone(verdict);
@@ -331,6 +373,16 @@ export const ClaimReview: React.FC = () => {
                 Marketing Copy to Analyze:
               </label>
               <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  type="button"
+                  id="fill-sample-invoice"
+                  onClick={fillSampleInvoice}
+                  className="btn btn-primary"
+                  style={{ fontSize: '0.75rem', padding: '3px 10px', height: 'auto' }}
+                >
+                  <FileCheck size={13} />
+                  Fill Sample Invoice
+                </button>
                 <button
                   type="button"
                   onClick={fillSampleCopy}

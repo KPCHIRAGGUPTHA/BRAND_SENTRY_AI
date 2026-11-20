@@ -7,6 +7,8 @@ import { ClaimReview } from './components/ClaimReview';
 import { Dashboard } from './components/Dashboard';
 import { AuditHistory } from './components/AuditHistory';
 import { BackendConnectionProvider } from './hooks/useBackendConnection';
+import { Tour } from './components/Tour';
+import { DEMO_EVENTS } from './samples/gstSample';
 import {
   Search,
   CheckCircle,
@@ -35,13 +37,23 @@ export const App: React.FC = () => {
     <BackendConnectionProvider>
       <div className="app-wrapper">
         <Header />
+        <Tour />
         <BackendStatusBanner />
 
         <main className="container" style={{ flex: 1, paddingBottom: '48px' }}>
           {/* Hero Section */}
           <section className="hero-section sx-hero" aria-labelledby="hero-title">
             <div>
-              <span className="sx-eyebrow">Before you file &bull; GAVS Hackathon</span>
+              <span className="sx-eyebrow">Before you file &bull; GAVS Hackathon</span>{' '}
+              <button
+                type="button"
+                className="btn btn-secondary tour-launch"
+                id="start-tour-hero"
+                onClick={() => window.dispatchEvent(new Event(DEMO_EVENTS.startTour))}
+                style={{ marginLeft: '12px', padding: '4px 10px' }}
+              >
+                New here? Take the 60-second tour &rarr;
+              </button>
               <h1 className="hero-title sx-headline" id="hero-title">
                 <span className="sx-brandline">ShreshtiAI</span>
                 <span className="sx-line">Every invoice</span>
@@ -58,10 +70,14 @@ export const App: React.FC = () => {
                 income-tax and MSMED Act rules, cite the exact section for every finding, and abstain rather than guess.
               </p>
               <div className="sx-actions hero-actions">
-                <a href="#review" className="btn btn-primary">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => window.dispatchEvent(new Event(DEMO_EVENTS.startTour))}
+                >
                   <FileSearch size={16} />
-                  <span>Run a check</span>
-                </a>
+                  <span>Try it on a sample invoice</span>
+                </button>
                 <a href="#guidelines" className="btn btn-secondary">
                   <Upload size={16} />
                   <span>Rule library</span>

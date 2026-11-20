@@ -23,6 +23,7 @@ import {
   fetchPolicyVersions,
   activatePolicyVersion,
 } from '../services/api';
+import { loadGstRules, DEMO_EVENTS } from '../samples/gstSample';
 import { GuidelineChunkMatch, DocumentSummary, PolicyVersion, PolicyVersionDiff } from '../types/api';
 import { useBackendConnection } from '../hooks/useBackendConnection';
 
@@ -202,6 +203,35 @@ export const GuidelineExplorer: React.FC = () => {
     }
   };
 
+  const handleLoadGstRules = async () => {
+    if (uploading) return;
+    setUploading(true);
+    setUploadError(null);
+    setUploadSuccess(null);
+    try {
+      const result = await loadGstRules();
+      setUploadSuccess(`Sample GST rules "${result.filename}" are loaded and ready. Use "Fill Sample Invoice" in the check above.`);
+      await loadDocuments();
+      window.dispatchEvent(new Event('guidelines-changed'));
+      setSelectedDocId(result.document_id);
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.gstLoaded, { detail: { document_id: result.document_id } }));
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Could not load the sample GST rules.');
+      window.dispatchEvent(new CustomEvent(DEMO_EVENTS.gstLoaded, { detail: { error: true } }));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  // The guided tour can ask for the GST rules to be loaded.
+  const loadGstRef = React.useRef(handleLoadGstRules);
+  loadGstRef.current = handleLoadGstRules;
+  React.useEffect(() => {
+    const onLoad = () => { void loadGstRef.current(); };
+    window.addEventListener(DEMO_EVENTS.loadGst, onLoad);
+    return () => window.removeEventListener(DEMO_EVENTS.loadGst, onLoad);
+  }, []);
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || searching) return;
@@ -247,17 +277,28 @@ export const GuidelineExplorer: React.FC = () => {
           </span>
         </div>
 
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          id="load-sample-gst"
+          onClick={handleLoadGstRules}
+          disabled={uploading}
+        >
+          <FileCheck size={14} />
+          <span>Load Sample GST Rules</span>
+        </button>
         <button
           type="button"
           className="btn btn-secondary"
           id="load-sample-guideline"
           onClick={handleLoadSample}
           disabled={uploading}
-          style={{ marginBottom: '12px' }}
         >
           <FileCheck size={14} />
           <span>Load Sample Marketing Compliance Guidelines</span>
         </button>
+        </div>
 
         <form onSubmit={handleUpload}>
           <label
